@@ -18,7 +18,7 @@ export default class Crypto {
 	 * @readonly
 	 * @type {string}
 	 */
-	private static readonly secret_key: string = "_p=/1#C>Mzi%5gkbFAamRh246.I(jiz/sow|rk9Z&tU5[}hve0F)AK2lX590WqUmPdAy#LZh){N^JR1H?v']s=RIE*!13-hF<mn.'SpaLQ~+9@d!o$`r#:qFX2vH6AE[>Bus*,.iw^tW}hn#Q_G)el=8Y:zfq`@~UBtZO-.3lg6T{w'>#-A]4}jQ(,P=RI8a;.v*:Cl?<-8Mc)y~WPS@7}>24T.fU+kwGL|1pj^Z8XHYT}xueK94k>[bMNI0lEuO|)prR3}9kg;y{P[$G5a&2N~0'v`G_Da|wULy[-xHZ$d]C<Pq#o4!t9{WgDv]bM_1VIk<du@haO;ES[yGYi#(%7PLT82hMn7tg3^D&6!s)*0I5p$-+"
+	private static readonly secret_key: string = ""
 
 	/**
 	 * @property chars

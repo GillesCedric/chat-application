@@ -1,0 +1,8 @@
+{
+	"development": {
+		"DATABASE_URL": "mongodb://127.0.0.1/chat-communication",
+		"FRONT_URL": "http://localhost:4000",
+		"BACK_URL": "http://localhost:8001"
+	},
+	"production": {}
+}
