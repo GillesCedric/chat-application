@@ -1,80 +1,77 @@
+//@ts-ignore
 import Conversation from '@/components/conversation'
 import Image from 'next/image'
 
+let conversations: string[] = [
+  "Thomas",
+  "Gilles",
+  "Kaoutar",
+  "Killian",
+  "Gauthier",
+  "Sana"
+]
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div>
+      <div className='container w-full h-screen'>
 
-        {
-          //<!-- Page content -->
-        }
-        <div className="bg-gray-100 p-2">
-          <div className="container mx-auto flex">
-            {
-              //<!-- Left top rectangle -->
-            }
-            <div className="w-1/12 p-2 border-r border-gray-300">
-              <h2 className="font-bold text-lg text-center">Vos Contacts</h2>
-            </div>
+          {
+            //<!-- Top -->
+          }
+        <div className='container w-full flex'>
+          <div className="w-2/12 border-r border-gray-300 font-bold text-lg text-center p-4">
+            Vos Contacts
+          </div>
 
-            {
-              //<!-- Right top rectangle -->
-            }
-            <div className="w-11/12 p-2">
-              <h2 className="font-bold ml-4">Nom et prénom du contact</h2>
-            </div>
+          <div className=" w-10/12 font-bold text-lg p-4">
+            Nom et prénom du contact
           </div>
         </div>
 
-        {
-          //<!-- Grand rectangle -->
-        }
-        <div className="bg-gray-100 p-2">
-          <div className="container mx-auto flex">
+            {
+              //<!-- Middle -->
+            }
+        <div className="bg-gray-100 container w-full h-5/6 flex">
             {
               //<!-- Left side of the grand rectangle (2/10 width) -->
             }
-            <div className="w-1/12 p-2 border-r border-gray-300 flex flex-col">
+            <div className="w-2/12 border-r border-gray-300 flex flex-col p-2">
               {
                 //<!-- List of buttons with spacing -->
+                conversations.map((value) => <Conversation name={value} />
+                )
               }
-              <Conversation />
-              <Conversation />
-              <Conversation />
-              <Conversation />
-              <Conversation />
-              <Conversation />
 
+            </div>
+
+
+            {
+              //<!-- Right side of the grand rectangle (8/10 width) -->
+            }
+            <div className="w-10/12 p-2">
             </div>
           </div>
 
           {
-            //<!-- Right side of the grand rectangle (8/10 width) -->
+              //<!-- Bottom -->
           }
-          <div className="w-11/12 p-2">
-          </div>
-        </div>
 
+          <div className="bg-gray-100 border-gray-300 container w-full h-1/6 flex">
+              {
+                //<!-- Left bottom rectangle -->
+              }
+              <div className="w-2/12 p-2 border-r border-gray-300 flex items-center justify-center">
+                <button className="bg-blue-500 text-white font-bold py-1 px-1 hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-700">Ajouter un contact</button>
+              </div>
 
-        <div className="bg-gray-100 border-b border-gray-300 p-2 absolute inset-x-0 bottom-11">
-          <div className="container mx-auto flex">
-            {
-              //<!-- Left bottom rectangle -->
-            }
-            <div className="w-1/12 p-2 border-r border-gray-300">
-              <button className="bg-blue-500 text-white font-bold py-1 px-1 rounded-full hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-700">Ajouter un contact</button>
+              {
+                //<!-- Right bottom rectangle -->
+              }
+              <div className="w-10/12 p-2">
+                <textarea className="w-full text-gray-400" placeholder="Start typing here..."></textarea>
+              </div>
             </div>
 
-            {
-              //<!-- Right bottom rectangle -->
-            }
-            <div className="w-11/12 p-2">
-              <textarea className="w-full text-gray-400" placeholder="Start typing here..."></textarea>
-            </div>
-          </div>
-        </div>
       </div>
-    </main>
   )
 }
