@@ -1,6 +1,8 @@
-import User from "models/User";
+import { User } from "models/User";
 import { Request, Response } from "express";
 import * as async from "async";
+import * as bcrypt from "bcrypt";
+import JWTUtils from "utils/JWTUtils";
 /**
  * @class UserController
  * @description this class is used to handle the request from the User endpoint
@@ -26,6 +28,45 @@ export default class UserController {
         (done: any) => {
           User.findOne({
             where: { username: username },
+          })
+            .then((userFound) => {
+              done(null, userFound);
+            })
+            .catch((error) => {
+              console.log(error);
+              return res.status(500).json({
+                error: "User verfication impossible",
+              });
+            });
+        },
+        (userFound: User, done: any) => {
+          if (!userFound) {
+            return res.status(401).json({
+              error: "Incorrect username",
+            });
+          }
+          bcrypt.compare(
+            password,
+            userFound.password,
+            (error: Error, result: boolean) => {
+              console.log(error);
+              done(null, userFound, result);
+            }
+          );
+        },
+        (userFound: User, result: boolean, done: any) => {
+          if (!result) {
+            console.log("Incorrect password");
+            return res.status(500).json({
+              error: "Incorrect password",
+            });
+          }
+          done(userFound);
+        },
+        (userFound: User, done: any) => {
+          return res.status(200).json({
+            userId: userFound.id,
+            token: JWTUtils.generateTokenForUser(userFound),
           });
         },
       ]);
