@@ -8,7 +8,6 @@ import * as fs from 'fs'
 import { createServer, Server as HTTPServer } from "http"
 import { Server } from "socket.io"
 import mongoose from 'mongoose'
-import BasicAuthentication from './middlewares/BasicAuthentication'
 import Routes from './routes/Routes'
 
 
