@@ -1,4 +1,4 @@
-import User from "models/User"
+import User from "../models/User"
 import * as jwt from 'jsonwebtoken'
 
 /**
@@ -15,14 +15,14 @@ export default abstract class JWTUtils {
 	/**
    * @method generateTokenForUser
    * @description this method is used to generate and sign a token for a specific user
-	 * @param {User} user the user
+	 * @param {string} id the user id
    * @readonly
 	 * @static
    * @private
    * @returns {string} the generated token
    */
-	public static readonly generateTokenForUser: (user: User) => string = (user: User): string => {
-		return jwt.sign({ userId: user.id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
+	public static readonly generateTokenForUser: (id: string) => string = (id: string): string => {
+		return jwt.sign({ userId: id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
 	}
 
 	/**
