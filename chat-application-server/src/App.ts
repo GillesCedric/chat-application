@@ -1,11 +1,15 @@
 import * as express from 'express'
 import * as bodyParser from "body-parser"
 import * as cors from "cors"
+import * as dotenv from 'dotenv'
 import helmet from "helmet"
-import * as dotenv from "dotenv"
-import {createServer, Server as HTTPServer} from "http"
+import * as path from 'path'
+import * as fs from 'fs'
+import { createServer, Server as HTTPServer } from "http"
 import { Server } from "socket.io"
 import mongoose from 'mongoose'
+import BasicAuthentication from './middlewares/BasicAuthentication'
+import Routes from './routes/Routes'
 
 
 /**
@@ -46,6 +50,15 @@ export default class App {
     private _httpServer: HTTPServer
 
     /**
+     * @property _routes
+     * @description the Routes instance
+     * @private
+     * @readonly
+     * @type {Routes}
+     */
+    private readonly _routes: Routes = new Routes()
+
+    /**
      * @method get
      * @description this method is used to get a specific express Application instance
      * @public
@@ -82,10 +95,17 @@ export default class App {
      * @constructor
      */
     constructor() {
+
+        const envFileBasePath = path.join(path.dirname(process.cwd()), 'library', 'config')
         dotenv.config({
-            path: `.env.${process.env.NODE_ENV || "development"}`
+            path: fs.existsSync(path.join(envFileBasePath, '.env.development')) ? path.join(envFileBasePath, '.env.development') : path.join(envFileBasePath, 'library', 'config', '.env')
+            
         })
+
         this.config()
+
+        this._routes.routes(this.app)
+
     }
 
     /**
@@ -111,11 +131,13 @@ export default class App {
         // serving static files 
         this.app.use(express.static('public'))
 
+        this.app.use(BasicAuthentication.authenticate)
+
         this._httpServer = createServer(this.app)
 
         //connection to the database
         mongoose
-            .connect(process.env.MONGO_URL)
+            .connect(process.env.DATABASE_URL)
             .then(() => console.log("connected to mongodb"))
             .catch((err) => console.log("can't connect to mongodb: ", err));
 

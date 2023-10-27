@@ -1,4 +1,5 @@
 import _Crypto from 'crypto'
+import * as keys from "../../config/keys.json"
 
 /**
  * @class Crypto
@@ -10,15 +11,6 @@ import _Crypto from 'crypto'
  */
 export default class Crypto {
 
-	/**
-	 * @property secret_key
-	 * @description the secret key of the application for all operations
-	 * @private
-	 * @static
-	 * @readonly
-	 * @type {string}
-	 */
-	private static readonly secret_key: string = ""
 
 	/**
 	 * @property chars
@@ -78,7 +70,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded SHA256 hash
 		 */
-		sha256: (message: string): string => _Crypto.SHA256(message).toString(_Crypto.enc.Base64),
+		//sha256: (message: string): string => _Crypto.SHA256(message).toString(_Crypto.enc.Base64),
 
 		/**
 		 * @function sha512
@@ -87,7 +79,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded sha512 hash
 		 */
-		sha512: (message: string): string => _Crypto.SHA512(message).toString(_Crypto.enc.Base64),
+		//sha512: (message: string): string => _Crypto.SHA512(message).toString(_Crypto.enc.Base64),
 	}
 
 	/**
@@ -97,7 +89,7 @@ export default class Crypto {
 	 * @param {string} message s.e.
 	 * @returns {string} the encoded AES hash
 	 */
-	public static readonly encrypt: (message: any) => string = (message: any): string => _Crypto.AES.encrypt(JSON.stringify(message), this.secret_key).toString()
+	//public static readonly encrypt: (message: any) => string = (message: any): string => _Crypto.AES.encrypt(JSON.stringify(message), this.secret_key).toString()
 
 	/**
 	* @function decrypt
@@ -106,7 +98,7 @@ export default class Crypto {
 	* @param {string} message s.e.
 	* @returns {string} the decoded string
 	*/
-	public static readonly decrypt: (message: string) => any = (message: string): any => JSON.parse(_Crypto.enc.Utf8.stringify(_Crypto.AES.decrypt(message, this.secret_key)))
+	//public static readonly decrypt: (message: string) => any = (message: string): any => JSON.parse(_Crypto.enc.Utf8.stringify(_Crypto.AES.decrypt(message, this.secret_key)))
 
 	/**
 	 * @function encode
