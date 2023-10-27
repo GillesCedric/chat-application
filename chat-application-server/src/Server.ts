@@ -33,7 +33,7 @@ class Server {
      */
     constructor() {
         this.app = new App()
-        this.port = process.env.PORT
+        this.port = process.env.BACK_PORT
     }
 
     /**
@@ -47,6 +47,7 @@ class Server {
         this.app.socketServer.on(SocketKeywords.connection, (socket: Socket) => {
             socket.on(SocketKeywords.join, (data) => {
                 socket.join(data.chat_id);
+                console.log(`client ${data.chat_id} joined`)
             })
         })
 
