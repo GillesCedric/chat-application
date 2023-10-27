@@ -11,7 +11,7 @@ const notificationSchema = new mongoose.Schema({
     ref: 'User', 
     required: true,
   },
-  message: [
+  chat: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Chat', 
