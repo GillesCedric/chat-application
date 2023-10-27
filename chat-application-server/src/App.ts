@@ -6,9 +6,10 @@ import helmet from "helmet"
 import * as path from 'path'
 import * as fs from 'fs'
 import { createServer, Server as HTTPServer } from "http"
-import { Server } from "socket.io"
+import { Server as SocketServer } from "socket.io"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
+import BasicAuthentication from 'middlewares/BasicAuthentication'
 
 
 /**
@@ -37,7 +38,7 @@ export default class App {
      * @readonly
      * @type {express.Application}
      */
-    private _socketServer: Server
+    private _socketServer: SocketServer
 
     /**
      * @property _app
@@ -64,7 +65,7 @@ export default class App {
      * @static
      * @returns {express.Application} the express Application instance
      */
-    public get socketServer(): Server {
+    public get socketServer(): SocketServer {
         return this._socketServer
     }
 
@@ -95,9 +96,8 @@ export default class App {
      */
     constructor() {
 
-        const envFileBasePath = path.join(path.dirname(process.cwd()), 'library', 'config')
         dotenv.config({
-            path: fs.existsSync(path.join(envFileBasePath, '.env.development')) ? path.join(envFileBasePath, '.env.development') : path.join(envFileBasePath, 'library', 'config', '.env')
+            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
             
         })
 
@@ -140,7 +140,7 @@ export default class App {
             .then(() => console.log("connected to mongodb"))
             .catch((err) => console.log("can't connect to mongodb: ", err));
 
-        this._socketServer = new Server(this._httpServer, {
+        this._socketServer = new SocketServer(this._httpServer, {
             cors: {
                 origin: process.env.FRONT_URL,
             },
