@@ -1,4 +1,3 @@
-import User from "../models/User"
 import * as jwt from 'jsonwebtoken'
 
 /**
@@ -10,7 +9,7 @@ import * as jwt from 'jsonwebtoken'
  * @default
  * @since 22/05/2022
  */
-export default abstract class JWTUtils {
+export default abstract class JWT {
 
 	/**
    * @method generateTokenForUser

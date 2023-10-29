@@ -1,5 +1,5 @@
-import _Crypto from 'crypto'
-import * as keys from "../../config/keys.json"
+import * as crypto from 'crypto'
+import * as keys from "../../../../library/config/keys.json"
 
 /**
  * @class Crypto
@@ -61,7 +61,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded MD5 hash
 		 */
-		md5: (message: string): string => _Crypto.createHash(message).toString(),
+		md5: (message: string): string => crypto.createHash(message).toString(),
 
 		/**
 		 * @function sha256
