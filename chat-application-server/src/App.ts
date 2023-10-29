@@ -9,7 +9,7 @@ import { createServer, Server as HTTPServer } from "http"
 import { Server as SocketServer } from "socket.io"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
-import BasicAuthentication from 'middlewares/BasicAuthentication'
+import BasicAuthentication from './middlewares/BasicAuthentication'
 
 
 /**

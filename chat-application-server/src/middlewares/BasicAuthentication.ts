@@ -1,5 +1,6 @@
 import * as express from 'express'
 import { createServer, Server as HTTPServer } from "http"
+import Crypto from '../modules/crypto/Crypto'
 
 
 /**
@@ -28,11 +29,11 @@ export default class BasicAuthentication {
      * @returns {void}
      */
     public static readonly authenticate = (request: express.Request, response: express.Response, next: express.NextFunction): any => {
-        // check for basic auth header
+        // check for basic auth heade
         if (request.headers.authorization && request.headers.authorization.indexOf('Basic ') != -1) {
-            const authorization = request.headers.authorization.split(' ')[1].split(':')
-            console.log(request.headers.authorization)
-            if(authorization[0] == process.env.CLIENT_USERNAME && authorization[1] == process.env.CLIENT_PASSWORD)
+            const authorization = Crypto.atob(request.headers.authorization.split(' ')[1]).split(':')
+            console.log(authorization)
+            if(authorization[0] == process.env.CLIENT_APP_USERNAME && authorization[1] == process.env.CLIENT_APP_PASSWORD)
                 next()
             else
                 return response.status(401).json({ message: 'Incorrect Authorization Header' });
