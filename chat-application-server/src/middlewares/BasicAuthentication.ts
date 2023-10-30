@@ -29,7 +29,7 @@ export default class BasicAuthentication {
      * @returns {void}
      */
     public static readonly authenticate = (request: express.Request, response: express.Response, next: express.NextFunction): any => {
-        // check for basic auth heade
+        // check for basic auth header
         if (request.headers.authorization && request.headers.authorization.indexOf('Basic ') != -1) {
             const authorization = Crypto.atob(request.headers.authorization.split(' ')[1]).split(':')
             console.log(authorization)
