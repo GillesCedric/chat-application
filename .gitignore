@@ -56,7 +56,9 @@
 
 # dotenv environment variables file
 /chat-application-*/.env
-/library/config/.env
+/chat-application-*/.env.development
+.env
+.env.development
 
 # next.js build output
 /chat-application-*/.next
