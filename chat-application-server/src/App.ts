@@ -12,6 +12,7 @@ import Routes from './routes/Routes'
 import BasicAuthentication from './middlewares/BasicAuthentication'
 
 
+
 /**
  * @class App
  * @author Gilles Cédric
@@ -98,7 +99,7 @@ export default class App {
 
         dotenv.config({
             path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
-            
+
         })
 
         this.config()
