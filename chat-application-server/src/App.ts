@@ -23,6 +23,7 @@ import BasicAuthentication from './middlewares/BasicAuthentication'
  */
 export default class App {
 
+    
     /**
      * @property _app
      * @description the express Application instance
