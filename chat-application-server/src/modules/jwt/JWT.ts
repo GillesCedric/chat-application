@@ -1,4 +1,5 @@
-import * as jwt from 'jsonwebtoken'
+import User from "schemaModels/UserModel";
+import * as jwt from "jsonwebtoken";
 
 /**
  * @class JWTUtils
@@ -13,7 +14,15 @@ export default abstract class JWTUtils {
   /**
    * @method generateTokenForUser
    * @description this method is used to generate and sign a token for a specific user
+<<<<<<< HEAD:chat-application-server/src/utils/JWTUtils.ts
+<<<<<<< HEAD
+   * @param {User} user the user
+=======
 	 * @param {string} id the user id
+>>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
+=======
+	 * @param {string} id the user id
+>>>>>>> 61faf41140fb10ab0cb29c72231596f2d97f42e5:chat-application-server/src/modules/jwt/JWT.ts
    * @readonly
    * @static
    * @private

@@ -1,21 +1,44 @@
-import mongoose from "mongoose";
+class Chat {
+  private _id: string;
 
-const chatSchema = new mongoose.Schema({
-  content: {
-    type: String,
-    required: true,
-  },
-  deleted: {
-    type: Boolean,
-    default: false,
-  },
-  sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
-    required: true,
-  },
-});
+  private _content: string;
 
-const Chat = mongoose.model('Chat', chatSchema);
+  private _deleted: boolean;
 
-export default Chat;
+  private _sender: User;
+
+  constructor(id: string, content: string, deleted: boolean, sender: User) {
+    this.content = content;
+    this.deleted = deleted;
+    this.sender = sender;
+    this.id = id;
+  }
+
+  public get content(): string {
+    return this._content;
+  }
+  public set content(value: string) {
+    this._content = value;
+  }
+
+  public get sender(): User {
+    return this._sender;
+  }
+  public set sender(value: User) {
+    this._sender = value;
+  }
+
+  public get deleted(): boolean {
+    return this._deleted;
+  }
+  public set deleted(value: boolean) {
+    this._deleted = value;
+  }
+
+  public get id(): string {
+    return this._id;
+  }
+  public set id(value: string) {
+    this._id = value;
+  }
+}

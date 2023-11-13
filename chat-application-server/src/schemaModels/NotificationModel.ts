@@ -3,23 +3,20 @@ import mongoose from "mongoose";
 const notificationSchema = new mongoose.Schema({
   conversation: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Conversation', 
+    ref: 'ConversationModel', 
     required: true,
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'UserModel', 
     required: true,
   },
   chat: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Chat', 
+      ref: 'ChatModel', 
     },
   ],
 });
 
-const Notification = mongoose.model('Notification', notificationSchema);
-
-export default Notification;
-
+export const NotificationModel = mongoose.model("NotificationModel", notificationSchema);
