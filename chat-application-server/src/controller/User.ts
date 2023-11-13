@@ -1,4 +1,4 @@
-import { User } from "models/User";
+import { User } from "schemaModels/User";
 import { Request, Response } from "express";
 import * as async from "async";
 import * as bcrypt from "bcrypt";
@@ -57,7 +57,7 @@ export default class UserController {
         (userFound: User, result: boolean, done: any) => {
           if (!result) {
             console.log("Incorrect password");
-            return res.status(500).json({
+            return res.status(401).json({
               error: "Incorrect password",
             });
           }

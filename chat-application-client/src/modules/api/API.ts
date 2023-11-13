@@ -1,6 +1,6 @@
 import axios from "axios"
 import Cookies from "../cookies/cookies"
-import Crypto from "../../../../library/modules/crypto/crypto"
+import Crypto from "../../../../library/modules/crypto/Crypto"
 
 /**
  * @class API

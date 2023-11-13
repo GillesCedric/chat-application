@@ -133,7 +133,7 @@ export default class Crypto {
 	 * @param {number} length {10} the length of the word
 	 * @returns {string} s.e.
 	 */
-	 public static readonly random = (length: number = this.randomLength): string => {
+	public static readonly random = (length: number = this.randomLength): string => {
 		let text = ''
 		for (let i = 0; i < length; i++) text += this.chars2[Math.random() * this.chars.length]
 		return text

@@ -1,5 +1,10 @@
-import User from "models/User";
+<<<<<<< HEAD
+import User from "schemaModels/User";
 import * as jwt from "jsonwebtoken";
+=======
+import User from "../models/User"
+import * as jwt from 'jsonwebtoken'
+>>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
 
 /**
  * @class JWTUtils
@@ -14,12 +19,17 @@ export default abstract class JWTUtils {
   /**
    * @method generateTokenForUser
    * @description this method is used to generate and sign a token for a specific user
+<<<<<<< HEAD
    * @param {User} user the user
+=======
+	 * @param {string} id the user id
+>>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
    * @readonly
    * @static
    * @private
    * @returns {string} the generated token
    */
+<<<<<<< HEAD
   public static readonly generateTokenForUser: (user: User) => string = (
     user: User
   ): string => {
@@ -27,6 +37,11 @@ export default abstract class JWTUtils {
       expiresIn: process.env.TOKEN_DELAY,
     });
   };
+=======
+	public static readonly generateTokenForUser: (id: string) => string = (id: string): string => {
+		return jwt.sign({ userId: id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
+	}
+>>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
 
   /**
    * @method parseToken
