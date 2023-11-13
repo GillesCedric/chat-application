@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from 'express'
-import Crypto from '../modules/crypto/Crypto'
+import {Crypto} from '../modules/crypto/Crypto'
 
 
 /**

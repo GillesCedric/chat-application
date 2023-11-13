@@ -1,5 +1,6 @@
 import * as crypto from 'crypto'
 
+export type encryptionKeys = 'token' | 'password' | 'basic' | 'all_data' | 'database'
 /**
  * @class Crypto
  * @author Gilles Cédric
@@ -8,7 +9,9 @@ import * as crypto from 'crypto'
  * @default
  * @since 23/05/2022
  */
-export default class Crypto {
+export class Crypto {
+
+	private readonly encryption_method: string = 'aes-256-cbc'
 
 
 	/**
@@ -42,7 +45,7 @@ export default class Crypto {
 	 * @readonly
 	 * @type {number}
 	 */
-	private static readonly randomLength: number = 10
+	protected static readonly randomLength: number = 10
 
 	/**
 	 * @property secret_key
@@ -88,7 +91,12 @@ export default class Crypto {
 	 * @param {string} message s.e.
 	 * @returns {string} the encoded AES hash
 	 */
-	//public static readonly encrypt: (message: any) => string = (message: any): string => _Crypto.AES.encrypt(JSON.stringify(message), this.secret_key).toString()
+	public static readonly encrypt: (data: any, key: encryptionKeys) => string = (data: any, key: encryptionKeys): string => {
+		const cipher = crypto.createCipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+		return Buffer.from(
+			cipher.update(data, 'utf8', 'hex') + cipher.final('hex')
+		).toString('base64')
+	}
 
 	/**
 	* @function decrypt
@@ -97,7 +105,14 @@ export default class Crypto {
 	* @param {string} message s.e.
 	* @returns {string} the decoded string
 	*/
-	//public static readonly decrypt: (message: string) => any = (message: string): any => JSON.parse(_Crypto.enc.Utf8.stringify(_Crypto.AES.decrypt(message, this.secret_key)))
+	public static readonly decrypt: (data: string, key: encryptionKeys) => any = (data: string, key: encryptionKeys): any => {
+		const buff = Buffer.from(data, 'base64')
+		const decipher = crypto.createDecipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+		return (
+			decipher.update(buff.toString('utf8'), 'hex', 'utf8') +
+			decipher.final('utf8')
+		)
+	}
 
 	/**
 	 * @function encode
