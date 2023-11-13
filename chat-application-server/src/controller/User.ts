@@ -1,8 +1,7 @@
 import { User } from "models/User";
 import { Request, Response } from "express";
-import * as async from "async";
 import * as bcrypt from "bcrypt";
-import JWTUtils from "utils/JWTUtils";
+import JWTUtils from "../modules/jwt/JWT";
 /**
  * @class UserController
  * @description this class is used to handle the request from the User endpoint
