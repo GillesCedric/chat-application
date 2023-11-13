@@ -3,7 +3,7 @@ class User {
 
   private _lastname: string;
 
-  private _username: string;
+  private _Username: string;
 
   private _firstname: string;
 
@@ -18,8 +18,9 @@ class User {
   private _friends: User[];
 
   constructor(
+    id: string,
     lastname: string,
-    username: string,
+    Username: string,
     firstname: string,
     tel: string,
     email: string,
@@ -29,12 +30,13 @@ class User {
   ) {
     this.lastname = lastname;
     this.firstname = firstname;
-    this.username = username;
+    this.Username = Username;
     this.email = email;
     this.tel = tel;
     this.password = password;
     this.isVerified = isVerified;
     this.friends = friends;
+    this.id = id;
   }
 
   public get lastname(): string {
@@ -50,11 +52,11 @@ class User {
   public set friends(value: User[]) {
     this._friends = value;
   }
-  public get username(): string {
-    return this._username;
+  public get Username(): string {
+    return this._Username;
   }
-  public set username(value: string) {
-    this._username = value;
+  public set Username(value: string) {
+    this._Username = value;
   }
 
   public get password(): string {

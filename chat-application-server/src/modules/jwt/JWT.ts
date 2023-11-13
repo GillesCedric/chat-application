@@ -1,4 +1,4 @@
-import User from "schemaModels/User";
+import User from "schemaModels/UserModel";
 import * as jwt from "jsonwebtoken";
 
 /**

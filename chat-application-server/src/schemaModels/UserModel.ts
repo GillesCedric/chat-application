@@ -33,9 +33,9 @@ const userSchema = new mongoose.Schema({
   friends: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "UserModel",
     },
   ],
 });
 
-export const User = mongoose.model("User", userSchema);
+export const UserModel = mongoose.model("UserModel", userSchema);

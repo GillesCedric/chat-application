@@ -11,11 +11,9 @@ const chatSchema = new mongoose.Schema({
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
+    ref: 'UserModel', 
     required: true,
   },
 });
 
-const Chat = mongoose.model('Chat', chatSchema);
-
-export default Chat;
+export const ChatModel = mongoose.model('ChatModel', chatSchema);

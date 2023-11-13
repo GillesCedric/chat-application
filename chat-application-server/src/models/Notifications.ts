@@ -1,5 +1,5 @@
-class Notification {
-  private _id: Conversation;
+class Notifications {
+  private _id: string;
 
   private _conversation: Conversation;
 
@@ -7,10 +7,11 @@ class Notification {
 
   private _sender: User;
 
-  constructor(conversation: Conversation, chat: Chat[], sender: User) {
+  constructor(id: string , conversation: Conversation, chat: Chat[], sender: User) {
     this.conversation = conversation;
     this.chat = chat;
     this.sender = sender;
+    this.id = id;
   }
 
   public get conversation(): Conversation {
@@ -34,10 +35,10 @@ class Notification {
     this._chat = value;
   }
 
-  public get id(): Conversation {
+  public get id(): string {
     return this._id;
   }
-  public set id(value: Conversation) {
+  public set id(value: string) {
     this._id = value;
   }
 }

@@ -37,7 +37,7 @@ export default class App {
    * @readonly
    * @type {express.Application}
    */
-  private _socketServer: Server;
+  private _socketServer: SocketServer;
 
     /**
      * @property _app
@@ -46,7 +46,7 @@ export default class App {
      * @readonly
      * @type {express.Application}
      */
-    private _socketServer: SocketServer
+    private _httpServer: HTTPServer
 
   /**
    * @property _routes
@@ -64,7 +64,7 @@ export default class App {
    * @static
    * @returns {express.Application} the express Application instance
    */
-  public get socketServer(): Server {
+  public get socketServer(): SocketServer {
     return this._socketServer;
   }
 
@@ -75,8 +75,8 @@ export default class App {
      * @static
      * @returns {express.Application} the express Application instance
      */
-    public get socketServer(): SocketServer {
-        return this._socketServer
+    public get httpServer(): HTTPServer {
+        return this._httpServer
     }
 
   /**
