@@ -1,5 +1,5 @@
-import Cookies from "../cookies/cookies"
-import {Crypto} from "../../../../chat-application-server/src/modules/crypto/Crypto"
+import Cookies from "../cookies/Cookies"
+import { Crypto } from "../../../../chat-application-server/src/modules/crypto/Crypto"
 
 /**
  * @class API
