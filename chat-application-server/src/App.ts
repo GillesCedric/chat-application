@@ -1,15 +1,16 @@
-import * as express from "express";
-import * as bodyParser from "body-parser";
-import * as cors from "cors";
-import * as dotenv from "dotenv";
-import helmet from "helmet";
-import * as path from "path";
-import * as fs from "fs";
-import { createServer, Server as HTTPServer } from "http";
-import { Server } from "socket.io";
-import mongoose from "mongoose";
-import Routes from "./routes/Routes";
-import BasicAuthentication from "middlewares/BasicAuthentication";
+import * as express from 'express'
+import * as bodyParser from "body-parser"
+import * as cors from "cors"
+import * as dotenv from 'dotenv'
+import helmet from "helmet"
+import * as path from 'path'
+import * as fs from 'fs'
+import { createServer, Server as HTTPServer } from "http"
+import { Server as SocketServer } from "socket.io"
+import mongoose from 'mongoose'
+import Routes from './routes/Routes'
+import BasicAuthentication from './middlewares/BasicAuthentication'
+
 
 /**
  * @class App
@@ -38,14 +39,14 @@ export default class App {
    */
   private _socketServer: Server;
 
-  /**
-   * @property _app
-   * @description the express Application instance
-   * @private
-   * @readonly
-   * @type {express.Application}
-   */
-  private _httpServer: HTTPServer;
+    /**
+     * @property _app
+     * @description the express Application instance
+     * @private
+     * @readonly
+     * @type {express.Application}
+     */
+    private _socketServer: SocketServer
 
   /**
    * @property _routes
@@ -67,16 +68,16 @@ export default class App {
     return this._socketServer;
   }
 
-  /**
-   * @method get
-   * @description this method is used to get a specific express Application instance
-   * @public
-   * @static
-   * @returns {express.Application} the express Application instance
-   */
-  public get httpServer(): HTTPServer {
-    return this._httpServer;
-  }
+    /**
+     * @method get
+     * @description this method is used to get a specific express Application instance
+     * @public
+     * @static
+     * @returns {express.Application} the express Application instance
+     */
+    public get socketServer(): SocketServer {
+        return this._socketServer
+    }
 
   /**
    * @method get
@@ -106,8 +107,10 @@ export default class App {
 
     this.config();
 
-    this._routes.routes(this.app);
-  }
+        dotenv.config({
+            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
+            
+        })
 
   /**
    * @method config
@@ -138,11 +141,26 @@ export default class App {
 
     this._httpServer = createServer(this.app);
 
-    //connection to the database
-    mongoose
-      .connect(process.env.DATABASE_URL)
-      .then(() => console.log("connected to mongodb"))
-      .catch((err) => console.log("can't connect to mongodb: ", err));
+        // serving static files 
+        this.app.use(express.static('public'))
+
+        this.app.use(BasicAuthentication.authenticate)
+
+        this._httpServer = createServer(this.app)
+
+        //connection to the database
+        mongoose
+            .connect(process.env.DATABASE_URL)
+            .then(() => console.log("connected to mongodb"))
+            .catch((err) => console.log("can't connect to mongodb: ", err));
+
+        this._socketServer = new SocketServer(this._httpServer, {
+            cors: {
+                origin: process.env.FRONT_URL,
+            },
+        });
+
+    }
 
     this._socketServer = new Server(this._httpServer, {
       cors: {

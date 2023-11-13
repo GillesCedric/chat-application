@@ -38,7 +38,7 @@ export default function Home() {
             <div className="w-2/12 border-r border-gray-300 flex flex-col p-2">
               {
                 //<!-- List of buttons with spacing -->
-                conversations.map((value) => <Conversation name={value} />
+                conversations.map((value, index) => <Conversation key={index} name={value} />
                 )
               }
 

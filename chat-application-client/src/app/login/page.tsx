@@ -23,7 +23,7 @@ export default function Home() {
             <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue" >Log in</button>
           </form>
           <div className="mt-4 text-center">
-            <p className="text-gray-600 text-sm">Don't have an account?</p>
+            <p className="text-gray-600 text-sm">Don&apos;t have an account?</p>
             <Link className="text-blue-500 hover:underline" href="/signup">
               Sign up
             </Link>
