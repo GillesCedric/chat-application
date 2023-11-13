@@ -1,6 +1,6 @@
 import { Request, Response, Application } from "express"
 import * as path from 'path'
-
+import UserController from "../controllers/User"
 /**
  * @class App
  * @author Gilles Cédric
@@ -18,7 +18,7 @@ export default class Routes {
 	 * @readonly
 	 * @type {UserController}
 	 */
-    //private readonly userController: UserController = new UserController()
+    private readonly userController: UserController = new UserController()
 
     /**
 	 * @method routes
@@ -35,6 +35,8 @@ export default class Routes {
                 res.status(200).sendFile(path.dirname(path.dirname(__dirname)) + '/public/index.html'.replace('/', path.sep))
             })
 
+            app.route('/api/' + 'users')
+            .get(this.userController.getAll)
             /*
         //User endpoints
         app.route('/api/' + this.version + '/users')
