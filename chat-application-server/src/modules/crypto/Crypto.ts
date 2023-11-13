@@ -1,5 +1,4 @@
 import * as crypto from 'crypto'
-import * as keys from "../../../../library/config/keys.json"
 
 /**
  * @class Crypto

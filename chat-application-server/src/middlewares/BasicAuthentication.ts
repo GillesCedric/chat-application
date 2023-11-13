@@ -1,5 +1,4 @@
-import * as express from 'express'
-import { createServer, Server as HTTPServer } from "http"
+import {Request, Response, NextFunction} from 'express'
 import Crypto from '../modules/crypto/Crypto'
 
 
@@ -28,7 +27,7 @@ export default class BasicAuthentication {
      * @private
      * @returns {void}
      */
-    public static readonly authenticate = (request: express.Request, response: express.Response, next: express.NextFunction): any => {
+    public static readonly authenticate = (request: Request, response: Response, next: NextFunction): any => {
         // check for basic auth header
         if (request.headers.authorization && request.headers.authorization.indexOf('Basic ') != -1) {
             const authorization = Crypto.atob(request.headers.authorization.split(' ')[1]).split(':')
