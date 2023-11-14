@@ -10,23 +10,19 @@ import JWTUtils from "../modules/jwt/JWT";
  */
 
 export default class UserController {
-  public readonly getAll = (req: Request, res: Response): Response => {
-    UserModel.find({})
-      .then((users) => {
-        var userMap = [];
-        users.forEach((user) => {
-          userMap[user.id] = user;
-        });
-        return res.status(200).json({
-          userMap: userMap,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({
-          error: "Error getting all users.",
-        });
+  public readonly getAll = (res: Response): Response => {
+    if (UserModel.find({}) === null) {
+      return res.status(422).json([]);
+    }
+    UserModel.find({}).then((users) => {
+      var userMap = [];
+      users.forEach((user) => {
+        userMap[user.id] = user;
       });
+      return res.status(200).json({
+        userMap: userMap,
+      });
+    });
   };
 
   public readonly get = (req: Request, res: Response): Response => {
