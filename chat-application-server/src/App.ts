@@ -1,11 +1,16 @@
 import * as express from 'express'
 import * as bodyParser from "body-parser"
 import * as cors from "cors"
+import * as dotenv from 'dotenv'
 import helmet from "helmet"
-import * as dotenv from "dotenv"
-import {createServer, Server as HTTPServer} from "http"
-import { Server } from "socket.io"
+import * as path from 'path'
+import * as fs from 'fs'
+import { createServer, Server as HTTPServer } from "http"
+import { Server as SocketServer } from "socket.io"
 import mongoose from 'mongoose'
+import Routes from './routes/Routes'
+import BasicAuthentication from './middlewares/BasicAuthentication'
+
 
 
 /**
@@ -18,6 +23,7 @@ import mongoose from 'mongoose'
  */
 export default class App {
 
+    
     /**
      * @property _app
      * @description the express Application instance
@@ -34,7 +40,7 @@ export default class App {
      * @readonly
      * @type {express.Application}
      */
-    private _socketServer: Server
+    private _socketServer: SocketServer
 
     /**
      * @property _app
@@ -46,13 +52,22 @@ export default class App {
     private _httpServer: HTTPServer
 
     /**
+     * @property _routes
+     * @description the Routes instance
+     * @private
+     * @readonly
+     * @type {Routes}
+     */
+    private readonly _routes: Routes = new Routes()
+
+    /**
      * @method get
      * @description this method is used to get a specific express Application instance
      * @public
      * @static
      * @returns {express.Application} the express Application instance
      */
-    public get socketServer(): Server {
+    public get socketServer(): SocketServer {
         return this._socketServer
     }
 
@@ -82,10 +97,16 @@ export default class App {
      * @constructor
      */
     constructor() {
+
         dotenv.config({
-            path: `.env.${process.env.NODE_ENV || "development"}`
+            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
+
         })
+
         this.config()
+
+        this._routes.routes(this.app)
+
     }
 
     /**
@@ -111,15 +132,17 @@ export default class App {
         // serving static files 
         this.app.use(express.static('public'))
 
+        this.app.use(BasicAuthentication.authenticate)
+
         this._httpServer = createServer(this.app)
 
         //connection to the database
         mongoose
-            .connect(process.env.MONGO_URL)
+            .connect(process.env.DATABASE_URL)
             .then(() => console.log("connected to mongodb"))
             .catch((err) => console.log("can't connect to mongodb: ", err));
 
-        this._socketServer = new Server(this._httpServer, {
+        this._socketServer = new SocketServer(this._httpServer, {
             cors: {
                 origin: process.env.FRONT_URL,
             },

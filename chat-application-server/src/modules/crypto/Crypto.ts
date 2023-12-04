@@ -1,5 +1,6 @@
-import _Crypto from 'crypto'
+import * as crypto from 'crypto'
 
+export type encryptionKeys = 'token' | 'password' | 'basic' | 'all_data' | 'database'
 /**
  * @class Crypto
  * @author Gilles Cédric
@@ -8,17 +9,10 @@ import _Crypto from 'crypto'
  * @default
  * @since 23/05/2022
  */
-export default class Crypto {
+export class Crypto {
 
-	/**
-	 * @property secret_key
-	 * @description the secret key of the application for all operations
-	 * @private
-	 * @static
-	 * @readonly
-	 * @type {string}
-	 */
-	private static readonly secret_key: string = ""
+	private readonly encryption_method: string = 'aes-256-cbc'
+
 
 	/**
 	 * @property chars
@@ -51,7 +45,7 @@ export default class Crypto {
 	 * @readonly
 	 * @type {number}
 	 */
-	private static readonly randomLength: number = 10
+	protected static readonly randomLength: number = 10
 
 	/**
 	 * @property secret_key
@@ -69,7 +63,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded MD5 hash
 		 */
-		md5: (message: string): string => _Crypto.createHash(message).toString(),
+		md5: (message: string): string => crypto.createHash(message).toString(),
 
 		/**
 		 * @function sha256
@@ -78,7 +72,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded SHA256 hash
 		 */
-		sha256: (message: string): string => _Crypto.SHA256(message).toString(_Crypto.enc.Base64),
+		//sha256: (message: string): string => _Crypto.SHA256(message).toString(_Crypto.enc.Base64),
 
 		/**
 		 * @function sha512
@@ -87,7 +81,7 @@ export default class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded sha512 hash
 		 */
-		sha512: (message: string): string => _Crypto.SHA512(message).toString(_Crypto.enc.Base64),
+		//sha512: (message: string): string => _Crypto.SHA512(message).toString(_Crypto.enc.Base64),
 	}
 
 	/**
@@ -97,7 +91,12 @@ export default class Crypto {
 	 * @param {string} message s.e.
 	 * @returns {string} the encoded AES hash
 	 */
-	public static readonly encrypt: (message: any) => string = (message: any): string => _Crypto.AES.encrypt(JSON.stringify(message), this.secret_key).toString()
+	public static readonly encrypt: (data: any, key: encryptionKeys) => string = (data: any, key: encryptionKeys): string => {
+		const cipher = crypto.createCipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+		return Buffer.from(
+			cipher.update(data, 'utf8', 'hex') + cipher.final('hex')
+		).toString('base64')
+	}
 
 	/**
 	* @function decrypt
@@ -106,7 +105,14 @@ export default class Crypto {
 	* @param {string} message s.e.
 	* @returns {string} the decoded string
 	*/
-	public static readonly decrypt: (message: string) => any = (message: string): any => JSON.parse(_Crypto.enc.Utf8.stringify(_Crypto.AES.decrypt(message, this.secret_key)))
+	public static readonly decrypt: (data: string, key: encryptionKeys) => any = (data: string, key: encryptionKeys): any => {
+		const buff = Buffer.from(data, 'base64')
+		const decipher = crypto.createDecipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+		return (
+			decipher.update(buff.toString('utf8'), 'hex', 'utf8') +
+			decipher.final('utf8')
+		)
+	}
 
 	/**
 	 * @function encode
@@ -141,7 +147,7 @@ export default class Crypto {
 	 * @param {number} length {10} the length of the word
 	 * @returns {string} s.e.
 	 */
-	 public static readonly random = (length: number = this.randomLength): string => {
+	public static readonly random = (length: number = this.randomLength): string => {
 		let text = ''
 		for (let i = 0; i < length; i++) text += this.chars2[Math.random() * this.chars.length]
 		return text
