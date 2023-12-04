@@ -1,5 +1,6 @@
 import React from "react"
 import Image from "next/image"
+import Link from "next/link"
 
 
 export default function Header() {
@@ -12,6 +13,11 @@ export default function Header() {
 				<span className="font-bold text-lg text-center">ChatCommunication</span>
 				<div className="flex items-center space-x-4">
 					<Image width={40} height={40} alt="Information Icon" src="./bell_no_notification_icon.svg" className="mr-4" />
+					<Link href="/userPage">
+					<button  >
+						<img width={40} height={40} alt="Add Image Icon" src="./chat_app.JPG" />
+					</button>
+					</Link>
 				</div>
 			</div>
 		</header>
