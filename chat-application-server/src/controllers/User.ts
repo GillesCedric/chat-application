@@ -10,27 +10,19 @@ import JWTUtils from "../modules/jwt/JWT";
  */
 
 export default class UserController {
-  public readonly getAll = (req: Request, res: Response): Response => {
-    UserModel.find({})
-      .then((users) => {
-        var userMap = [];
-        users.forEach((user) => {
-          userMap[user.id] = user;
-        });
-        return res.status(200).json({
-          userMap: userMap,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        return res.status(500).json({
-          error: "Error getting all users.",
-        });
+  public readonly getAll = (req:Request , res: Response): Response => {
+    if (UserModel.find({}) === null) {
+      return res.status(422).json([]);
+    }
+    UserModel.find({}).then((users) => {
+      return res.status(200).json({
+          users
       });
+    });
   };
 
   public readonly get = (req: Request, res: Response): Response => {
-    if (req.body.id === null) {
+    if (req.body.id == null) {
       return res.status(422).json({
         error: "Missing parameters.",
       });
@@ -38,7 +30,7 @@ export default class UserController {
     const userId = req.body.id;
     UserModel.findById(userId).then((user) => {
       return res.status(200).json({
-        user,
+        user
       });
     });
   };
@@ -60,6 +52,9 @@ export default class UserController {
               error: "Incorrect username",
             });
           }
+          console.log( bcrypt.compare(
+            password,
+            userFound.password))
           bcrypt.compare(
             password,
             userFound.password,
