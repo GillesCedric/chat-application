@@ -72,7 +72,7 @@ export default function Home() {
                 Don't have an account yet?
                 <Link
                   href="/register"
-                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500 ml-1"
                 >
                   Sign up
                 </Link>
