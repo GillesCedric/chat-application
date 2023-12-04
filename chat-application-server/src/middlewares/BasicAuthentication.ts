@@ -27,7 +27,6 @@ export default class BasicAuthentication {
         // check for basic auth header
         if (request.headers.authorization && request.headers.authorization.indexOf('Basic ') != -1) {
             const authorization = Crypto.atob(request.headers.authorization.split(' ')[1]).split(':')
-            console.log(authorization)
             if (authorization[0] == process.env.CLIENT_APP_USERNAME && authorization[1] == process.env.CLIENT_APP_PASSWORD)
                 next()
             else
