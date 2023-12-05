@@ -7,6 +7,15 @@ export async function middleware(request: NextRequest) {
 	if (!request.nextUrl.pathname.startsWith('/api')) {
 		NextResponse.next()
 	} else {
+
+		const authorization = request.headers.get('authorization')
+		if (!authorization || authorization.indexOf('Basic ') == -1)
+			return NextResponse.json({ message: 'Incorrect Client Authorization Header' });
+
+		const credentials = Crypto.atob(authorization.split(' ')[1]).split(':')
+		if (credentials[0] != process.env.CLIENT_APP_USERNAME || credentials[1] != process.env.CLIENT_APP_PASSWORD)
+			return NextResponse.json({ message: 'Missing Client Authorization Header' });
+
 		try {
 			const
 				config: any = {
