@@ -1,6 +1,7 @@
 import { Request, Response, Application } from "express";
 import * as path from "path";
 import UserController from "../controllers/User";
+import ChatController from "../controllers/Chat";
 /**
  * @class App
  * @author Gilles Cédric
@@ -18,6 +19,7 @@ export default class Routes {
    * @type {UserController}
    */
   private readonly userController: UserController = new UserController();
+  private readonly ChatController: ChatController = new ChatController();
 
   /**
    * @method routes
@@ -40,20 +42,8 @@ export default class Routes {
     app.route("/api/" + "users").get(this.userController.getAll);
     app.route("/api/" + "users").get(this.userController.get);
     app.route("/api/" + "users/login").post(this.userController.login);
+    app.route("/api/users/getChats").post(this.ChatController.getUserChats);
+    app.route("/api/users/getFriends").post(this.userController.getUserFriends);
 
-    /*
-        //User endpoints
-        app.route('/api/' + this.version + '/users')
-            .get(this.userController.getAll)
-
-        app.route('/api/' + this.version + '/users/login').post(this.userController.login)
-
-        app.route('/api/' + this.version + '/users/register').post(this.userController.register)
-
-        app.route('/api/' + this.version + '/users/:userId')
-            .get(this.userController.get)
-
-
-            */
   };
 }
