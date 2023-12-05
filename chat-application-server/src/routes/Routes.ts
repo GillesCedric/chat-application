@@ -33,13 +33,13 @@ export default class Routes {
         .status(200)
         .sendFile(
           path.dirname(path.dirname(__dirname)) +
-            "/public/index.html".replace("/", path.sep)
+          "/public/index.html".replace("/", path.sep)
         );
     });
 
     app.route("/api/" + "users").get(this.userController.getAll);
-    app.route("/api/" + "user").get(this.userController.get);
-    app.route("/api/" + "user/login").post(this.userController.login);
+    app.route("/api/" + "users").get(this.userController.get);
+    app.route("/api/" + "users/login").post(this.userController.login);
 
     /*
         //User endpoints
