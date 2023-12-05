@@ -10,19 +10,48 @@ import JWTUtils from "../modules/jwt/JWT";
  */
 
 export default class UserController {
-  public readonly getAll = (req:Request , res: Response): Response => {
+  public readonly getAll = (req: Request, res: Response): Response => {
     if (UserModel.find({}) === null) {
-      return res.status(422).json([]);
+      return res.status(422).json(null);
     }
     UserModel.find({}).then((users) => {
       return res.status(200).json({
-          users
+        users,
       });
     });
   };
 
+  public readonly getUserFriends = (req: Request, res: Response): Response => {
+    if (undefined === req.body.userId) {
+      return res.status(422).json({
+        error: "Missing parameters",
+      });
+    }
+    const friends = [];
+    const userId = req.body.userId;
+
+    UserModel.findById(userId)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        var friendsId = user.friends;
+        UserModel.find({ _id: { $in: friendsId } }).then((friends) => {
+          // console.log(friends);
+          return res.status(200).json({
+            frineds: friends,
+          });
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error" });
+      });
+  };
+
   public readonly get = (req: Request, res: Response): Response => {
-    if (req.body.id == null) {
+    console.log(req.baseUrl);
+    if (req.body.id === undefined) {
       return res.status(422).json({
         error: "Missing parameters.",
       });
@@ -30,13 +59,13 @@ export default class UserController {
     const userId = req.body.id;
     UserModel.findById(userId).then((user) => {
       return res.status(200).json({
-        user
+        user,
       });
     });
   };
   public readonly login = (req: Request, res: Response): Response => {
     {
-      if (req.body.username === null || req.body.password === null) {
+      if (!req.body.username || !req.body.password) {
         return res.status(422).json({
           error: "Missing parameters",
         });
@@ -52,31 +81,25 @@ export default class UserController {
               error: "Incorrect username",
             });
           }
-          console.log( bcrypt.compare(
-            password,
-            userFound.password))
-          bcrypt.compare(
-            password,
-            userFound.password,
-            (error: Error, result: boolean) => {
-              console.log(error);
-              if (!result) {
-                console.log("Incorrect password");
-                return res.status(401).json({
-                  error: "Incorrect password",
-                });
-              }
-              return res.status(200).json({
-                userId: userFound.id,
-                token: JWTUtils.generateTokenForUser(userFound.id),
-              });
-            }
-          );
+          const passwordMatches = bcrypt.compare(password, userFound.password);
+
+          if (!passwordMatches) {
+            console.log("Incorrect password");
+            return res.status(401).json({
+              error: "Incorrect password",
+              data: password + userFound.password + " " + passwordMatches,
+            });
+          }
+          // If credentials are correct, return the desired response
+          return res.status(200).json({
+            userId: userFound.id,
+            token: JWTUtils.generateTokenForUser(userFound.id),
+          });
         })
         .catch((error) => {
           console.log(error);
           return res.status(500).json({
-            error: "User verfication impossible",
+            error: "User verification impossible",
           });
         });
     }

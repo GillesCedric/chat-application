@@ -10,9 +10,16 @@ const chatSchema = new mongoose.Schema({
     default: false,
   },
   sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserModel', 
+    type: String,
     required: true,
+  },
+  receiver: {
+    type: String,
+    required: true,
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
   },
 });
 
