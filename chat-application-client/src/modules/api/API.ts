@@ -15,15 +15,26 @@ export default class API {
 
 	private static readonly basicTokenPrefix: string = 'Basic '
 
-	private static readonly apiUrl: string = process.env.API_URL + '/api'
+	private static readonly apiUrl: string = `${process.env.REVERSE_URL}:${process.env.REVERSE_PORT}/api`
+
+	private static readonly headers: HeadersInit = {
+			accept: "application/json",
+			'content-type': "application/json",
+			'user-agent': 'chat-application/client/proxy',
+			['chat-application-session']: Crypto.random(16),
+			['authorization']: 'Basic ' + Crypto.btoa(`${process.env.CLIENT_APP_USERNAME}:${process.env.CLIENT_APP_PASSWORD}`),
+		}
+		
+	
 
 	public static readonly getAllUsers: () => Promise<any> = async (): Promise<any> => {
 		//return await axios.get(this.apiUrl + 'users')
 	}
 
 	public static readonly login: (data: any) => Promise<any> = async (data: any): Promise<any> => {
-		return fetch(this.apiUrl+'/users', {
-			
+		return await fetch(this.apiUrl+'/users/login', {
+			method: 'POST',
+			headers: this.headers
 		})
 	}
 
