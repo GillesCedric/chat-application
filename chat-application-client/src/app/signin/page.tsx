@@ -1,6 +1,28 @@
-import React from "react";
+"use client"
+import React, { FormEvent, useRef } from "react";
 import Link from "next/link";
+import API from "../../modules/api/API";
 export default function Home() {
+  let formRef: HTMLFormElement | null = null
+
+  const signUp = (event: FormEvent) => {
+    event.preventDefault()
+    
+    API.login({})
+    .then(response => {
+      response.json()
+      .then((data: any) => {
+        console.log(data.message || data.error)
+      })
+      .catch((error: any) => {
+        console.log(error)
+      })
+      
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -9,7 +31,7 @@ export default function Home() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign in to your account
             </h1>
-            <form className="space-y-4 md:space-y-6" action="#">
+            <form className="space-y-4 md:space-y-6" action="#" ref={ ref => formRef = ref} onSubmit={signUp}>
               <div>
                 <label
                   htmlFor="email"

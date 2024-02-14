@@ -2,6 +2,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import API from "../../modules/api/API";
 export default function Home() {
   const emailRef = useRef<HTMLInputElement | null>(null);
   const firstnameRef = useRef<HTMLInputElement | null>(null);
@@ -301,10 +302,24 @@ export default function Home() {
 
   const signUp = () => {
     if (checkPassword()) {
+      API.register({
+        firstname: firstnameRef.current?.value,
+        lastname: lastnameRef.current?.value,
+        username: usernameRef.current?.value,
+        email: emailRef.current?.value,
+        password: passwordRef.current?.value,
+        tel: telRef.current?.value
+      })
+      .then(Response => Response.json()
+      .then((data: any) => {
+        console.log(data)
+      })
+      )
       return true;
     }
     return false;
   };
+
   function checkNames() {
     if (
       firstnameRef.current &&

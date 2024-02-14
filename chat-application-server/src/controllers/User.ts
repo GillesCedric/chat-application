@@ -2,6 +2,7 @@ import { UserModel } from "../schemas/UserModel";
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
 import JWTUtils from "../modules/jwt/JWT";
+import { Crypto } from "../../../chat-application-client/src/modules/crypto/Crypto";
 /**
  * @class UserController
  * @description this class is used to handle the request from the User endpoint
@@ -102,6 +103,45 @@ export default class UserController {
             error: "User verification impossible",
           });
         });
+    }
+  };
+
+  public readonly signUp = (req: Request, res: Response): Response => {
+    {
+      //const body = JSON.parse(req.body.body)
+      console.log(req.body)
+      if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
+        return res.status(422).json({
+          error: "Missing parameters",
+        });
+      }
+
+      const firstname = Crypto.encrypt(req.body.username, 'database');
+      const lastname = Crypto.encrypt(req.body.lastname, 'database');
+      const username = Crypto.encrypt(req.body.username, 'database');
+      const tel = Crypto.encrypt(req.body.tel, 'database');
+      const email = Crypto.encrypt(req.body.email, 'database');
+      const password = Crypto.encrypt(bcrypt.hashSync(req.body.password, process.env.SALT), 'database');
+
+      try {
+        UserModel.insertMany({
+          lastname: lastname,
+          firstname: firstname,
+          username: username,
+          email: email,
+          password: password,
+          isVerified: false,
+          friends: []
+        })
+        return res.status(200).json({
+          message: "success",
+        });
+      } catch (error) {
+        return res.status(401).json({
+          error: error,
+        });
+      }
+
     }
   };
 }

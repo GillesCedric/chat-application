@@ -42,6 +42,7 @@ export default class Routes {
     app.route("/api/" + "users").get(this.userController.getAll);
     app.route("/api/" + "users").get(this.userController.get);
     app.route("/api/" + "users/login").post(this.userController.login);
+    app.route("/api/" + "users/signup").post(this.userController.signUp);
     app.route("/api/users/getChats").post(this.ChatController.getUserChats);
     app.route("/api/users/getFriends").post(this.userController.getUserFriends);
 
