@@ -1,11 +1,8 @@
-import { ChatModel } from "../schemas/ChatModel";
+import { ChatModel } from "../../../schemas/ChatModel";
 import { Request, Response } from "express";
-/**
- * @class ChatController
- * @description this class is used to handle the request from the User endpoint
- * @author Jean-Loan BATCHO
- * @returns {Response}
- */
+
+
+
 
 export default class ChatController {
   public readonly getAll = (req: Request, res: Response): Response => {
@@ -48,12 +45,12 @@ export default class ChatController {
         { sender: userId, receiver: friendId, deleted: false },
         { sender: friendId, receiver: userId, deleted: false },
       ],
-    }) .populate('sender', 'firstname lastname') 
-    .sort({ timestamp: 'asc' }).then((chats) => {
-      // console.log(chats);
-      return res.status(200).json({
-        chats: chats,
+    }).populate('sender', 'firstname lastname')
+      .sort({ timestamp: 'asc' }).then((chats) => {
+        // console.log(chats);
+        return res.status(200).json({
+          chats: chats,
+        });
       });
-    });
   };
 }

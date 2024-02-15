@@ -36,6 +36,9 @@
 /chat-application-*/node_modules/
 /chat-application-*/jspm_packages/
 
+# dist directories
+/chat-application-*/dist/
+
 # TypeScript v1 declaration files
 /chat-application-*/typings/
 

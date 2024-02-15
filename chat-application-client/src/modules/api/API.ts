@@ -1,5 +1,5 @@
 import Cookies from "../cookies/Cookies"
-import { Crypto } from "../../../../chat-application-server/src/modules/crypto/Crypto"
+import { Crypto } from "../../modules/crypto/Crypto"
 
 /**
  * @class API
@@ -13,16 +13,14 @@ export default class API {
 
 	private static readonly tokenPrefix: string = 'Bearer '
 
-	private static readonly basicTokenPrefix: string = 'Basic '
-
-	private static readonly apiUrl: string = `${process.env.REVERSE_URL}:${process.env.REVERSE_PORT}/api`
+	private static readonly apiUrl: string = `${process.env.NEXT_PUBLIC_REVERSE_URL}:${process.env.NEXT_PUBLIC_REVERSE_PORT}/api`
 
 	private static readonly headers: HeadersInit = {
 			accept: "application/json",
 			'content-type': "application/json",
 			'user-agent': 'chat-application/client/proxy',
 			['chat-application-session']: Crypto.random(16),
-			['authorization']: 'Basic ' + Crypto.btoa(`${process.env.CLIENT_APP_USERNAME}:${process.env.CLIENT_APP_PASSWORD}`),
+			['authorization']: 'Basic ' + Crypto.btoa(`${process.env.NEXT_PUBLIC_CLIENT_APP_USERNAME}:${process.env.NEXT_PUBLIC_CLIENT_APP_PASSWORD}`),
 		}
 		
 	
@@ -48,7 +46,11 @@ export default class API {
 	 * @returns {Promise<any>} the response from the API
 	 */
 	public static readonly register: (data: any) => Promise<any> = async (data: any): Promise<any> => {
-		//return await axios.post(this.apiUrl + 'users/register', data)
+		return await fetch(this.apiUrl+'/users/signup', {
+			method: 'POST',
+			headers: this.headers,
+			body: data
+		})
 	}
 
 }

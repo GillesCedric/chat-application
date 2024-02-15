@@ -1,0 +1,17 @@
+[
+	{
+		"name": "chat",
+		"domain": "localhost",
+		"port": 6000
+	},
+	{
+		"name": "user",
+		"domain": "localhost",
+		"port": 6001
+	},
+	{
+		"name": "notification",
+		"domain": "localhost",
+		"port": 6002
+	}
+]

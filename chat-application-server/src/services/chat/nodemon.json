@@ -1,0 +1,13 @@
+{
+  "watch": [
+    "src/models",
+    "src/schemas",
+    "src/services/chat",
+    "src/config/services.json"
+  ],
+  "ext": "ts,json",
+  "ignore": [
+    "*.spec.ts"
+  ],
+  "exec": "ts-node ./src/services/chat/Server.ts"
+}
