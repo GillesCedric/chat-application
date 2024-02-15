@@ -1,0 +1,23 @@
+// @see https://tech.serhatteker.com/post/2020-05/generate-vscode-extensions/
+{
+	"recommendations": [
+		"bmewburn.vscode-intelephense-client",
+		"christian-kohler.npm-intellisense",
+		"dbaeumer.vscode-eslint",
+		"dsznajder.es7-react-js-snippets",
+		"eamodio.gitlens",
+		"gruntfuggly.todo-tree",
+		"humao.rest-client",
+		"moalamri.inline-fold",
+		"mrcrowl.easy-less",
+		"msjsdiag.vscode-react-native",
+		"oderwat.indent-rainbow",
+		"streetsidesoftware.code-spell-checker",
+		"vscode-icons-team.vscode-icons",
+		"yzhang.markdown-all-in-one",
+		"zignd.html-css-class-completion"
+	],
+	"unwantedRecommendations": [
+		"ms-vscode.live-server"
+	],
+}

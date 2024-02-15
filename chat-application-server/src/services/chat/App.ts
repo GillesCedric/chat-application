@@ -7,26 +7,20 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
-import { createServer as createTLSServer, Server as TLSServer } from "tls"
-import { Server as SocketServer } from "socket.io"
 import mongoose from 'mongoose'
+import Routes from './routes/Routes'
+
 
 
 export default class App {
 
     private readonly _app: express.Application = express()
 
-    private _socketServer: SocketServer
-
     private _httpServer: HTTPServer
 
     private _httpsServer: HTTPSServer
 
-    private _webServer: HTTPServer | HTTPSServer
-
-    public get socketServer(): SocketServer {
-        return this._socketServer
-    }
+    private readonly _routes: Routes = new Routes()
 
     public get webServer(): HTTPServer | HTTPSServer {
         return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
@@ -48,15 +42,10 @@ export default class App {
 
         this.config()
 
+        this._routes.routes(this.app)
+
     }
 
-    /**
-     * @method config
-     * @description this method is used to Initialize the basic config of the application
-     * @readonly
-     * @private
-     * @returns {void}
-     */
     private readonly config = (): void => {
         //security configuration with helmet
         this.app.use(helmet())
@@ -70,12 +59,9 @@ export default class App {
             origin: process.env.FRONT_URL,
         }))
 
-        // serving static files 
-        this.app.use(express.static('public'))
-
         if (process.env.NODE_ENV == "development")
             this._httpServer = createHTTPServer(this._app)
-        else 
+        else
             this._httpsServer = createHTTPSServer({
                 requestCert: true,
                 rejectUnauthorized: true,
@@ -83,19 +69,12 @@ export default class App {
                 cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
                 ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
             }, this._app)
-        
 
         //connection to the database
         mongoose
             .connect(process.env.DATABASE_URL)
             .then(() => console.log("connected to mongodb"))
             .catch((err) => console.log("can't connect to mongodb: ", err));
-
-        this._socketServer = new SocketServer(this._webServer, {
-            cors: {
-                origin: process.env.FRONT_URL,
-            },
-        });
 
     }
 

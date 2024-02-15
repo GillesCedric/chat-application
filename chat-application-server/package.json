@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon",
+    "chat": "nodemon --config ./src/services/chat/nodemon.json",
+    "user": "nodemon --config ./src/services/user/nodemon.json",
+    "notification": "nodemon --config ./src/services/notification/nodemon.json",
+    "api": "nodemon",
     "start": "SET NODE_ENV=development && nodemon ./dist/Server.js",
     "prod": "SET NODE_ENV=production && npm run build && npm run start",
     "test": ""
@@ -22,6 +25,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "helmet": "^7.0.0",
+    "http-proxy-middleware": "^2.0.6",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.4",
     "nodemon": "^3.0.1",

@@ -1,8 +1,8 @@
-import { UserModel } from "../schemas/UserModel";
+import { UserModel } from "../../../schemas/UserModel";
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
-import JWTUtils from "../modules/jwt/JWT";
-import { Crypto } from "../../../chat-application-client/src/modules/crypto/Crypto";
+import JWTUtils from "../../security/modules/jwt/JWT";
+import { Crypto } from "../../../../../chat-application-client/src/modules/crypto/Crypto";
 /**
  * @class UserController
  * @description this class is used to handle the request from the User endpoint
