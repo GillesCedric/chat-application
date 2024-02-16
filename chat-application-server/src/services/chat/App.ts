@@ -1,10 +1,10 @@
-import * as express from 'express'
-import * as bodyParser from "body-parser"
-import * as cors from "cors"
-import * as dotenv from 'dotenv'
+import express from 'express'
+import bodyParser from "body-parser"
+import cors from "cors"
+import dotenv from 'dotenv'
 import helmet from "helmet"
-import * as path from 'path'
-import * as fs from 'fs'
+import path from 'path'
+import fs from 'fs'
 import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
@@ -20,8 +20,6 @@ export default class App {
 
     private _httpsServer: HTTPSServer
 
-    private readonly _routes: Routes = new Routes()
-
     public get webServer(): HTTPServer | HTTPSServer {
         return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
     }
@@ -30,9 +28,6 @@ export default class App {
         return this._app
     }
 
-    /**
-     * @constructor
-     */
     constructor() {
 
         dotenv.config({
@@ -42,7 +37,7 @@ export default class App {
 
         this.config()
 
-        this._routes.routes(this.app)
+        Routes.routes(this.app)
 
     }
 
@@ -56,7 +51,7 @@ export default class App {
 
         //cors configuration
         this.app.use(cors({
-            origin: process.env.FRONT_URL,
+            origin: process.env.DOMAIN_NAME,
         }))
 
         if (process.env.NODE_ENV == "development")

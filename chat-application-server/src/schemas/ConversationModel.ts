@@ -3,13 +3,13 @@ const conversationSchema = new mongoose.Schema({
   members: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'Users',
     },
   ], // An array of members, where each member is represented as an object
   chats: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ChatModel',
+      ref: 'Chats',
     },
 
   ],
@@ -22,4 +22,4 @@ const conversationSchema = new mongoose.Schema({
   },
 });
 
-export const ConversationModel = mongoose.model('ConversationModel', conversationSchema);
+export const ConversationModel = mongoose.model('Conversations', conversationSchema);
