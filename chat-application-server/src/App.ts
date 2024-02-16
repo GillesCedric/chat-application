@@ -1,15 +1,20 @@
-import * as express from 'express'
-import * as bodyParser from "body-parser"
-import * as cors from "cors"
-import * as dotenv from 'dotenv'
+import express from 'express'
+import bodyParser from "body-parser"
+import cors from "cors"
+import dotenv from 'dotenv'
 import helmet from "helmet"
-import * as path from 'path'
-import * as fs from 'fs'
+import path from 'path'
+import fs from 'fs'
 import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
-import { createServer as createTLSServer, Server as TLSServer } from "tls"
 import { Server as SocketServer } from "socket.io"
+import session from "express-session"
 import mongoose from 'mongoose'
+import Socket from './Socket'
+import MongoStore from 'connect-mongo'
+import rateLimit from 'express-rate-limit'
+import Proxy from './Proxy'
+import BasicAuthentication from './middlewares/BasicAuthentication'
 
 
 export default class App {
@@ -50,14 +55,8 @@ export default class App {
 
     }
 
-    /**
-     * @method config
-     * @description this method is used to Initialize the basic config of the application
-     * @readonly
-     * @private
-     * @returns {void}
-     */
     private readonly config = (): void => {
+
         //security configuration with helmet
         this.app.use(helmet())
 
@@ -67,15 +66,45 @@ export default class App {
 
         //cors configuration
         this.app.use(cors({
-            origin: process.env.FRONT_URL,
+            origin: process.env.DOMAIN_NAME,
         }))
 
         // serving static files 
         this.app.use(express.static('public'))
 
+        this.app.use(session({
+            name: 'chat-application',
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: true,
+            store: MongoStore.create({
+                mongoUrl: process.env.DATABASE_URL,
+            }),
+            cookie: {
+                secure: process.env.NODE_ENV == 'production',
+                httpOnly: process.env.NODE_ENV == 'production',
+                maxAge: 2 * 60 * 60 * 1000, //2h,
+                domain: process.env.DOMAIN_NAME,
+                path: "/",
+                sameSite: process.env.NODE_ENV == 'production',
+            }
+        }))
+
+
+        this.app.use(rateLimit({
+            windowMs: 10 * 60 * 1000, // 10 minutes
+            limit: 100, // 5 calls,
+            standardHeaders: 'draft-7',
+            legacyHeaders: false,
+        }))
+
+        this.app.use(BasicAuthentication.authenticate)
+
+        Proxy.serve(this.app)
+
         if (process.env.NODE_ENV == "development")
             this._httpServer = createHTTPServer(this._app)
-        else 
+        else
             this._httpsServer = createHTTPSServer({
                 requestCert: true,
                 rejectUnauthorized: true,
@@ -83,7 +112,7 @@ export default class App {
                 cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
                 ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
             }, this._app)
-        
+
 
         //connection to the database
         mongoose
@@ -93,9 +122,11 @@ export default class App {
 
         this._socketServer = new SocketServer(this._webServer, {
             cors: {
-                origin: process.env.FRONT_URL,
-            },
-        });
+                origin: process.env.DOMAIN_NAME,
+            }
+        })
+
+        this.socketServer.use(Socket.serve)
 
     }
 
