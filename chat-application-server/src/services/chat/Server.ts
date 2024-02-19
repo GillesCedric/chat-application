@@ -19,7 +19,7 @@ class Server {
     public readonly serve = (): void => {
 
         this.app.webServer.listen(this.port, () => {
-            console.log('Chat Service Server listening on port ' + this.port)
+            console.log('Chat Service listening on port ' + this.port)
         })
 
     }

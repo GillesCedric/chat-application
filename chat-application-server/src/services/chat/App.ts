@@ -58,11 +58,8 @@ export default class App {
             this._httpServer = createHTTPServer(this._app)
         else
             this._httpsServer = createHTTPSServer({
-                requestCert: true,
-                rejectUnauthorized: true,
                 key: fs.readFileSync('chemin/vers/votre/cle_privee_client.key'),
                 cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
-                ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
             }, this._app)
 
         //connection to the database

@@ -12,17 +12,13 @@ export default class Proxy {
 
 	public static readonly serve = (app: Application): void => {
 
-		app.get('/test', (req, res) => {
-			res.send({ message: 'ca marche' })
-		})
-
-		app.use('/api/v1/users', Session.serve, createProxyMiddleware({
+		app.use('/api/v1/users', Session.authenticate, createProxyMiddleware({
 			target: 'http://localhost:6001',
 			changeOrigin: true,
 			pathRewrite: { '^/api/v1/users': '' },
 		}))
 
-		app.use('/api/v1/chats', Session.serve, createProxyMiddleware({
+		app.use('/api/v1/chats', Session.authenticate, createProxyMiddleware({
 			target: 'http://localhost:6000',
 			changeOrigin: true,
 			pathRewrite: { '^/api/v1/chats': '' },

@@ -98,6 +98,11 @@ export default class App {
             legacyHeaders: false,
         }))
 
+        this.app.use((req, res, next) => {
+            console.log(req.session); // Cela devrait afficher l'objet de session
+            next();
+        });
+
         this.app.use(BasicAuthentication.authenticate)
 
         Proxy.serve(this.app)
