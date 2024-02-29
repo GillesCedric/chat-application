@@ -3,12 +3,12 @@
     "src/models",
     "src/schemas",
     "src/utils/**/*.ts",
-    "src/services/chat",
+    "src/services/user",
     "src/config/services.json"
   ],
   "ext": "ts,json",
   "ignore": [
     "*.spec.ts"
   ],
-  "exec": "ts-node ./src/services/chat/Server.ts"
+  "exec": "ts-node ./src/services/user/Server.ts"
 }

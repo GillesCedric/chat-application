@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { Code, Method } from '../../chat-application-server/src/utils/Methods'
-import { Crypto } from '../src/modules/crypto/Crypto'
+import { Crypto } from '../../chat-application-server/src/utils/crypto/Crypto'
 
 //Mettre en place le Reverse Proxy
 export async function middleware(request: NextRequest) {

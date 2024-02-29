@@ -2,7 +2,7 @@ import { UserModel } from "../../../schemas/UserModel";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../security/modules/jwt/JWT";
-import { Crypto } from "../../../../../chat-application-client/src/modules/crypto/Crypto";
+import { Crypto } from "../../../utils/crypto/Crypto";
 
 
 export default class UserController {
@@ -61,35 +61,34 @@ export default class UserController {
   };
   public readonly login = (req: Request, res: Response): Response => {
     {
-      if (!req.body.username || !req.body.password) {
+      if (!req.body.email || !req.body.password) {
         return res.status(422).json({
           error: "Missing parameters",
         });
       }
 
-      const username = req.body.username;
+      const email = req.body.email;
       const password = req.body.password;
 
-      UserModel.findOne({ username: username })
+      UserModel.findOne({ email: Crypto.encrypt(email, 'email') })
         .then((userFound) => {
           if (!userFound) {
             return res.status(401).json({
-              error: "Incorrect username",
+              error: "Incorrect email",
             });
           }
-          const passwordMatches = bcrypt.compare(password, userFound.password);
+
+          const passwordMatches = bcrypt.compareSync(password, userFound.password);
 
           if (!passwordMatches) {
-            console.log("Incorrect password");
             return res.status(401).json({
               error: "Incorrect password",
-              data: password + userFound.password + " " + passwordMatches,
-            });
+            })
           }
           // If credentials are correct, return the desired response
+          req.session['token'] = JWTUtils.generateTokenForUser(userFound.id)
           return res.status(200).json({
-            userId: userFound.id,
-            token: JWTUtils.generateTokenForUser(userFound.id),
+            message: 'connection established 2'
           });
         })
         .catch((error) => {
@@ -103,29 +102,30 @@ export default class UserController {
 
   public readonly signUp = (req: Request, res: Response): Response => {
     {
-      //const body = JSON.parse(req.body.body)
-      console.log(req.body)
       if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
         return res.status(422).json({
           error: "Missing parameters",
         });
       }
 
-      const firstname = Crypto.encrypt(req.body.username, 'database');
-      const lastname = Crypto.encrypt(req.body.lastname, 'database');
-      const username = Crypto.encrypt(req.body.username, 'database');
-      const tel = Crypto.encrypt(req.body.tel, 'database');
-      const email = Crypto.encrypt(req.body.email, 'database');
-      const password = Crypto.encrypt(bcrypt.hashSync(req.body.password, process.env.SALT), 'database');
+      //salt should always be in number for because bcrypt generate salt only for salt in number not string
+      const firstname = Crypto.encrypt(req.body.firstname, 'database')
+      const lastname = Crypto.encrypt(req.body.lastname, 'database')
+      const username = Crypto.encrypt(req.body.username, 'username')
+      const tel = Crypto.encrypt(req.body.tel, 'tel')
+      const email = Crypto.encrypt(req.body.email, 'email')
+      const password = bcrypt.hashSync(req.body.password, Number.parseInt(process.env.SALT_ROUNDS))
+      const isVerified = Crypto.encrypt('false', 'database')
 
       try {
         UserModel.insertMany({
           lastname: lastname,
           firstname: firstname,
           username: username,
+          tel: tel,
           email: email,
           password: password,
-          isVerified: false,
+          isVerified: isVerified,
           friends: []
         })
         return res.status(200).json({

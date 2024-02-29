@@ -1,5 +1,5 @@
 import Cookies from "../cookies/Cookies"
-import { Crypto } from "../../modules/crypto/Crypto"
+import { Crypto } from "../../../../chat-application-server/src/utils/crypto/Crypto"
 
 /**
  * @class API
@@ -16,21 +16,21 @@ export default class API {
 	private static readonly apiUrl: string = `${process.env.NEXT_PUBLIC_REVERSE_URL}:${process.env.NEXT_PUBLIC_REVERSE_PORT}/api`
 
 	private static readonly headers: HeadersInit = {
-			accept: "application/json",
-			'content-type': "application/json",
-			'user-agent': 'chat-application/client/proxy',
-			['chat-application-session']: Crypto.random(16),
-			['authorization']: 'Basic ' + Crypto.btoa(`${process.env.NEXT_PUBLIC_CLIENT_APP_USERNAME}:${process.env.NEXT_PUBLIC_CLIENT_APP_PASSWORD}`),
-		}
-		
-	
+		accept: "application/json",
+		'content-type': "application/json",
+		'user-agent': 'chat-application/client/proxy',
+		['chat-application-session']: Crypto.random(16),
+		['authorization']: 'Basic ' + Crypto.btoa(`${process.env.NEXT_PUBLIC_CLIENT_APP_USERNAME}:${process.env.NEXT_PUBLIC_CLIENT_APP_PASSWORD}`),
+	}
+
+
 
 	public static readonly getAllUsers: () => Promise<any> = async (): Promise<any> => {
 		//return await axios.get(this.apiUrl + 'users')
 	}
 
 	public static readonly login: (data: any) => Promise<any> = async (data: any): Promise<any> => {
-		return await fetch(this.apiUrl+'/users/login', {
+		return await fetch(this.apiUrl + '/users/login', {
 			method: 'POST',
 			headers: this.headers
 		})
@@ -46,7 +46,7 @@ export default class API {
 	 * @returns {Promise<any>} the response from the API
 	 */
 	public static readonly register: (data: any) => Promise<any> = async (data: any): Promise<any> => {
-		return await fetch(this.apiUrl+'/users/signup', {
+		return await fetch(this.apiUrl + '/users/signup', {
 			method: 'POST',
 			headers: this.headers,
 			body: data

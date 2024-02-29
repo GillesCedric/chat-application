@@ -15,6 +15,7 @@ import MongoStore from 'connect-mongo'
 import rateLimit from 'express-rate-limit'
 import Proxy from './Proxy'
 import BasicAuthentication from './middlewares/BasicAuthentication'
+import Logger from './utils/logger/Logger'
 
 
 export default class App {
@@ -57,6 +58,8 @@ export default class App {
 
     private readonly config = (): void => {
 
+        Logger.config()
+
         //security configuration with helmet
         this.app.use(helmet())
 
@@ -82,26 +85,22 @@ export default class App {
             }),
             cookie: {
                 secure: process.env.NODE_ENV == 'production',
-                httpOnly: process.env.NODE_ENV == 'production',
-                maxAge: 2 * 60 * 60 * 1000, //2h,
+                httpOnly: true,
+                maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                 domain: process.env.DOMAIN_NAME,
                 path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
+                signed: true
             }
         }))
 
 
         this.app.use(rateLimit({
             windowMs: 10 * 60 * 1000, // 10 minutes
-            limit: 100, // 5 calls,
+            limit: 100, // 100 calls,
             standardHeaders: 'draft-7',
             legacyHeaders: false,
         }))
-
-        this.app.use((req, res, next) => {
-            console.log(req.session); // Cela devrait afficher l'objet de session
-            next();
-        });
 
         this.app.use(BasicAuthentication.authenticate)
 
@@ -111,19 +110,16 @@ export default class App {
             this._httpServer = createHTTPServer(this._app)
         else
             this._httpsServer = createHTTPSServer({
-                requestCert: true,
-                rejectUnauthorized: true,
                 key: fs.readFileSync('chemin/vers/votre/cle_privee_client.key'),
                 cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
-                ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
             }, this._app)
 
 
         //connection to the database
         mongoose
             .connect(process.env.DATABASE_URL)
-            .then(() => console.log("connected to mongodb"))
-            .catch((err) => console.log("can't connect to mongodb: ", err));
+            .then(() => Logger.log("connected to mongodb"))
+            .catch((err) => Logger.log("can't connect to mongodb: "+ err, 'error'));
 
         this._socketServer = new SocketServer(this._webServer, {
             cors: {

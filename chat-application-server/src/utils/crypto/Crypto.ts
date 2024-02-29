@@ -1,6 +1,9 @@
 import * as crypto from 'crypto'
+import CONFIG from '../../config/config.json'
 
-export type encryptionKeys = 'token' | 'password' | 'basic' | 'all_data' | 'database'
+export type encryptionKeys = 'token' | 'password' | 'database'
+
+export type deterministEncryptionKeys = 'username' | 'tel' | 'email'
 /**
  * @class Crypto
  * @author Gilles Cédric
@@ -63,7 +66,7 @@ export class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded MD5 hash
 		 */
-		md5: (message: string): string => crypto.createHash(message).toString(),
+		md5: (message: any): string => crypto.createHash('md5').update(JSON.stringify(message)).digest('hex'),
 
 		/**
 		 * @function sha256
@@ -72,7 +75,7 @@ export class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded SHA256 hash
 		 */
-		//sha256: (message: string): string => _Crypto.SHA256(message).toString(_Crypto.enc.Base64),
+		sha256: (message: any): string => crypto.createHash('sha256').update(JSON.stringify(message)).digest('hex'),
 
 		/**
 		 * @function sha512
@@ -81,7 +84,7 @@ export class Crypto {
 		 * @param {string} message s.e.
 		 * @returns {string} the base64 encoded sha512 hash
 		 */
-		//sha512: (message: string): string => _Crypto.SHA512(message).toString(_Crypto.enc.Base64),
+		sha512: (message: any): string => crypto.createHash('sha512').update(JSON.stringify(message)).digest('hex'),
 	}
 
 	/**
@@ -91,11 +94,23 @@ export class Crypto {
 	 * @param {string} message s.e.
 	 * @returns {string} the encoded AES hash
 	 */
-	public static readonly encrypt: (data: any, key: encryptionKeys) => string = (data: any, key: encryptionKeys): string => {
-		const cipher = crypto.createCipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+	public static readonly encrypt = (data: string, key: encryptionKeys | deterministEncryptionKeys): string => {
+
+		let determinist = false
+		
+		if (key == 'username' || key == 'email' || key == 'tel')
+			determinist = true
+
+		const encryptionKey = Buffer.from(process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`], 'hex')
+		const initializationVector = determinist ? Buffer.from(this.hash.sha256(data.toLowerCase() + CONFIG.appname + process.env[`${key.toUpperCase()}_DETERMINISTE_IV_GENERATION_KEY`]).slice(0, 32), 'hex') : crypto.randomBytes(16)
+
+		if (encryptionKey.length != 32 || initializationVector.length != 16)
+			throw new Error("Invalid Key or Iv Size") //TODO: Log the error
+
+		const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, initializationVector)
 		return Buffer.from(
 			cipher.update(data, 'utf8', 'hex') + cipher.final('hex')
-		).toString('base64')
+		).toString('base64') + '.' + initializationVector.toString('base64')
 	}
 
 	/**
@@ -106,8 +121,14 @@ export class Crypto {
 	* @returns {string} the decoded string
 	*/
 	public static readonly decrypt: (data: string, key: encryptionKeys) => any = (data: string, key: encryptionKeys): any => {
-		const buff = Buffer.from(data, 'base64')
-		const decipher = crypto.createDecipheriv('aes-256-cbc', `${process.env[key.toUpperCase()]}__ENCRYPTION_KEY`, `${process.env[key.toUpperCase()]}__ENCRYPTION_IV`)
+		const encryptionKey = Buffer.from(process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`], 'hex')
+
+		if (process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`].length != 32)
+			throw new Error("Invalid Key Size") //TODO: Log the error
+		
+		const iv = Buffer.from(data.substring(data.lastIndexOf('.') + 1, data.length), 'base64')
+		const buff = Buffer.from(data.substring(0, data.lastIndexOf('.') - 1), 'base64')
+		const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv)
 		return (
 			decipher.update(buff.toString('utf8'), 'hex', 'utf8') +
 			decipher.final('utf8')
