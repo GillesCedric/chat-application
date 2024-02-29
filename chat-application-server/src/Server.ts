@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io'
 import App from './App'
 import { SocketKeywords } from './utils/Keywords'
+import Logger from './utils/logger/Logger'
 
 class Server {
 
@@ -16,7 +17,7 @@ class Server {
     public readonly serve = (): void => {
 
         this.app.webServer.listen(this.port, () => {
-            console.log('Gateway API Server listening on port ' + this.port)
+            Logger.log('Gateway API Server listening on port ' + this.port)
         })
 
     }

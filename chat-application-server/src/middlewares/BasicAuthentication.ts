@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Crypto } from '../../../chat-application-client/src/modules/crypto/Crypto'
+import { Crypto } from '../utils/crypto/Crypto'
 
 
 export default class BasicAuthentication {

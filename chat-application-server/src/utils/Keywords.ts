@@ -3,3 +3,9 @@ export enum SocketKeywords{
 	connection = "connection",
 	emit = "emit",
 }
+
+export enum Services {
+	user = "user",
+	chat = "chat",
+	notification = "notification",
+}
