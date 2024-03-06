@@ -9,6 +9,7 @@ import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
+import { chatLogger as Logger } from '../../modules/logger/Logger'
 
 
 
@@ -42,6 +43,9 @@ export default class App {
     }
 
     private readonly config = (): void => {
+
+        Logger.config()
+
         //security configuration with helmet
         this.app.use(helmet())
 
@@ -68,8 +72,8 @@ export default class App {
         //connection to the database
         mongoose
             .connect(process.env.DATABASE_URL)
-            .then(() => console.log("connected to mongodb"))
-            .catch((err) => console.log("can't connect to mongodb: ", err));
+            .then(() => Logger.log("connected to mongodb"))
+            .catch((err) => Logger.error("can't connect to mongodb: " + err))
 
     }
 

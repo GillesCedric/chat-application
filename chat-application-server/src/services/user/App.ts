@@ -11,6 +11,7 @@ import mongoose from 'mongoose'
 import Routes from './routes/Routes'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
+import { userLogger as Logger } from '../../modules/logger/Logger'
 
 
 
@@ -44,17 +45,24 @@ export default class App {
     }
 
     private readonly config = (): void => {
+
+        Logger.config()
+
+        //this.app.use(cors())
+
+        //cors configuration
+        this.app.use(cors({
+            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autorise uniquement les méthodes GET et POST
+            credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
+        }))
+
         //security configuration with helmet
         this.app.use(helmet())
 
         //body parser configuration
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
-
-        //cors configuration
-        this.app.use(cors({
-            origin: process.env.DOMAIN_NAME,
-        }))
 
         this.app.use(session({
             name: 'chat-application',
@@ -67,7 +75,7 @@ export default class App {
             cookie: {
                 secure: process.env.NODE_ENV == 'production',
                 httpOnly: process.env.NODE_ENV == 'production',
-                maxAge: 2 * 60 * 60 * 1000, //2h,
+                maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                 domain: process.env.DOMAIN_NAME,
                 path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
@@ -88,8 +96,8 @@ export default class App {
         //connection to the database
         mongoose
             .connect(process.env.DATABASE_URL)
-            .then(() => console.log("connected to mongodb"))
-            .catch((err) => console.log("can't connect to mongodb: ", err))
+            .then(() => Logger.log("connected to mongodb"))
+            .catch((err) => Logger.error("can't connect to mongodb: " + err))
 
     }
 

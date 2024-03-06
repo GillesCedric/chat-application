@@ -5,7 +5,7 @@
 			"label": "1. Start FrontEnd",
 			"detail": "Start the React FrontEnd App",
 			"type": "shell",
-			"command": "",
+			"command": "npm run dev",
 			"options": {
 				"cwd": "./chat-application-client"
 			},

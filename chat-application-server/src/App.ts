@@ -15,7 +15,7 @@ import MongoStore from 'connect-mongo'
 import rateLimit from 'express-rate-limit'
 import Proxy from './Proxy'
 import BasicAuthentication from './middlewares/BasicAuthentication'
-import Logger from './utils/logger/Logger'
+import { apiGWLogger as Logger } from './modules/logger/Logger'
 
 
 export default class App {
@@ -60,17 +60,21 @@ export default class App {
 
         Logger.config()
 
+        //cors configuration
+        this.app.use(cors({
+            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autorise uniquement les méthodes GET et POST
+            credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
+        }))
+
+        //this.app.use(cors())
+
         //security configuration with helmet
         this.app.use(helmet())
 
         //body parser configuration
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
-
-        //cors configuration
-        this.app.use(cors({
-            origin: process.env.DOMAIN_NAME,
-        }))
 
         // serving static files 
         this.app.use(express.static('public'))
@@ -88,7 +92,7 @@ export default class App {
                 httpOnly: true,
                 maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                 domain: process.env.DOMAIN_NAME,
-                path: "/",
+                path: "/api/v1",
                 sameSite: process.env.NODE_ENV == 'production',
                 signed: true
             }
@@ -119,7 +123,7 @@ export default class App {
         mongoose
             .connect(process.env.DATABASE_URL)
             .then(() => Logger.log("connected to mongodb"))
-            .catch((err) => Logger.log("can't connect to mongodb: "+ err, 'error'));
+            .catch((err) => Logger.log("can't connect to mongodb: " + err, 'error'));
 
         this._socketServer = new SocketServer(this._webServer, {
             cors: {

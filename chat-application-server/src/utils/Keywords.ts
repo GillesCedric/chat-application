@@ -8,4 +8,5 @@ export enum Services {
 	user = "user",
 	chat = "chat",
 	notification = "notification",
+	apigw = "api-gw",
 }

@@ -310,11 +310,9 @@ export default function Home() {
         password: passwordRef.current?.value,
         tel: telRef.current?.value
       })
-      .then(Response => Response.json()
       .then((data: any) => {
         console.log(data)
       })
-      )
       return true;
     }
     return false;
