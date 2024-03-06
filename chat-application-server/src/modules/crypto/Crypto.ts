@@ -97,7 +97,7 @@ export class Crypto {
 	public static readonly encrypt = (data: string, key: encryptionKeys | deterministEncryptionKeys): string => {
 
 		let determinist = false
-		
+
 		if (key == 'username' || key == 'email' || key == 'tel')
 			determinist = true
 
@@ -125,7 +125,7 @@ export class Crypto {
 
 		if (process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`].length != 32)
 			throw new Error("Invalid Key Size") //TODO: Log the error
-		
+
 		const iv = Buffer.from(data.substring(data.lastIndexOf('.') + 1, data.length), 'base64')
 		const buff = Buffer.from(data.substring(0, data.lastIndexOf('.') - 1), 'base64')
 		const decipher = crypto.createDecipheriv('aes-256-cbc', encryptionKey, iv)

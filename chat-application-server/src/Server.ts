@@ -1,7 +1,8 @@
 import { Socket } from 'socket.io'
 import App from './App'
-import { SocketKeywords } from './utils/Keywords'
-import Logger from './utils/logger/Logger'
+import { Services, SocketKeywords } from './utils/Keywords'
+import { apiGWLogger as Logger } from './modules/logger/Logger'
+import SERVICES from './config/services.json'
 
 class Server {
 
@@ -11,7 +12,7 @@ class Server {
 
     constructor() {
         this.app = new App()
-        this.port = process.env.API_GW_PORT
+        this.port = SERVICES.filter(service => service.name == Services.apigw)[0].port
     }
 
     public readonly serve = (): void => {

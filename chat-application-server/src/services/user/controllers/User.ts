@@ -1,8 +1,9 @@
 import { UserModel } from "../../../schemas/UserModel";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import JWTUtils from "../../security/modules/jwt/JWT";
-import { Crypto } from "../../../utils/crypto/Crypto";
+import JWTUtils from "../../../modules/jwt/JWT";
+import { Crypto } from "../../../modules/crypto/Crypto";
+import { Code } from "../../../utils/HTTP";
 
 
 export default class UserController {
@@ -88,7 +89,7 @@ export default class UserController {
           // If credentials are correct, return the desired response
           req.session['token'] = JWTUtils.generateTokenForUser(userFound.id)
           return res.status(200).json({
-            message: 'connection established 2'
+            message: 'connection success'
           });
         })
         .catch((error) => {
@@ -100,43 +101,42 @@ export default class UserController {
     }
   };
 
-  public readonly signUp = (req: Request, res: Response): Response => {
-    {
-      if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
-        return res.status(422).json({
-          error: "Missing parameters",
-        });
-      }
+  public readonly signUp = async (req: Request, res: Response): Promise<Response> => {
 
-      //salt should always be in number for because bcrypt generate salt only for salt in number not string
-      const firstname = Crypto.encrypt(req.body.firstname, 'database')
-      const lastname = Crypto.encrypt(req.body.lastname, 'database')
-      const username = Crypto.encrypt(req.body.username, 'username')
-      const tel = Crypto.encrypt(req.body.tel, 'tel')
-      const email = Crypto.encrypt(req.body.email, 'email')
-      const password = bcrypt.hashSync(req.body.password, Number.parseInt(process.env.SALT_ROUNDS))
-      const isVerified = Crypto.encrypt('false', 'database')
+    if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
+      return res.status(Code.error).json({
+        error: "Missing parameters",
+      });
+    }
 
-      try {
-        UserModel.insertMany({
-          lastname: lastname,
-          firstname: firstname,
-          username: username,
-          tel: tel,
-          email: email,
-          password: password,
-          isVerified: isVerified,
-          friends: []
-        })
-        return res.status(200).json({
-          message: "success",
-        });
-      } catch (error) {
-        return res.status(401).json({
-          error: error,
-        });
-      }
+    //salt should always be in number for because bcrypt generate salt only for salt in number not string
+    const firstname = Crypto.encrypt(req.body.firstname, 'database')
+    const lastname = Crypto.encrypt(req.body.lastname, 'database')
+    const username = Crypto.encrypt(req.body.username, 'username')
+    const tel = Crypto.encrypt(req.body.tel, 'tel')
+    const email = Crypto.encrypt(req.body.email, 'email')
+    const password = bcrypt.hashSync(req.body.password, Number.parseInt(process.env.SALT_ROUNDS))
+    const isVerified = Crypto.encrypt('false', 'database')
 
+    try {
+      await UserModel.insertMany({
+        lastname: lastname,
+        firstname: firstname,
+        username: username,
+        tel: tel,
+        email: email,
+        password: password,
+        isVerified: isVerified,
+        friends: []
+      })
+      return res.status(200).json({
+        message: "success",
+      });
+    } catch (error) {
+      //TODO log the error
+      return res.status(401).json({
+        error: "Impossible d'enregistrer l'utilisateur",
+      });
     }
   };
 }

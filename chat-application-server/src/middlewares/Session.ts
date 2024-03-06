@@ -3,8 +3,6 @@ import { Request, Response, NextFunction } from 'express'
 
 export default class Session {
 
-    constructor() { }
-
     public static readonly authenticate = (req: Request, res: Response, next: NextFunction): any => {
         if (req.session && req.session['token']) {
             if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin') {
