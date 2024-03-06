@@ -47,16 +47,16 @@ export default class App {
      */
     constructor() {
 
-        dotenv.config({
-            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
-
-        })
-
         this.config()
 
     }
 
     private readonly config = (): void => {
+
+        dotenv.config({
+            path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+
+        })
 
         Logger.config()
 
