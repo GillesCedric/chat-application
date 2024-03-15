@@ -14,8 +14,10 @@ import Socket from './Socket'
 import MongoStore from 'connect-mongo'
 import rateLimit from 'express-rate-limit'
 import Proxy from './Proxy'
-import BasicAuthentication from './middlewares/BasicAuthentication'
-import { apiGWLogger as Logger } from './modules/logger/Logger'
+import BasicAuthentication from '../../middlewares/BasicAuthentication'
+import { apiGWLogger as Logger } from '../../modules/logger/Logger'
+import { Method } from '../../utils/HTTP'
+import Session from '../../middlewares/Session'
 
 
 export default class App {
@@ -47,23 +49,25 @@ export default class App {
      */
     constructor() {
 
-        dotenv.config({
-            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
-
-        })
-
         this.config()
 
     }
 
     private readonly config = (): void => {
 
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            dotenv.config({
+                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+
+            })
+        }
+
         Logger.config()
 
         //cors configuration
         this.app.use(cors({
             origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
-            methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autorise uniquement les méthodes GET et POST
+            methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
 
@@ -92,7 +96,7 @@ export default class App {
                 httpOnly: true,
                 maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                 domain: process.env.DOMAIN_NAME,
-                path: "/api/v1",
+                path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
                 signed: true
             }
@@ -107,6 +111,8 @@ export default class App {
         }))
 
         this.app.use(BasicAuthentication.authenticate)
+
+        this.app.use(Session.authenticate)
 
         Proxy.serve(this.app)
 

@@ -1,6 +1,7 @@
 # Logs
 /chat-application-*/logs
 /chat-application-*/*.log
+/chat-application-*/**/logs
 /chat-application-*/npm-debug.log*
 /chat-application-*/yarn-debug.log*
 /chat-application-*/yarn-error.log*

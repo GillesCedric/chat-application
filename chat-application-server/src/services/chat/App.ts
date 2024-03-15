@@ -10,6 +10,9 @@ import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
 import { chatLogger as Logger } from '../../modules/logger/Logger'
+import { Method } from '../../utils/HTTP'
+import BasicAuthentication from '../../middlewares/BasicAuthentication'
+import Session from '../../middlewares/Session'
 
 
 
@@ -31,10 +34,12 @@ export default class App {
 
     constructor() {
 
-        dotenv.config({
-            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            dotenv.config({
+                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
 
-        })
+            })
+        }
 
         this.config()
 
@@ -45,6 +50,13 @@ export default class App {
     private readonly config = (): void => {
 
         Logger.config()
+
+        //cors configuration
+        this.app.use(cors({
+            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
+            credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
+        }))
 
         //security configuration with helmet
         this.app.use(helmet())
@@ -57,6 +69,10 @@ export default class App {
         this.app.use(cors({
             origin: process.env.DOMAIN_NAME,
         }))
+
+        this.app.use(BasicAuthentication.authenticate)
+
+        this.app.use(Session.authenticate)
 
         if (process.env.NODE_ENV == "development")
             this._httpServer = createHTTPServer(this._app)

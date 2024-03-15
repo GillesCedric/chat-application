@@ -46,31 +46,35 @@ export default class UserController {
       });
   };
 
-  public readonly get = (req: Request, res: Response): Response => {
-    console.log(req.baseUrl);
-    if (req.body.id === undefined) {
-      return res.status(422).json({
-        error: "Missing parameters.",
+  public readonly me = (req: Request, res: Response): Response => {
+
+    const token = req.session['token']
+    const userId = req.body.id;
+    try {
+      UserModel.findById(userId)
+        .then((user) => {
+          return res.status(200).json({
+            user,
+          })
+        })
+        .catch((error) => {
+          console.log(error);
+          return res.status(500).json({
+            error: "Impossible de récupérer les informations",
+          });
+        })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Erreur lors de la vérification des informations",
       });
     }
-    const userId = req.body.id;
-    UserModel.findById(userId).then((user) => {
-      return res.status(200).json({
-        user,
-      });
-    });
+
   };
-  public readonly login = (req: Request, res: Response): Response => {
-    {
-      if (!req.body.email || !req.body.password) {
-        return res.status(422).json({
-          error: "Missing parameters",
-        });
-      }
-
-      const email = req.body.email;
-      const password = req.body.password;
-
+  public readonly signIn = (req: Request, res: Response): Response => {
+    const email = req.body.email;
+    const password = req.body.password;
+    try {
       UserModel.findOne({ email: Crypto.encrypt(email, 'email') })
         .then((userFound) => {
           if (!userFound) {
@@ -92,22 +96,22 @@ export default class UserController {
             message: 'connection success'
           });
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           return res.status(500).json({
-            error: "User verification impossible",
+            error: "Cet utilisateur n'existe pas",
           });
-        });
-    }
-  };
-
-  public readonly signUp = async (req: Request, res: Response): Promise<Response> => {
-
-    if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
-      return res.status(Code.error).json({
-        error: "Missing parameters",
+        })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "User verification impossible",
       });
     }
+
+  };
+
+  public readonly signUp = (req: Request, res: Response): Response => {
 
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
     const firstname = Crypto.encrypt(req.body.firstname, 'database')
@@ -119,7 +123,7 @@ export default class UserController {
     const isVerified = Crypto.encrypt('false', 'database')
 
     try {
-      await UserModel.insertMany({
+      UserModel.insertMany({
         lastname: lastname,
         firstname: firstname,
         username: username,
@@ -129,9 +133,17 @@ export default class UserController {
         isVerified: isVerified,
         friends: []
       })
-      return res.status(200).json({
-        message: "success",
-      });
+        .then(user => {
+          return res.status(200).json({
+            message: "success",
+          });
+        })
+        .catch(error => {
+          //TODO log the error
+          return res.status(401).json({
+            error: "Cet utilisateur existe déjà",
+          });
+        })
     } catch (error) {
       //TODO log the error
       return res.status(401).json({
