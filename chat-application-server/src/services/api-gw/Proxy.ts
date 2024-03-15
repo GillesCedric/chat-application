@@ -1,9 +1,9 @@
 import { Socket as WebSocket, } from "socket.io";
 import { ExtendedError } from "socket.io/dist/namespace";
-import { SocketKeywords } from "./utils/Keywords";
+import { SocketKeywords } from "../../utils/Keywords";
 import { Application } from "express";
 import { RequestHandler, createProxyMiddleware, fixRequestBody, responseInterceptor } from "http-proxy-middleware";
-import Session from './middlewares/Session'
+import Session from '../../middlewares/Session'
 
 
 

@@ -12,6 +12,9 @@ import Routes from './routes/Routes'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import { userLogger as Logger } from '../../modules/logger/Logger'
+import { Method } from '../../utils/HTTP'
+import Session from '../../middlewares/Session'
+import BasicAuthentication from '../../middlewares/BasicAuthentication'
 
 
 
@@ -33,11 +36,13 @@ export default class App {
 
     constructor() {
 
-        dotenv.config({
-            path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            dotenv.config({
+                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
 
-        })
-        
+            })
+        }
+
         this.config()
 
         Routes.routes(this.app)
@@ -53,7 +58,7 @@ export default class App {
         //cors configuration
         this.app.use(cors({
             origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
-            methods: ['GET', 'POST', 'PUT', 'DELETE'], // Autorise uniquement les méthodes GET et POST
+            methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
 
@@ -66,7 +71,7 @@ export default class App {
 
         this.app.use(session({
             name: 'chat-application',
-            secret: process.env.SESSION_SECRET,
+            secret: process.env.SESSION_SECRET as string,
             resave: false,
             saveUninitialized: true,
             store: MongoStore.create({
@@ -82,6 +87,10 @@ export default class App {
             }
         }))
 
+        this.app.use(BasicAuthentication.authenticate)
+
+        this.app.use(Session.authenticate)
+
         if (process.env.NODE_ENV == "development")
             this._httpServer = createHTTPServer(this._app)
         else
@@ -95,7 +104,7 @@ export default class App {
 
         //connection to the database
         mongoose
-            .connect(process.env.DATABASE_URL)
+            .connect(process.env.DATABASE_URL as string)
             .then(() => Logger.log("connected to mongodb"))
             .catch((err) => Logger.error("can't connect to mongodb: " + err))
 

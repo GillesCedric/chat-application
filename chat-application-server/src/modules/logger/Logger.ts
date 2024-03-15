@@ -53,7 +53,11 @@ export default abstract class Logger {
           zippedArchive: true,
           maxSize: this.maxSize,
           maxFiles: this.maxFiles,
-          format: winston.format.simple(), //TODO test json format
+          format: winston.format.combine(winston.format.timestamp({
+            format: this.timestampFormat,
+          }),
+            winston.format.json(),
+          )
           
         }),
       ] : null,
@@ -64,7 +68,11 @@ export default abstract class Logger {
           zippedArchive: true,
           maxSize: this.maxSize,
           maxFiles: this.maxFiles,
-          format: winston.format.simple(), //TODO test json format
+          format: winston.format.combine(winston.format.timestamp({
+            format: this.timestampFormat,
+          }),
+            winston.format.json(),
+          )
         }),
       ] : null,
     });
@@ -85,6 +93,11 @@ export default abstract class Logger {
   warn = (message: string, level: LogLevel = 'warn') => {
     this.logger.log({ level, message })
   }
+
+  http = (message: string, level: LogLevel = 'http') => {
+    this.logger.log({ level, message })
+  }
+
 }
 
 class APIGWLogger extends Logger {

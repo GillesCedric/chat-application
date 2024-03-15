@@ -2,9 +2,11 @@
   "watch": [
     "src/models",
     "src/schemas",
-    "src/utils/**/*.ts",
+    "src/middlewares",
+    "src/modules",
+    "src/utils",
     "src/services/chat",
-    "src/config/services.json"
+    "src/config"
   ],
   "ext": "ts,json",
   "ignore": [
