@@ -5,12 +5,12 @@
     "src/middlewares",
     "src/modules",
     "src/utils",
-    "src/services/chat",
+    "src/services/user",
     "src/config"
   ],
   "ext": "ts,json",
   "ignore": [
     "*.spec.ts"
   ],
-  "exec": "ts-node ./src/services/chat/Server.ts"
+  "exec": "ts-node ./src/services/user/Server.ts"
 }

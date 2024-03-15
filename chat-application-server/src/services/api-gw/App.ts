@@ -14,7 +14,10 @@ import Socket from './Socket'
 import MongoStore from 'connect-mongo'
 import rateLimit from 'express-rate-limit'
 import Proxy from './Proxy'
-import BasicAuthentication from './middlewares/BasicAuthentication'
+import BasicAuthentication from '../../middlewares/BasicAuthentication'
+import { apiGWLogger as Logger } from '../../modules/logger/Logger'
+import { Method } from '../../utils/HTTP'
+import Session from '../../middlewares/Session'
 
 
 export default class App {
@@ -46,16 +49,29 @@ export default class App {
      */
     constructor() {
 
-        dotenv.config({
-            path: fs.existsSync(path.join(path.dirname(process.cwd()), '.env.development')) ? path.join(path.dirname(process.cwd()), '.env.development') : path.join(path.dirname(process.cwd()), '.env')
-
-        })
-
         this.config()
 
     }
 
     private readonly config = (): void => {
+
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            dotenv.config({
+                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+
+            })
+        }
+
+        Logger.config()
+
+        //cors configuration
+        this.app.use(cors({
+            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
+            credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
+        }))
+
+        //this.app.use(cors())
 
         //security configuration with helmet
         this.app.use(helmet())
@@ -63,11 +79,6 @@ export default class App {
         //body parser configuration
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
-
-        //cors configuration
-        this.app.use(cors({
-            origin: process.env.DOMAIN_NAME,
-        }))
 
         // serving static files 
         this.app.use(express.static('public'))
@@ -82,23 +93,26 @@ export default class App {
             }),
             cookie: {
                 secure: process.env.NODE_ENV == 'production',
-                httpOnly: process.env.NODE_ENV == 'production',
-                maxAge: 2 * 60 * 60 * 1000, //2h,
+                httpOnly: true,
+                maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                 domain: process.env.DOMAIN_NAME,
                 path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
+                signed: true
             }
         }))
 
 
         this.app.use(rateLimit({
             windowMs: 10 * 60 * 1000, // 10 minutes
-            limit: 100, // 5 calls,
+            limit: 100, // 100 calls,
             standardHeaders: 'draft-7',
             legacyHeaders: false,
         }))
 
         this.app.use(BasicAuthentication.authenticate)
+
+        this.app.use(Session.authenticate)
 
         Proxy.serve(this.app)
 
@@ -106,19 +120,16 @@ export default class App {
             this._httpServer = createHTTPServer(this._app)
         else
             this._httpsServer = createHTTPSServer({
-                requestCert: true,
-                rejectUnauthorized: true,
                 key: fs.readFileSync('chemin/vers/votre/cle_privee_client.key'),
                 cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
-                ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
             }, this._app)
 
 
         //connection to the database
         mongoose
             .connect(process.env.DATABASE_URL)
-            .then(() => console.log("connected to mongodb"))
-            .catch((err) => console.log("can't connect to mongodb: ", err));
+            .then(() => Logger.log("connected to mongodb"))
+            .catch((err) => Logger.log("can't connect to mongodb: " + err, 'error'));
 
         this._socketServer = new SocketServer(this._webServer, {
             cors: {

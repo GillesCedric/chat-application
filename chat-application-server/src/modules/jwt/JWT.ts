@@ -17,19 +17,19 @@ export default abstract class JWTUtils {
 <<<<<<< HEAD
    * @param {User} user the user
 =======
-	 * @param {string} id the user id
+   * @param {string} id the user id
 >>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
 =======
-	 * @param {string} id the user id
+   * @param {string} id the user id
 >>>>>>> 61faf41140fb10ab0cb29c72231596f2d97f42e5:chat-application-server/src/modules/jwt/JWT.ts
    * @readonly
    * @static
    * @private
    * @returns {string} the generated token
-	 */
-	public static readonly generateTokenForUser: (id: string) => string = (id: string): string => {
-		return jwt.sign({ userId: id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
-	}
+   */
+  public static readonly generateTokenForUser: (id: string) => string = (id: string): string => {
+    return jwt.sign({ userId: id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
+  }
 
   /**
    * @method parseToken

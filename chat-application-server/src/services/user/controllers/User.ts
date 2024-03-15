@@ -1,14 +1,10 @@
 import { UserModel } from "../../../schemas/UserModel";
 import { Request, Response } from "express";
-import * as bcrypt from "bcrypt";
-import JWTUtils from "../../security/modules/jwt/JWT";
-import { Crypto } from "../../../../../chat-application-client/src/modules/crypto/Crypto";
-/**
- * @class UserController
- * @description this class is used to handle the request from the User endpoint
- * @author Jean-Loan BATCHO
- * @returns {Response}
- */
+import bcrypt from "bcrypt";
+import JWTUtils from "../../../modules/jwt/JWT";
+import { Crypto } from "../../../modules/crypto/Crypto";
+import { Code } from "../../../utils/HTTP";
+
 
 export default class UserController {
   public readonly getAll = (req: Request, res: Response): Response => {
@@ -50,98 +46,109 @@ export default class UserController {
       });
   };
 
-  public readonly get = (req: Request, res: Response): Response => {
-    console.log(req.baseUrl);
-    if (req.body.id === undefined) {
-      return res.status(422).json({
-        error: "Missing parameters.",
-      });
-    }
+  public readonly me = (req: Request, res: Response): Response => {
+
+    const token = req.session['token']
     const userId = req.body.id;
-    UserModel.findById(userId).then((user) => {
-      return res.status(200).json({
-        user,
-      });
-    });
-  };
-  public readonly login = (req: Request, res: Response): Response => {
-    {
-      if (!req.body.username || !req.body.password) {
-        return res.status(422).json({
-          error: "Missing parameters",
-        });
-      }
-
-      const username = req.body.username;
-      const password = req.body.password;
-
-      UserModel.findOne({ username: username })
-        .then((userFound) => {
-          if (!userFound) {
-            return res.status(401).json({
-              error: "Incorrect username",
-            });
-          }
-          const passwordMatches = bcrypt.compare(password, userFound.password);
-
-          if (!passwordMatches) {
-            console.log("Incorrect password");
-            return res.status(401).json({
-              error: "Incorrect password",
-              data: password + userFound.password + " " + passwordMatches,
-            });
-          }
-          // If credentials are correct, return the desired response
+    try {
+      UserModel.findById(userId)
+        .then((user) => {
           return res.status(200).json({
-            userId: userFound.id,
-            token: JWTUtils.generateTokenForUser(userFound.id),
-          });
+            user,
+          })
         })
         .catch((error) => {
           console.log(error);
           return res.status(500).json({
-            error: "User verification impossible",
+            error: "Impossible de récupérer les informations",
           });
-        });
+        })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Erreur lors de la vérification des informations",
+      });
     }
+
+  };
+  public readonly signIn = (req: Request, res: Response): Response => {
+    const email = req.body.email;
+    const password = req.body.password;
+    try {
+      UserModel.findOne({ email: Crypto.encrypt(email, 'email') })
+        .then((userFound) => {
+          if (!userFound) {
+            return res.status(401).json({
+              error: "Incorrect email",
+            });
+          }
+
+          const passwordMatches = bcrypt.compareSync(password, userFound.password);
+
+          if (!passwordMatches) {
+            return res.status(401).json({
+              error: "Incorrect password",
+            })
+          }
+          // If credentials are correct, return the desired response
+          req.session['token'] = JWTUtils.generateTokenForUser(userFound.id)
+          return res.status(200).json({
+            message: 'connection success'
+          });
+        })
+        .catch(error => {
+          console.log(error);
+          return res.status(500).json({
+            error: "Cet utilisateur n'existe pas",
+          });
+        })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "User verification impossible",
+      });
+    }
+
   };
 
   public readonly signUp = (req: Request, res: Response): Response => {
-    {
-      //const body = JSON.parse(req.body.body)
-      console.log(req.body)
-      if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.tel || !req.body.email || !req.body.password) {
-        return res.status(422).json({
-          error: "Missing parameters",
-        });
-      }
 
-      const firstname = Crypto.encrypt(req.body.username, 'database');
-      const lastname = Crypto.encrypt(req.body.lastname, 'database');
-      const username = Crypto.encrypt(req.body.username, 'database');
-      const tel = Crypto.encrypt(req.body.tel, 'database');
-      const email = Crypto.encrypt(req.body.email, 'database');
-      const password = Crypto.encrypt(bcrypt.hashSync(req.body.password, process.env.SALT), 'database');
+    //salt should always be in number for because bcrypt generate salt only for salt in number not string
+    const firstname = Crypto.encrypt(req.body.firstname, 'database')
+    const lastname = Crypto.encrypt(req.body.lastname, 'database')
+    const username = Crypto.encrypt(req.body.username, 'username')
+    const tel = Crypto.encrypt(req.body.tel, 'tel')
+    const email = Crypto.encrypt(req.body.email, 'email')
+    const password = bcrypt.hashSync(req.body.password, Number.parseInt(process.env.SALT_ROUNDS))
+    const isVerified = Crypto.encrypt('false', 'database')
 
-      try {
-        UserModel.insertMany({
-          lastname: lastname,
-          firstname: firstname,
-          username: username,
-          email: email,
-          password: password,
-          isVerified: false,
-          friends: []
+    try {
+      UserModel.insertMany({
+        lastname: lastname,
+        firstname: firstname,
+        username: username,
+        tel: tel,
+        email: email,
+        password: password,
+        isVerified: isVerified,
+        friends: []
+      })
+        .then(user => {
+          return res.status(200).json({
+            message: "success",
+          });
         })
-        return res.status(200).json({
-          message: "success",
-        });
-      } catch (error) {
-        return res.status(401).json({
-          error: error,
-        });
-      }
-
+        .catch(error => {
+          //TODO log the error
+          return res.status(401).json({
+            error: "Cet utilisateur existe déjà",
+          });
+        })
+    } catch (error) {
+      //TODO log the error
+      return res.status(401).json({
+        error: "Impossible d'enregistrer l'utilisateur",
+      });
     }
   };
 }

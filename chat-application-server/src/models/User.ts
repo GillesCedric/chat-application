@@ -13,7 +13,7 @@ class User {
 
   private _password: string;
 
-  private _isVerified: boolean;
+  private _isVerified: string;
 
   private _friends: User[];
 
@@ -25,7 +25,7 @@ class User {
     tel: string,
     email: string,
     password: string,
-    isVerified: boolean,
+    isVerified: string,
     friends: User[]
   ) {
     this.lastname = lastname;
@@ -85,10 +85,10 @@ class User {
   public set tel(value: string) {
     this._tel = value;
   }
-  public get isVerified(): boolean {
+  public get isVerified(): string {
     return this._isVerified;
   }
-  public set isVerified(value: boolean) {
+  public set isVerified(value: string) {
     this._isVerified = value;
   }
 

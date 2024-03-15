@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   tel: {
     type: String,
+    unique: true,
   },
   email: {
     type: String,
@@ -27,8 +28,8 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   isVerified: {
-    type: Boolean,
-    default: false,
+    type: String,
+    required: true,
   },
   friends: [
     {

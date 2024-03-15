@@ -1,21 +1,27 @@
 import App from './App'
+import SERVICES from '../../config/services.json'
+import { userLogger as Logger } from '../../modules/logger/Logger'
+import { Services } from '../../utils/Keywords'
 
 class Server {
 
     private readonly app: App
 
-    private readonly internalPort: string | number
+    private readonly port: string | number
 
+
+    /**
+     * @constructor
+     */
     constructor() {
         this.app = new App()
-        this.internalPort = process.env.CHAT_SERVICE_PORT
+        this.port = SERVICES.filter(service => service.name == Services.user)[0].port
     }
 
     public readonly serve = (): void => {
 
-
-        this.app.internalServer.listen(this.internalPort, () => {
-            console.log('Internal Server listening on port ' + this.internalPort)
+        this.app.webServer.listen(this.port, () => {
+            Logger.log('User Service listening on port ' + this.port)
         })
 
     }

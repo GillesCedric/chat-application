@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
-import { Crypto } from '../../../chat-application-client/src/modules/crypto/Crypto'
+import { Crypto } from '../modules/crypto/Crypto'
 
 
 export default class BasicAuthentication {
-
-    constructor() { }
 
     public static readonly authenticate = (request: Request, response: Response, next: NextFunction): any => {
         // check for basic auth header

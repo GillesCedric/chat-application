@@ -1,5 +1,7 @@
 import App from './App'
-import CONFIG from '../../config/services.json'
+import SERVICES from '../../config/services.json'
+import { chatLogger as Logger } from '../../modules/logger/Logger'
+import { Services } from '../../utils/Keywords'
 
 class Server {
 
@@ -13,13 +15,13 @@ class Server {
      */
     constructor() {
         this.app = new App()
-        this.port = CONFIG.filter(service => service.name == "chat")[0].port
+        this.port = SERVICES.filter(service => service.name == Services.chat)[0].port
     }
 
     public readonly serve = (): void => {
 
         this.app.webServer.listen(this.port, () => {
-            console.log('Chat Service Server listening on port ' + this.port)
+            Logger.log('Chat Service listening on port ' + this.port)
         })
 
     }

@@ -1,6 +1,8 @@
 import { Socket } from 'socket.io'
 import App from './App'
-import { SocketKeywords } from './utils/Keywords'
+import { Services, SocketKeywords } from '../../utils/Keywords'
+import { apiGWLogger as Logger } from '../../modules/logger/Logger'
+import SERVICES from '../../config/services.json'
 
 class Server {
 
@@ -10,13 +12,13 @@ class Server {
 
     constructor() {
         this.app = new App()
-        this.port = process.env.API_GW_PORT
+        this.port = SERVICES.filter(service => service.name == Services.apigw)[0].port
     }
 
     public readonly serve = (): void => {
 
         this.app.webServer.listen(this.port, () => {
-            console.log('Gateway API Server listening on port ' + this.port)
+            Logger.log('Gateway API Server listening on port ' + this.port)
         })
 
     }

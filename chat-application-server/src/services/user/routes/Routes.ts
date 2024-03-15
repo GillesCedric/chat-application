@@ -1,20 +1,21 @@
 import { Request, Response, Application } from "express";
 import * as path from "path";
 import UserController from "../controllers/User";
+import Validators from "../../../middlewares/Validators";
 
 
 
 export default class Routes {
 
-  private readonly userController: UserController = new UserController();
+  private static readonly userController: UserController = new UserController()
 
-  public readonly routes = (app: Application): void => {
+  public static readonly routes = (app: Application): void => {
 
-    app.route("/api/" + "users").get(this.userController.getAll);
-    app.route("/api/" + "users").get(this.userController.get);
-    app.route("/api/" + "users/login").post(this.userController.login);
-    app.route("/api/" + "users/signup").post(this.userController.signUp);
-    app.route("/api/users/getFriends").post(this.userController.getUserFriends);
+    app.route("/").get(this.userController.getAll)
+    app.route("/me").get(this.userController.me)
+    app.route("/signin").post(...Validators.signIn, Validators.errors, this.userController.signIn)
+    app.route("/signup").post(...Validators.signUp, Validators.errors, this.userController.signUp)
+    app.route("/getFriends").post(this.userController.getUserFriends)
 
   };
 }

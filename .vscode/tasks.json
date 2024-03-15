@@ -5,7 +5,7 @@
 			"label": "1. Start FrontEnd",
 			"detail": "Start the React FrontEnd App",
 			"type": "shell",
-			"command": "",
+			"command": "npm run dev",
 			"options": {
 				"cwd": "./chat-application-client"
 			},
@@ -72,11 +72,12 @@
 			}
 		},
 		{
-			"label": "1. Start Back-End",
+			"label": "2. Start Back-End",
 			"detail": "Start the whole back-end : API GW and all the microservices",
 			"dependsOn": [
 				"3. Start API GW Service",
-				"4. Start Chat Service"
+				"4. Start Chat Service",
+				"5. Start User Service",
 			],
 			"presentation": {
 				"reveal": "always",
