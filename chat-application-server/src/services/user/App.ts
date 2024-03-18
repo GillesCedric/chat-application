@@ -12,7 +12,7 @@ import Routes from './routes/Routes'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import { userLogger as Logger } from '../../modules/logger/Logger'
-import { Method } from '../../utils/HTTP'
+import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
 
@@ -51,13 +51,18 @@ export default class App {
 
     private readonly config = (): void => {
 
-        Logger.config()
+        try {
+            Logger.config()
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
 
         //this.app.use(cors())
 
         //cors configuration
         this.app.use(cors({
-            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            origin: `${protocol}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -81,7 +86,7 @@ export default class App {
                 secure: process.env.NODE_ENV == 'production',
                 httpOnly: process.env.NODE_ENV == 'production',
                 maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                domain: process.env.DOMAIN_NAME,
+                domain: process.env.CLIENT_URL,
                 path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
             }

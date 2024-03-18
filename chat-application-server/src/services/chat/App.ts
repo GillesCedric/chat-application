@@ -10,7 +10,7 @@ import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
 import { chatLogger as Logger } from '../../modules/logger/Logger'
-import { Method } from '../../utils/HTTP'
+import { Method, protocol } from '../../utils/HTTP'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
 import Session from '../../middlewares/Session'
 
@@ -49,11 +49,16 @@ export default class App {
 
     private readonly config = (): void => {
 
-        Logger.config()
+        try {
+            Logger.config()
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
 
         //cors configuration
         this.app.use(cors({
-            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            origin: `${protocol}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -64,11 +69,6 @@ export default class App {
         //body parser configuration
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
-
-        //cors configuration
-        this.app.use(cors({
-            origin: process.env.DOMAIN_NAME,
-        }))
 
         this.app.use(BasicAuthentication.authenticate)
 

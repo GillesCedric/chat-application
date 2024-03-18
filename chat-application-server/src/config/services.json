@@ -1,22 +1,46 @@
-[
-	{
-		"name": "api-gw",
-		"domain": "localhost",
-		"port": 4000
-	},
-	{
-		"name": "chat",
-		"domain": "localhost",
-		"port": 6000
-	},
-	{
-		"name": "user",
-		"domain": "localhost",
-		"port": 6001
-	},
-	{
-		"name": "notification",
-		"domain": "localhost",
-		"port": 6002
-	}
-]
+{
+	"development": [
+		{
+			"name": "api-gw",
+			"domain": "localhost",
+			"port": 4000
+		},
+		{
+			"name": "chat",
+			"domain": "localhost",
+			"port": 6000
+		},
+		{
+			"name": "user",
+			"domain": "localhost",
+			"port": 6001
+		},
+		{
+			"name": "notification",
+			"domain": "localhost",
+			"port": 6002
+		}
+	],
+	"production": [
+		{
+			"name": "api-gw",
+			"domain": "api-gw",
+			"port": 3000
+		},
+		{
+			"name": "chat",
+			"domain": "chat",
+			"port": 3000
+		},
+		{
+			"name": "user",
+			"domain": "user",
+			"port": 3000
+		},
+		{
+			"name": "notification",
+			"domain": "notification",
+			"port": 3000
+		}
+	]
+}

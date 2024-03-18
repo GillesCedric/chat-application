@@ -19,3 +19,5 @@ export enum Code {
 	internalError = 500,
 	badRequest = 422,
 }
+
+export const protocol = () => process.env.NODE_ENV == "development" ? "http" : "https"
