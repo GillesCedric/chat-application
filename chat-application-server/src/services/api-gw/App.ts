@@ -56,19 +56,19 @@ export default class App {
 
     private readonly config = (): void => {
 
-        //if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == "development") {
+        if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == "development") {
 
-        try {
+            try {
 
-            dotenv.config({
-                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
-            })
-        } catch (error) {
-            console.error(error)
-            process.exit(1)
+                dotenv.config({
+                    path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+                })
+            } catch (error) {
+                console.error(error)
+                process.exit(1)
+            }
+
         }
-
-        //}
 
         try {
             Logger.config()
@@ -76,10 +76,6 @@ export default class App {
             console.error(error)
             process.exit(1)
         }
-
-
-
-
 
         //cors configuration
         this.app.use(cors({
@@ -155,6 +151,7 @@ export default class App {
 
         //connection to the database
         try {
+            Logger.log(process.env.DATABASE_URL)
             mongoose
                 .connect(process.env.DATABASE_URL)
                 .then(() => Logger.log("connected to mongodb"))
