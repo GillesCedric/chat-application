@@ -36,13 +36,6 @@ export default class App {
 
     constructor() {
 
-        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
-            dotenv.config({
-                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
-
-            })
-        }
-
         this.config()
 
         Routes.routes(this.app)
@@ -50,6 +43,25 @@ export default class App {
     }
 
     private readonly config = (): void => {
+
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            try {
+                dotenv.config({
+                    path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+                })
+            } catch (error) {
+                console.error(error)
+                process.exit(1)
+            }
+
+        }
+
+        try {
+            Logger.config()
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
 
         try {
             Logger.config()

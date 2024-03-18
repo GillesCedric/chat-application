@@ -56,12 +56,19 @@ export default class App {
 
     private readonly config = (): void => {
 
-        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+        //if (process.env.NODE_ENV == undefined || process.env.NODE_ENV == "development") {
+
+        try {
+
             dotenv.config({
                 path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
-
             })
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
         }
+
+        //}
 
         try {
             Logger.config()
@@ -69,6 +76,8 @@ export default class App {
             console.error(error)
             process.exit(1)
         }
+
+
 
 
 
@@ -131,8 +140,8 @@ export default class App {
         Proxy.serve(this.app)
 
         try {
-            //if (process.env.NODE_ENV == "development")
-            if (process.env.NODE_ENV == "production")
+            if (process.env.NODE_ENV == "development")
+                //if (process.env.NODE_ENV == "production")
                 this._httpServer = createHTTPServer(this._app)
             else
                 this._httpsServer = createHTTPSServer({
