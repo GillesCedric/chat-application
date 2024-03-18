@@ -23,7 +23,7 @@ export default abstract class Logger {
     this.maxFiles = '30d'
     this.timestampFormat = 'YYYY-MM-DD hh:mm:ss.SSS A'
     this.env = this.env || "development"
-    this.logsFolder = this.env == "development" ? "src" : "${this.env}"
+    this.logsFolder = this.env == "development" ? "src" : "dist"
   }
 
   config = () => {
@@ -32,7 +32,7 @@ export default abstract class Logger {
       defaultMeta: {
         service: this.serviceName
       },
-      transports: this.env == "production" ? [
+      transports: this.env == "development" ? [
         new winston.transports.Console({
           format: winston.format.cli()
         }),
