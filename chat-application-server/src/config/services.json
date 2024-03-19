@@ -1,7 +1,7 @@
 {
 	"development": [
 		{
-			"name": "api-gw",
+			"name": "api-gateway",
 			"domain": "localhost",
 			"port": 4000
 		},
@@ -23,8 +23,8 @@
 	],
 	"production": [
 		{
-			"name": "api-gw",
-			"domain": "api-gw",
+			"name": "api-gateway",
+			"domain": "api-gateway",
 			"port": 3000
 		},
 		{

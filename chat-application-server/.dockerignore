@@ -9,6 +9,7 @@ node_modules
 # Fichiers Docker
 Dockerfile*
 .dockerignore
+src/services/**/Dockerfile
 
 # Fichiers et répertoires spécifiques aux services
 src/services/**/logs
@@ -56,3 +57,6 @@ coverage/
 *.md
 LICENSE
 CONTRIBUTING.md
+
+# Script de configuration
+*.sh

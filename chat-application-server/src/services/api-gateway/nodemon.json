@@ -5,12 +5,12 @@
     "src/middlewares",
     "src/modules",
     "src/utils",
-    "src/services/api-gw",
+    "src/services/api-gateway",
     "src/config"
   ],
   "ext": "ts,json",
   "ignore": [
     "*.spec.ts"
   ],
-  "exec": "ts-node ./src/services/api-gw/Server.ts"
+  "exec": "ts-node ./src/services/api-gateway/Server.ts"
 }

@@ -23,7 +23,7 @@ RUN npm run build
 # Étape 5: Nettoyage, supprimer les 'devDependencies' qui ne sont pas nécessaires pour l'exécution
 RUN npm prune --production
 
-RUN rm -rf tsconfig.json README.md LICENSE CONTRIBUTING.md .env .env.example src dist/services/${SERVICE}/nodemon.json dist/services/chat dist/services/api-gw dist/services/notification
+RUN rm -rf tsconfig.json README.md LICENSE CONTRIBUTING.md .env .env.example src dist/services/${SERVICE}/nodemon.json dist/services/chat dist/services/api-gateway dist/services/notification
 
 # Étape 6: Étape finale pour l'image de production
 FROM node:lts-slim

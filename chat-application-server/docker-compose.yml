@@ -3,7 +3,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: src/services/api-gw/Dockerfile
+      dockerfile: src/services/api-gateway/Dockerfile
     ports:
       - "8080:3000"
     image: api-gateway
