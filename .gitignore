@@ -66,3 +66,11 @@
 
 # next.js build output
 /chat-application-*/.next
+
+# script de configuration
+/chat-application-*/*.sh
+
+#fichiers docker
+/chat-application-*/docker-compose.yml
+/chat-application-*/.dockerignore
+/chat-application-*/**/Dockerfile
