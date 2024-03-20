@@ -30,6 +30,7 @@ FROM node:lts-slim
 
 # Définir un argument pour le répertoire de travail
 ARG WORKDIR=/app
+ARG SERVICE=user
 
 # Créer et définir un répertoire de travail
 WORKDIR ${WORKDIR}
@@ -48,4 +49,4 @@ USER ${SERVICE}
 EXPOSE 3000
 
 # Définir la commande pour démarrer l'application
-CMD ["node", "dist/services/${SERVICE}/Server.js"]
+CMD ["sh", "-c", "node dist/services/${SERVICE}/Server.js"]

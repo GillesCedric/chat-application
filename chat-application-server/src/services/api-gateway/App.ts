@@ -151,7 +151,6 @@ export default class App {
 
         //connection to the database
         try {
-            Logger.log(process.env.DATABASE_URL)
             mongoose
                 .connect(process.env.DATABASE_URL)
                 .then(() => Logger.log("connected to mongodb"))

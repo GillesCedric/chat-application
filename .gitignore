@@ -71,6 +71,6 @@
 /chat-application-*/*.sh
 
 #fichiers docker
-/chat-application-*/docker-compose.yml
+/chat-application-server/docker-compose.yml
 /chat-application-*/.dockerignore
 /chat-application-*/**/Dockerfile

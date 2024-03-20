@@ -6,7 +6,7 @@ services:
       dockerfile: src/services/api-gateway/Dockerfile
     ports:
       - "8080:3000"
-    image: api-gateway
+    image: gillescedric/api-gateway:latest
     networks:
       - chat-application-network
     restart: always
@@ -14,6 +14,23 @@ services:
       - .env
     volumes:
       - /etc/chat-application/certs/api-gateway:/app/certs:ro
+    depends_on:
+      - mongodb
+
+  user:
+    build:
+      context: .
+      dockerfile: src/services/user/Dockerfile
+    ports:
+      - "3000"
+    image: gillescedric/user:latest
+    networks:
+      - chat-application-network
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /etc/chat-application/certs/user:/app/certs:ro
     depends_on:
       - mongodb
 

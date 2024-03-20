@@ -11,3 +11,59 @@ sast:
   stage: test
 include:
 - template: Security/SAST.gitlab-ci.yml
+
+name: Deploy Chat Application on Production Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+    - name: Generate Certificates
+      run: |
+        bash generate_certificates.sh
+        
+    - name: Build and Push Docker Images
+      run: |
+        docker-compose build
+        docker-compose push
+        
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v0.1.2
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          if ! command -v docker &> /dev/null; then
+            curl -fsSL https://get.docker.com -o get-docker.sh
+            sudo sh get-docker.sh
+            sudo usermod -aG docker ${USER}
+            newgrp docker
+          fi
+          
+          if ! command -v docker-compose &> /dev/null; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+          
+          cd /path/to/your/project
+          docker-compose pull
+          docker-compose down
+          docker-compose up -d
+
