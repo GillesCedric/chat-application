@@ -23,13 +23,14 @@ RUN npm run build
 # Étape 5: Nettoyage, supprimer les 'devDependencies' qui ne sont pas nécessaires pour l'exécution
 RUN npm prune --production
 
-RUN rm -rf tsconfig.json README.md LICENSE CONTRIBUTING.md .env .env.example src dist/services/${SERVICE}/nodemon.json dist/services/chat dist/services/api-gw dist/services/notification
+RUN rm -rf tsconfig.json README.md LICENSE CONTRIBUTING.md .env .env.example src dist/services/${SERVICE}/nodemon.json dist/services/chat dist/services/api-gateway dist/services/notification
 
 # Étape 6: Étape finale pour l'image de production
 FROM node:lts-slim
 
 # Définir un argument pour le répertoire de travail
 ARG WORKDIR=/app
+ARG SERVICE=user
 
 # Créer et définir un répertoire de travail
 WORKDIR ${WORKDIR}
@@ -48,4 +49,4 @@ USER ${SERVICE}
 EXPOSE 3000
 
 # Définir la commande pour démarrer l'application
-CMD ["node", "dist/services/${SERVICE}/Server.js"]
+CMD ["sh", "-c", "node dist/services/${SERVICE}/Server.js"]

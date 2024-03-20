@@ -141,8 +141,8 @@ export default class App {
                 this._httpServer = createHTTPServer(this._app)
             else
                 this._httpsServer = createHTTPSServer({
-                    key: fs.readFileSync('chemin/vers/votre/cle_privee_client.key'),
-                    cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
+                    key: fs.readFileSync(path.join('certs', 'api-gateway', 'api-gateway-key.key')),
+                    cert: fs.readFileSync(path.join('certs', 'api-gateway', 'api-gateway-cert.pem')),
                 }, this._app)
         } catch (error) {
             Logger.log(error.message)
@@ -151,7 +151,6 @@ export default class App {
 
         //connection to the database
         try {
-            Logger.log(process.env.DATABASE_URL)
             mongoose
                 .connect(process.env.DATABASE_URL)
                 .then(() => Logger.log("connected to mongodb"))
