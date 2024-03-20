@@ -12,7 +12,7 @@ import Routes from './routes/Routes'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import { userLogger as Logger } from '../../modules/logger/Logger'
-import { Method } from '../../utils/HTTP'
+import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
 
@@ -36,13 +36,6 @@ export default class App {
 
     constructor() {
 
-        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
-            dotenv.config({
-                path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
-
-            })
-        }
-
         this.config()
 
         Routes.routes(this.app)
@@ -51,13 +44,37 @@ export default class App {
 
     private readonly config = (): void => {
 
-        Logger.config()
+        if (!process.env.NODE_ENV || process.env.NODE_ENV == "development") {
+            try {
+                dotenv.config({
+                    path: fs.existsSync(path.join(process.cwd(), '.env.development')) ? path.join(process.cwd(), '.env.development') : path.join(process.cwd(), '.env')
+                })
+            } catch (error) {
+                console.error(error)
+                process.exit(1)
+            }
+
+        }
+
+        try {
+            Logger.config()
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
+
+        try {
+            Logger.config()
+        } catch (error) {
+            console.error(error)
+            process.exit(1)
+        }
 
         //this.app.use(cors())
 
         //cors configuration
         this.app.use(cors({
-            origin: 'http://localhost:3000', // Autorise uniquement les requêtes provenant de ce domaine
+            origin: `${protocol}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -81,7 +98,7 @@ export default class App {
                 secure: process.env.NODE_ENV == 'production',
                 httpOnly: process.env.NODE_ENV == 'production',
                 maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                domain: process.env.DOMAIN_NAME,
+                domain: process.env.CLIENT_URL,
                 path: "/",
                 sameSite: process.env.NODE_ENV == 'production',
             }
@@ -97,9 +114,9 @@ export default class App {
             this._httpsServer = createHTTPSServer({
                 requestCert: true,
                 rejectUnauthorized: true,
-                key: fs.readFileSync('chemin/vers/votre/cle_privee_client.key'),
-                cert: fs.readFileSync('chemin/vers/votre/certificat_client.pem'),
-                ca: fs.readFileSync('chemin/vers/ca_certificat_microservice.pem'),
+                key: fs.readFileSync(path.join('certs', 'user', 'user-key.key')),
+                cert: fs.readFileSync(path.join('certs', 'user', 'user-cert.pem')),
+                ca: fs.readFileSync(path.join('certs', 'ca', 'ca-cert.pem')),
             }, this._app)
 
         //connection to the database

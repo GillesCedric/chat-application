@@ -15,7 +15,7 @@ class Server {
      */
     constructor() {
         this.app = new App()
-        this.port = SERVICES.filter(service => service.name == Services.chat)[0].port
+        this.port = SERVICES[process.env.NODE_ENV].filter(service => service.name == Services.chat)[0].port
     }
 
     public readonly serve = (): void => {

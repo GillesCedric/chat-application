@@ -1,0 +1,62 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Répertoire de l'environnement de développement local
+node_modules
+
+# Fichiers Docker
+Dockerfile*
+.dockerignore
+src/services/**/Dockerfile
+
+# Fichiers et répertoires spécifiques aux services
+src/services/**/logs
+src/services/**/*.log
+
+# Fichiers et répertoires de configuration
+.env
+.env*
+.env.local
+.env.example
+.env.development
+.env.test.local
+.env.production.local
+
+# Répertoires de contrôle de version
+.git
+.gitignore
+
+# Dossiers OS
+.DS_Store
+Thumbs.db
+
+# Répertoires et fichiers de dépendances
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build/compilation
+build
+dist
+.tmp
+
+# Fichiers de configuration de l'IDE
+.idea
+.vscode
+*.sublime-workspace
+
+# Fichiers de test
+*.spec.js
+*.test.js
+tests/
+coverage/
+
+# Fichiers de documentation
+*.md
+LICENSE
+CONTRIBUTING.md
+
+# Script de configuration
+*.sh

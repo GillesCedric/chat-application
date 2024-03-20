@@ -8,11 +8,13 @@ export type LogLevel = 'error' | 'warn' | 'info' | 'http' | 'debug'
 export default abstract class Logger {
   protected logger: winston.Logger
   protected serviceName: string
-  protected datePattern: string 
+  protected readonly datePattern: string
+  protected readonly logsFolder: string
   protected logsPath: string
-  protected maxSize: string
-  protected maxFiles: string
-  protected timestampFormat: string
+  protected readonly maxSize: string
+  protected readonly maxFiles: string
+  protected readonly timestampFormat: string
+  protected readonly env: string
 
 
   constructor() {
@@ -20,6 +22,8 @@ export default abstract class Logger {
     this.maxSize = '20m'
     this.maxFiles = '30d'
     this.timestampFormat = 'YYYY-MM-DD hh:mm:ss.SSS A'
+    this.env = this.env || "development"
+    this.logsFolder = this.env == "development" ? "src" : "dist"
   }
 
   config = () => {
@@ -28,7 +32,7 @@ export default abstract class Logger {
       defaultMeta: {
         service: this.serviceName
       },
-      transports: process.env.NODE_ENV == "development" ? [
+      transports: this.env == "development" ? [
         new winston.transports.Console({
           format: winston.format.cli()
         }),
@@ -46,7 +50,7 @@ export default abstract class Logger {
           )
         }),
       ],
-      exceptionHandlers: process.env.NODE_ENV == "production" ? [
+      exceptionHandlers: this.env == "production" ? [
         new DailyRotateFile({
           filename: `${this.logsPath}-exceptions-%DATE%.log`,
           datePattern: this.datePattern,
@@ -58,10 +62,10 @@ export default abstract class Logger {
           }),
             winston.format.json(),
           )
-          
+
         }),
       ] : null,
-      rejectionHandlers: process.env.NODE_ENV == "production" ? [
+      rejectionHandlers: this.env == "production" ? [
         new DailyRotateFile({
           filename: `${this.logsPath}-rejections-%DATE%.log`,
           datePattern: this.datePattern,
@@ -103,8 +107,8 @@ export default abstract class Logger {
 class APIGWLogger extends Logger {
   constructor() {
     super()
-    this.logsPath = `logs/${CONFIG.appname}`
-    this.serviceName = SERVICES[0].name
+    this.logsPath = `${this.env}/services/${SERVICES[this.env][0].name}/logs/${CONFIG.appname}`
+    this.serviceName = SERVICES[this.env][0].name
   }
 }
 
@@ -113,8 +117,8 @@ export const apiGWLogger = new APIGWLogger()
 class USERLogger extends Logger {
   constructor() {
     super()
-    this.logsPath = `src/services/${SERVICES[2].name}/logs/${CONFIG.appname}`
-    this.serviceName = SERVICES[2].name
+    this.logsPath = `${this.env}/services/${SERVICES[this.env][2].name}/logs/${CONFIG.appname}`
+    this.serviceName = SERVICES[this.env][2].name
   }
 }
 
@@ -123,8 +127,8 @@ export const userLogger = new USERLogger()
 class CHATLogger extends Logger {
   constructor() {
     super()
-    this.logsPath = `src/services/${SERVICES[1].name}/logs/${CONFIG.appname}`
-    this.serviceName = SERVICES[1].name
+    this.logsPath = `${this.env}/services/${SERVICES[this.env][1].name}/logs/${CONFIG.appname}`
+    this.serviceName = SERVICES[this.env][1].name
   }
 }
 
@@ -134,8 +138,8 @@ export const chatLogger = new CHATLogger()
 class NOTIFICATIONLogger extends Logger {
   constructor() {
     super()
-    this.logsPath = `src/services/${SERVICES[3].name}/logs/${CONFIG.appname}`
-    this.serviceName = SERVICES[3].name
+    this.logsPath = `${this.env}/services/${SERVICES[this.env][3].name}/logs/${CONFIG.appname}`
+    this.serviceName = SERVICES[this.env][3].name
   }
 }
 
