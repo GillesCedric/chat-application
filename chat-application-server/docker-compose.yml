@@ -13,7 +13,8 @@ services:
     env_file:
       - .env
     volumes:
-      - /etc/chat-application/certs/api-gateway:/app/certs:ro
+      - /etc/chat-application/certs/api-gateway:/app/certs/api-gateway
+      - /etc/chat-application/logs/api-gateway:/app/logs
     depends_on:
       - mongodb
 
@@ -30,13 +31,18 @@ services:
     env_file:
       - .env
     volumes:
-      - /etc/chat-application/certs/user:/app/certs:ro
+      - /etc/chat-application/certs/user:/app/certs/user
+      - /etc/chat-application/certs/ca:/app/certs/ca
+      - /etc/chat-application/logs/user:/app/logs
     depends_on:
       - mongodb
 
   mongodb:
-    image: mongo
+    image: mongo:latest
+    user: "999:999"
     restart: always
+    volumes:
+      - mongodb_data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -51,7 +57,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/
+      ME_CONFIG_MONGODB_SERVER: mongodb
     networks:
       - chat-application-network
     depends_on:
@@ -59,5 +65,8 @@ services:
 
 networks:
   chat-application-network:
+
+volumes:
+  mongodb_data:
 
 

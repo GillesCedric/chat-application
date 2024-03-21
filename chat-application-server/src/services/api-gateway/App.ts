@@ -37,8 +37,8 @@ export default class App {
     }
 
     public get webServer(): HTTPServer | HTTPSServer {
-        //return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
-        return this._httpServer
+        return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
+        //return this._httpServer
     }
 
     public get app(): express.Application {
@@ -116,7 +116,7 @@ export default class App {
                 }
             }))
         } catch (error) {
-            Logger.log(error.message)
+            Logger.error(error.message)
             process.exit(1)
         }
 
@@ -141,11 +141,11 @@ export default class App {
                 this._httpServer = createHTTPServer(this._app)
             else
                 this._httpsServer = createHTTPSServer({
-                    key: fs.readFileSync(path.join('certs', 'api-gateway', 'api-gateway-key.key')),
-                    cert: fs.readFileSync(path.join('certs', 'api-gateway', 'api-gateway-cert.pem')),
+                    key: fs.readFileSync(path.join(process.cwd(), 'certs', 'api-gateway', 'api-gateway-key.pem')),
+                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', 'api-gateway', 'api-gateway-cert.pem')),
                 }, this._app)
         } catch (error) {
-            Logger.log(error.message)
+            Logger.error(error.message)
             process.exit(1)
         }
 
@@ -154,10 +154,10 @@ export default class App {
             mongoose
                 .connect(process.env.DATABASE_URL)
                 .then(() => Logger.log("connected to mongodb"))
-                .catch((err) => Logger.log("can't connect to mongodb: " + err, 'error'));
+                .catch((err) => Logger.error("can't connect to mongodb: " + err, 'error'));
 
         } catch (error) {
-            Logger.log(error.message)
+            Logger.error(error.message)
             process.exit(1)
         }
 

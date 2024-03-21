@@ -43,10 +43,10 @@ RUN groupadd -r ${SERVICE} && useradd -r -g ${SERVICE} ${SERVICE} \
 	&& chown -R ${SERVICE}:${SERVICE} ${WORKDIR}
 
 # Changer l'utilisateur. Ne pas utiliser l'utilisateur root.
-USER ${SERVICE}
+#USER ${SERVICE}
 
 # Exposer le port sur lequel votre application s'exécute
 EXPOSE 3000
 
 # Définir la commande pour démarrer l'application
-CMD ["sh", "-c", "node dist/services/${SERVICE}/Server.js"]
+CMD ["node", "dist/services/user/Server.js"]

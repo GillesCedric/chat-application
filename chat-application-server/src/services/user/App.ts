@@ -63,13 +63,6 @@ export default class App {
             process.exit(1)
         }
 
-        try {
-            Logger.config()
-        } catch (error) {
-            console.error(error)
-            process.exit(1)
-        }
-
         //this.app.use(cors())
 
         //cors configuration
@@ -108,22 +101,33 @@ export default class App {
 
         this.app.use(Session.authenticate)
 
-        if (process.env.NODE_ENV == "development")
-            this._httpServer = createHTTPServer(this._app)
-        else
-            this._httpsServer = createHTTPSServer({
-                requestCert: true,
-                rejectUnauthorized: true,
-                key: fs.readFileSync(path.join('certs', 'user', 'user-key.key')),
-                cert: fs.readFileSync(path.join('certs', 'user', 'user-cert.pem')),
-                ca: fs.readFileSync(path.join('certs', 'ca', 'ca-cert.pem')),
-            }, this._app)
+        try {
+            if (process.env.NODE_ENV == "development")
+                this._httpServer = createHTTPServer(this._app)
+            else
+                this._httpsServer = createHTTPSServer({
+                    requestCert: true,
+                    rejectUnauthorized: true,
+                    key: fs.readFileSync(path.join(process.cwd(), 'certs', 'user', 'user-key.pem')),
+                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', 'user', 'user-cert.pem')),
+                    ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'ca', 'ca-cert.pem')),
+                }, this._app)
+        } catch (error) {
+            Logger.error(error.message)
+            process.exit(1)
+        }
 
         //connection to the database
-        mongoose
-            .connect(process.env.DATABASE_URL as string)
-            .then(() => Logger.log("connected to mongodb"))
-            .catch((err) => Logger.error("can't connect to mongodb: " + err))
+        try {
+            mongoose
+                .connect(process.env.DATABASE_URL)
+                .then(() => Logger.log("connected to mongodb"))
+                .catch((err) => Logger.error("can't connect to mongodb: " + err, 'error'));
+
+        } catch (error) {
+            Logger.error(error.message)
+            process.exit(1)
+        }
 
     }
 
