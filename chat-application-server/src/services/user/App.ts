@@ -9,12 +9,11 @@ import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
-import session from 'express-session'
-import MongoStore from 'connect-mongo'
 import { userLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
+import { Services } from '../../utils/Keywords'
 
 
 
@@ -67,7 +66,7 @@ export default class App {
 
         //cors configuration
         this.app.use(cors({
-            origin: `${protocol}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
+            origin: `${protocol()}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -78,24 +77,6 @@ export default class App {
         //body parser configuration
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
-
-        this.app.use(session({
-            name: 'chat-application',
-            secret: process.env.SESSION_SECRET as string,
-            resave: false,
-            saveUninitialized: true,
-            store: MongoStore.create({
-                mongoUrl: process.env.DATABASE_URL,
-            }),
-            cookie: {
-                secure: process.env.NODE_ENV == 'production',
-                httpOnly: process.env.NODE_ENV == 'production',
-                maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                domain: process.env.CLIENT_URL,
-                path: "/",
-                sameSite: process.env.NODE_ENV == 'production',
-            }
-        }))
 
         this.app.use(BasicAuthentication.authenticate)
 
@@ -108,8 +89,8 @@ export default class App {
                 this._httpsServer = createHTTPSServer({
                     requestCert: true,
                     rejectUnauthorized: true,
-                    key: fs.readFileSync(path.join(process.cwd(), 'certs', 'user', 'user-key.pem')),
-                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', 'user', 'user-cert.pem')),
+                    key: fs.readFileSync(path.join(process.cwd(), 'certs', Services.user, `${Services.user}-key.pem`)),
+                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', Services.user, `${Services.user}-cert.pem`)),
                     ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'ca', 'ca-cert.pem')),
                 }, this._app)
         } catch (error) {

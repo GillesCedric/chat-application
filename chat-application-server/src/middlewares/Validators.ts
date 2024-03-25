@@ -5,12 +5,12 @@ import { Code } from '../utils/HTTP'
 
 export default class Validators {
 
-    public static readonly errors = (req: Request, res: Response, next: NextFunction): void => {
+    public static readonly errors = (req: Request, res: Response, next: NextFunction): Response => {
         const errors = validationResult(req)
         if (errors.isEmpty()) {
             next()
         } else {
-            res.status(Code.badRequest).json({ errors: errors.array() })
+            return res.status(Code.badRequest).json({ errors: errors.array() })
         }
 
     }

@@ -18,5 +18,5 @@ export default class Socket {
 			console.log('test')
 		})
 
-	};
+	}
 }

@@ -18,6 +18,7 @@ import BasicAuthentication from '../../middlewares/BasicAuthentication'
 import { apiGWLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
+import { Services } from '../../utils/Keywords'
 
 
 export default class App {
@@ -79,7 +80,7 @@ export default class App {
 
         //cors configuration
         this.app.use(cors({
-            origin: `${protocol}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
+            origin: `${protocol()}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -92,7 +93,7 @@ export default class App {
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
         // serving static files 
-        this.app.use(express.static('public'))
+        //this.app.use(express.static('public'))
 
         try {
             const store = MongoStore.create({
@@ -109,7 +110,7 @@ export default class App {
                     secure: process.env.NODE_ENV == 'production',
                     httpOnly: true,
                     maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                    domain: process.env.CLIENT_URL,
+                    domain: process.env.CLIENT_URL.split(':')[0],
                     path: "/",
                     sameSite: process.env.NODE_ENV == 'production',
                     signed: true
@@ -141,8 +142,8 @@ export default class App {
                 this._httpServer = createHTTPServer(this._app)
             else
                 this._httpsServer = createHTTPSServer({
-                    key: fs.readFileSync(path.join(process.cwd(), 'certs', 'api-gateway', 'api-gateway-key.pem')),
-                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', 'api-gateway', 'api-gateway-cert.pem')),
+                    key: fs.readFileSync(path.join(process.cwd(), 'certs', Services.apigw, `${Services.apigw}-key.pem`)),
+                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', Services.apigw, `${Services.apigw}-cert.pem`))
                 }, this._app)
         } catch (error) {
             Logger.error(error.message)
@@ -163,7 +164,7 @@ export default class App {
 
         this._socketServer = new SocketServer(this._webServer, {
             cors: {
-                origin: process.env.CLIENT_URL,
+                origin: `${protocol()}://${process.env.CLIENT_URL}`
             }
         })
 

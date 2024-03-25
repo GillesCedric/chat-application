@@ -1,4 +1,5 @@
 {
 	"appname": "chat-application",
-	"version": "1.0.0"
+	"version": "1.0.0",
+	"basePath": "api"
 }

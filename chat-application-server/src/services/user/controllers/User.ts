@@ -90,10 +90,10 @@ export default class UserController {
               error: "Incorrect password",
             })
           }
-          // If credentials are correct, return the desired response
-          req.session['token'] = JWTUtils.generateTokenForUser(userFound.id)
+          
           return res.status(200).json({
-            message: 'connection success'
+            message: 'connection success',
+            token: JWTUtils.generateTokenForUser(userFound.id)
           });
         })
         .catch(error => {

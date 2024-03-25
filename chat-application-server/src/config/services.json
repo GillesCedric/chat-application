@@ -1,46 +1,46 @@
 {
-	"development": [
-		{
+	"development": {
+		"api-gateway": {
 			"name": "api-gateway",
 			"domain": "localhost",
 			"port": 4000
 		},
-		{
+		"chat":{
 			"name": "chat",
 			"domain": "localhost",
 			"port": 6000
 		},
-		{
+		"user":{
 			"name": "user",
 			"domain": "localhost",
 			"port": 6001
 		},
-		{
+		"notification":{
 			"name": "notification",
 			"domain": "localhost",
 			"port": 6002
 		}
-	],
-	"production": [
-		{
+	},
+	"production": {
+		"api-gateway": {
 			"name": "api-gateway",
 			"domain": "api-gateway",
 			"port": 3000
 		},
-		{
+		"chat": {
 			"name": "chat",
 			"domain": "chat",
 			"port": 3000
 		},
-		{
+		"user": {
 			"name": "user",
 			"domain": "user",
 			"port": 3000
 		},
-		{
+		"notification": {
 			"name": "notification",
 			"domain": "notification",
 			"port": 3000
 		}
-	]
+	}
 }
