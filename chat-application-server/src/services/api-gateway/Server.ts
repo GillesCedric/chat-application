@@ -12,7 +12,7 @@ class Server {
 
     constructor() {
         this.app = new App()
-        this.port = SERVICES[process.env.NODE_ENV].filter(service => service.name == Services.apigw)[0].port
+        this.port = SERVICES[process.env.NODE_ENV][Services.apigw].port
     }
 
     public readonly serve = (): void => {

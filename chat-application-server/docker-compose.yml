@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: src/services/api-gateway/Dockerfile
     ports:
-      - "8080:3000"
+      - "443:3000"
     image: gillescedric/api-gateway:latest
     networks:
       - chat-application-network
@@ -13,7 +13,9 @@ services:
     env_file:
       - .env
     volumes:
-      - /etc/chat-application/certs/api-gateway:/app/certs:ro
+      - /etc/chat-application/certs/api-gateway:/app/certs/api-gateway:ro
+      - /etc/chat-application/certs/ca:/app/certs/ca:ro
+      - api-gateway-logs:/app/logs
     depends_on:
       - mongodb
 
@@ -30,13 +32,17 @@ services:
     env_file:
       - .env
     volumes:
-      - /etc/chat-application/certs/user:/app/certs:ro
+      - /etc/chat-application/certs/user:/app/certs/user:ro
+      - /etc/chat-application/certs/ca:/app/certs/ca:ro
+      - user-logs:/app/logs
     depends_on:
       - mongodb
 
   mongodb:
-    image: mongo
+    image: mongo:latest
     restart: always
+    volumes:
+      - mongodb_data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -51,7 +57,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongodb:27017/
+      ME_CONFIG_MONGODB_SERVER: mongodb
     networks:
       - chat-application-network
     depends_on:
@@ -59,5 +65,10 @@ services:
 
 networks:
   chat-application-network:
+
+volumes:
+  mongodb_data:
+  api-gateway-logs:
+  user-logs:
 
 

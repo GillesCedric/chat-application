@@ -1,3 +1,8 @@
+import https from 'https'
+import fs from 'fs'
+import path from 'path'
+import { Services } from './Keywords'
+
 export enum Method {
 	options = 'OPTIONS',
 	head = 'HEAD',
@@ -21,3 +26,11 @@ export enum Code {
 }
 
 export const protocol = () => process.env.NODE_ENV == "development" ? "http" : "https"
+
+export const httpsAgent = (service: Services) => new https.Agent({
+	requestCert: true,
+	rejectUnauthorized: true,
+	key: fs.readFileSync(path.join(process.cwd(), 'certs', service, `${service}-key.pem`)),
+	cert: fs.readFileSync(path.join(process.cwd(), 'certs', service, `${service}-cert.pem`)),
+	ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'ca', 'ca-cert.pem')),
+})

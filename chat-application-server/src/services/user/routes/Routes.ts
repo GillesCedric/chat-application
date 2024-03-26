@@ -1,7 +1,6 @@
-import { Request, Response, Application } from "express";
-import * as path from "path";
-import UserController from "../controllers/User";
-import Validators from "../../../middlewares/Validators";
+import { Application } from "express"
+import UserController from "../controllers/User"
+import Validators from "../../../middlewares/Validators"
 
 
 
@@ -17,5 +16,5 @@ export default class Routes {
     app.route("/signup").post(...Validators.signUp, Validators.errors, this.userController.signUp)
     app.route("/getFriends").post(this.userController.getUserFriends)
 
-  };
+  }
 }

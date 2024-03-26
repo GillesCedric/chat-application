@@ -7,7 +7,7 @@
 			"type": "shell",
 			"command": "npm run dev",
 			"options": {
-				"cwd": "./chat-application-client"
+				"cwd": "./chat-application-desktop"
 			},
 			"problemMatcher": [],
 			"presentation": {
