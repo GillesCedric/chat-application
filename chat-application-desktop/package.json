@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
+  "name": "chat-application",
+  "description": "Chat Application Desktop",
   "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "author": "Gilles Cédric <nguefackgilles@gmail.com>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
