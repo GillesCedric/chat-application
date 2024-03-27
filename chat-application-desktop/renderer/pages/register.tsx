@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import API from "../../modules/api/API";
 export default function Home() {
+  console.log(process)
   const emailRef = useRef<HTMLInputElement | null>(null);
   const firstnameRef = useRef<HTMLInputElement | null>(null);
   const lastnameRef = useRef<HTMLInputElement | null>(null);
@@ -310,9 +311,9 @@ export default function Home() {
         password: passwordRef.current?.value,
         tel: telRef.current?.value
       })
-      .then((data: any) => {
-        console.log(data)
-      })
+        .then((data: any) => {
+          console.log(data)
+        })
       return true;
     }
     return false;

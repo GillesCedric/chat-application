@@ -2,6 +2,16 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import path from 'path'
+import dotenv from 'dotenv'
+
+try {
+  dotenv.config()
+} catch (error) {
+  console.error(error)
+  process.exit(1)
+}
+console.log(process)
 
 export default function HomePage() {
   return (
@@ -15,19 +25,19 @@ export default function HomePage() {
             className="ml-auto mr-auto"
             src="/images/logo.png"
             alt="Logo image"
-            width="256px"
-            height="256px"
+            width="256"
+            height="256"
           />
         </div>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/register">
-          <a className="btn-blue">Go to Register Page</a>
+          Go to Register Page
         </Link>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/chat">
-          <a className="btn-blue">Go to chat Page</a>
+          Go to chat Page
         </Link>
       </div>
     </React.Fragment>
