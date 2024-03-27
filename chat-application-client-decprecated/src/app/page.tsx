@@ -8,89 +8,44 @@ let conversations: string[] = [
   "Kaoutar",
   "Killian",
   "Gauthier",
-  "Sana"
+  "Sana",
+  "Johan"
 ]
 
 export default function Home() {
   return (
-    <div className='container w-full h-screen'>
+    <div className='container mx-auto h-screen bg-gray-200'>
+      <div className='flex flex-col h-full'>
 
-      { /* Top */}
-      <div className='container w-full flex'>
-        <div className="w-12/12 sm:w-2/12 border-r border-gray-300 font-bold text-lg text-center p-4">
-          Vos Contacts
+        { /* Top */}
+        <div className='flex justify-center items-center h-1/6 border-b border-gray-300 bg-blue-100'>
+          <h1 className='text-lg font-bold text-blue-800'>Votre conversation avec </h1>
         </div>
 
-            {
-              //<!-- Middle -->
-            }
-        <div className="bg-gray-100 container w-full h-5/6 flex">
-            {
-              //<!-- Left side of the grand rectangle (2/10 width) -->
-            }
-            <div className="w-2/12 border-r border-gray-300 flex flex-col p-2">
-              {
-                //<!-- List of buttons with spacing -->
-                conversations.map((value, index) => <Conversation key={index} name={value} />
-                )
-              }
-
-            </div>
-
-
-            {
-              //<!-- Right side of the grand rectangle (8/10 width) -->
-            }
-            <div className="w-10/12 p-2">
-            </div>
+        { /* Middle */}
+        <div className='flex flex-1 bg-white'>
+          { /* Left side */}
+          <div className='w-2/12 border-r border-gray-300 flex flex-col bg-blue-50'>
+            {conversations.map((value, index) => <Conversation key={index} name={value} />)}
           </div>
 
-          {
-              //<!-- Bottom -->
-          }
-
-          <div className="bg-gray-100 border-gray-300 container w-full h-1/6 flex">
-              {
-                //<!-- Left bottom rectangle -->
-              }
-              <div className="w-2/12 p-2 border-r border-gray-300 flex items-center justify-center">
-                <button className="bg-blue-500 text-white font-bold py-1 px-1 hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-700">Ajouter un contact</button>
-              </div>
-
-              {
-                //<!-- Right bottom rectangle -->
-              }
-              <div className="w-10/12 p-2">
-                <textarea className="w-full text-gray-400" placeholder="Start typing here..."></textarea>
-              </div>
-            </div>
-
-      </div>
-
-      { /* Middle */}
-      <div className="bg-gray-100 container w-full h-5/6 flex">
-        { /* Left side of the grand rectangle (2/10 width) */}
-        <div className="w-12/12 sm:w-2/12 border-r border-gray-300 flex flex-col p-2">
-          { /* List of buttons with spacing */}
-          {conversations.map((value) => <Conversation name={value} />)}
+          { /* Right side */}
+          <div className='w-10/12 bg-gray-100 p-4'>
+            {/* Content for the right side */}
+          </div>
         </div>
 
-        { /* Right side of the grand rectangle (8/10 width) */}
-        <div className="w-12/12 sm:w-10/12 p-2">
-        </div>
-      </div>
+        { /* Bottom */}
+        <div className='flex justify-center items-center h-1/6 border-t border-gray-300 bg-blue-100'>
+          <div className='w-2/12'>
+            <button className='bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-700 transition duration-300'>Ajouter un contact</button>
+          </div>
+          <div className='w-10/12'>
+            <textarea className='w-full h-full p-4 text-gray-400 bg-gray-200' placeholder='Commencez à taper ici...'></textarea>
 
-      { /* Bottom */}
-      <div className="bg-gray-100 border-gray-300 container w-full h-1/6 flex">
-        { /* Left bottom rectangle */}
-        <div className="w-12/12 sm:w-2/12 p-2 border-r border-gray-300 flex items-center justify-center">
-          <button className="bg-blue-500 text-white font-bold p-1 mb-3 hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-700">Ajouter un contact</button>
+          </div>
         </div>
 
-        { /* Right bottom rectangle */}
-        <div className="w-12/12 sm:w-10/12 p-2">
-          <textarea className="w-full text-gray-400" placeholder="Start typing here..."></textarea>
-        </div>
       </div>
     </div>
   )
