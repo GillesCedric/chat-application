@@ -25,7 +25,7 @@ export default class API {
 		return await fetch(this.apiUrl + '/users/signin', {
 			method: 'POST',
 			headers: this.headers,
-			body: data
+			body: JSON.stringify(data)
 		})
 	}
 
