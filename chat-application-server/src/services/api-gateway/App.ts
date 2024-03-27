@@ -80,7 +80,8 @@ export default class App {
 
         //cors configuration
         this.app.use(cors({
-            origin: `${protocol()}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
+            //origin: `${protocol()}://${process.env.CLIENT_URL}`, // Autorise uniquement les requêtes provenant de ce domaine
+            origin: '*',
             methods: Object.values(Method), // Autorise uniquement les méthodes GET et POST
             credentials: true // Autorise l'envoi de cookies et d'autres informations d'authentification
         }))
@@ -110,9 +111,9 @@ export default class App {
                     secure: process.env.NODE_ENV == 'production',
                     httpOnly: true,
                     maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                    domain: process.env.CLIENT_URL.split(':')[0],
                     path: "/",
                     sameSite: process.env.NODE_ENV == 'production',
+                    //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug
                     signed: true
                 }
             }))

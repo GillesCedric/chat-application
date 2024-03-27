@@ -14,7 +14,9 @@ export default class Routes {
     app.route("/me").get(this.userController.me)
     app.route("/signin").post(...Validators.signIn, Validators.errors, this.userController.signIn)
     app.route("/signup").post(...Validators.signUp, Validators.errors, this.userController.signUp)
-    app.route("/getFriends").post(this.userController.getUserFriends)
+    app.route("/friends").get(this.userController.getUserFriends)
+    app.route("/friends").post(this.userController.addFriend)
+    app.route("/friends/:id").delete(this.userController.deleteFriend)
 
   }
 }

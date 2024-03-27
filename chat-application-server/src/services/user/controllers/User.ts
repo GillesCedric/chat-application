@@ -90,7 +90,7 @@ export default class UserController {
               error: "Incorrect password",
             })
           }
-          
+
           return res.status(200).json({
             message: 'connection success',
             token: JWTUtils.generateTokenForUser(userFound.id)
@@ -122,6 +122,7 @@ export default class UserController {
     const password = bcrypt.hashSync(req.body.password, Number.parseInt(process.env.SALT_ROUNDS))
     const isVerified = Crypto.encrypt('false', 'database')
 
+    //TODO add username, tel and email unique verification
     try {
       UserModel.insertMany({
         lastname: lastname,
@@ -151,4 +152,10 @@ export default class UserController {
       });
     }
   };
+
+  public readonly addFriend = (req: Request, res: Response): Response => { return null }
+
+  public readonly deleteFriend = (req: Request, res: Response): Response => {
+    return null
+  }
 }
