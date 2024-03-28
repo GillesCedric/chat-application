@@ -23,10 +23,10 @@ export default class App extends React.Component<{}, {}> {
 				<Route path='/' element={<Navigate to={'/home'} />} />
 				<Route path='/register' element={<Register />} />
 				<Route path='/home' element={
-					// <ProtectedPage>
+					// <ProtectedPage> //TODO enable the protection when the signin will be finished
 					<Home />
 
-					// </ProtectedPage>
+					// </ProtectedPage> //TODO add all the routes of the application
 				} />
 				<Route path='/chat' element={
 					// <ProtectedPage>
