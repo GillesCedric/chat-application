@@ -8,8 +8,6 @@
     "user": "nodemon --config ./src/services/user/nodemon.json",
     "notification": "nodemon --config ./src/services/notification/nodemon.json",
     "api": "nodemon --config ./src/services/api-gateway/nodemon.json",
-    "start": "SET NODE_ENV=development && nodemon ./dist/Server.js",
-    "prod": "SET NODE_ENV=production && npm run build && npm run start",
     "test": ""
   },
   "dependencies": {
