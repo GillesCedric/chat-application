@@ -1,3 +1,6 @@
+#archives projects
+archives
+
 # Logs
 /chat-application-*/logs
 /chat-application-*/*.log
