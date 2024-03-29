@@ -25,7 +25,7 @@ export default function Home() {
         { /* Top */}
         <div className='flex justify-center items-center h-1/6 border-b border-gray-300 bg-blue-100'>
           <h1 className='text-lg font-bold text-blue-800'>Votre conversation avec </h1>
-          <button onClick={() => notify("Test Notification", "error")} className="ml-2 bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-700 transition duration-300">Test Notification</button>
+          <button onClick={() => notify("Notification", "error")} className="ml-2 bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-700 transition duration-300">Test Notification</button>
         </div>
 
         { /* Middle */}
