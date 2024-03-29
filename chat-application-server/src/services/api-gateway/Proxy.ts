@@ -11,32 +11,35 @@ export default class Proxy {
 
 	public static readonly serve = (app: Application): void => {
 
-		app.use('/api/v1/users', Session.authenticate, createProxyMiddleware({
+		app.use('/api/v1/users', createProxyMiddleware({
 			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.user].domain}:${SERVICES[process.env.NODE_ENV][Services.user].port}`,
 			changeOrigin: true,
 			pathRewrite: { '^/api/v1/users': '' },
 			selfHandleResponse: true,
 			onProxyReq: (proxyReq: http.ClientRequest, req: http.IncomingMessage) => {
 
-				fixRequestBody(proxyReq, req)
-
 				const expressReq = req as unknown as Express.Request
 
-				if (expressReq.session['token'])
-					proxyReq.setHeader('Authorization', `Bearer ${expressReq.session['token']}`)
+				if (expressReq.session['access_token'])
+					proxyReq.setHeader('Authorization', `Bearer ${expressReq.session['access_token']}`)
+
+				fixRequestBody(proxyReq, req)
+
 			},
 			onProxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
 				const response = JSON.parse(responseBuffer.toString('utf8'))
-				if (response.token) {
+				if (response.accessToken && response.refreshToken) {
 
 					const expressReq = req as unknown as Express.Request
 
-					expressReq.session['token'] = response.token
+					expressReq.session['access_token'] = response.accessToken
+					expressReq.session['refresh_token'] = response.refreshToken
 					await new Promise<void>((resolve, reject) => {
 						expressReq.session.save((err: any) => err ? reject(err) : resolve())
 					})
 
-					delete response.token
+					delete response.accessToken
+					delete response.refreshToken
 				}
 
 				return JSON.stringify(response)
@@ -45,7 +48,7 @@ export default class Proxy {
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.apigw) : undefined
 		}))
 
-		app.use('/api/v1/chats', Session.authenticate, createProxyMiddleware({
+		app.use('/api/v1/chats', createProxyMiddleware({
 			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.chat].domain}:${SERVICES[process.env.NODE_ENV][Services.chat].port}`,
 			changeOrigin: true,
 			pathRewrite: { '^/api/v1/chats': '' },

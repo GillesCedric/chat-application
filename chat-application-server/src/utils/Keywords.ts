@@ -10,3 +10,8 @@ export enum Services {
 	notification = "notification",
 	apigw = "api-gateway",
 }
+
+export enum Tokens {
+	accessToken = "access_token",
+	refreshToken = "refresh_token",
+}

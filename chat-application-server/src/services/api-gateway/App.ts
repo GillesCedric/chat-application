@@ -110,7 +110,7 @@ export default class App {
                 cookie: {
                     secure: process.env.NODE_ENV == 'production',
                     httpOnly: true,
-                    maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
+                    //maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
                     path: "/",
                     sameSite: process.env.NODE_ENV == 'production',
                     //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug

@@ -11,6 +11,7 @@ export default class Routes {
   public static readonly routes = (app: Application): void => {
 
     app.route("/").get(this.userController.getAll)
+    app.route("/token").post(this.userController.token)
     app.route("/me").get(this.userController.me)
     app.route("/signin").post(...Validators.signIn, Validators.errors, this.userController.signIn)
     app.route("/signup").post(...Validators.signUp, Validators.errors, this.userController.signUp)
