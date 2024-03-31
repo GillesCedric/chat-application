@@ -111,6 +111,7 @@
 	"typescript.updateImportsOnFileMove.enabled": "always",
 	"workbench.iconTheme": "vscode-icons",
 	"cSpell.words": [
-		"apigw"
+		"apigw",
+		"keytar"
 	],
 }

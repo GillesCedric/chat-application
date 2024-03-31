@@ -15,35 +15,7 @@ export default class Proxy {
 			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.user].domain}:${SERVICES[process.env.NODE_ENV][Services.user].port}`,
 			changeOrigin: true,
 			pathRewrite: { '^/api/v1/users': '' },
-			selfHandleResponse: true,
-			onProxyReq: (proxyReq: http.ClientRequest, req: http.IncomingMessage) => {
-
-				const expressReq = req as unknown as Express.Request
-
-				if (expressReq.session['access_token'])
-					proxyReq.setHeader('Authorization', `Bearer ${expressReq.session['access_token']}`)
-
-				fixRequestBody(proxyReq, req)
-
-			},
-			onProxyRes: responseInterceptor(async (responseBuffer, proxyRes, req, res) => {
-				const response = JSON.parse(responseBuffer.toString('utf8'))
-				if (response.accessToken && response.refreshToken) {
-
-					const expressReq = req as unknown as Express.Request
-
-					expressReq.session['access_token'] = response.accessToken
-					expressReq.session['refresh_token'] = response.refreshToken
-					await new Promise<void>((resolve, reject) => {
-						expressReq.session.save((err: any) => err ? reject(err) : resolve())
-					})
-
-					delete response.accessToken
-					delete response.refreshToken
-				}
-
-				return JSON.stringify(response)
-			}),
+			onProxyReq: fixRequestBody,
 			secure: true,
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.apigw) : undefined
 		}))

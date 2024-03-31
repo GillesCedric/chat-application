@@ -94,8 +94,8 @@ export default class UserController {
 
           return res.status(200).json({
             message: 'connection success',
-            accessToken: JWTUtils.generateTokenForUser(userFound.id, Tokens.accessToken),
-            refreshToken: JWTUtils.generateTokenForUser(userFound.id, Tokens.refreshToken)
+            access_token: JWTUtils.generateTokenForUser(userFound.id, Tokens.accessToken),
+            refresh_token: JWTUtils.generateTokenForUser(userFound.id, Tokens.refreshToken)
           });
         })
         .catch(error => {
@@ -155,9 +155,9 @@ export default class UserController {
     }
   };
 
-  public readonly token = (req: Request, res: Response): Response => {
+  public readonly updateTokens = (req: Request, res: Response): Response => {
 
-    const { refreshToken } = req.body
+    const refreshToken = req.body.refresh_token
 
     if (!refreshToken) return res.status(401).json({ error: "Missing refresh token" });
 
@@ -170,9 +170,29 @@ export default class UserController {
     const newRefreshToken = JWTUtils.generateTokenForUser(userId, Tokens.accessToken)
 
     return res.status(200).json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken
+      message: "refresh success",
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken
     })
+  };
+
+  public readonly isValidTokens = (req: Request, res: Response): Response => {
+
+    const accessToken = req.body.access_token
+    const refreshToken = req.body.refresh_token
+
+    if (!accessToken || !refreshToken) return res.status(401).json({ error: "Missing tokens" });
+
+    const accessTokenUserId = JWTUtils.getUserFromToken(accessToken, Tokens.accessToken)
+    const refreshTokenUserId = JWTUtils.getUserFromToken(refreshToken, Tokens.refreshToken)
+
+    // Vérifier si le refreshToken est stocké et valide
+    if (refreshTokenUserId == undefined) return res.status(403).json({ error: "Invalid tokens" });
+
+    if (accessTokenUserId == undefined) return res.status(403).json({ error: "Invalid access token" });
+
+    return res.status(200).json({ message: "Valid Tokens" });
+
   };
 
   public readonly addFriend = (req: Request, res: Response): Response => { return null }

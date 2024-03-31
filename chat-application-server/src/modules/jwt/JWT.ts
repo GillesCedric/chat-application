@@ -44,7 +44,7 @@ export default abstract class JWTUtils {
     token: string,
     tokenType: TokenType
   ): string | undefined => {
-    token = tokenType == "access_token" ? this.parseToken(token) : token
+    token = this.parseToken(token)
     let userId = undefined;
     try {
       const jwtToken = jwt.verify(token, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY);

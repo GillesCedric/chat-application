@@ -8,6 +8,7 @@ import { Logout } from './components/Logout'
 import '../styles/global.css'
 import Register from './pages/register'
 import Chat from './pages/chat'
+import SignIn from './pages/signin'
 
 
 export default class App extends React.Component<{}, {}> {
@@ -18,21 +19,16 @@ export default class App extends React.Component<{}, {}> {
 	}
 
 	render = (): JSX.Element => {
+		//TODO add all the routes of the application
 		return <>
 			<Routes>
-				<Route path='/' element={<Navigate to={'/home'} />} />
+				<Route path='/' element={<Navigate to={'/chat'} />} />
 				<Route path='/register' element={<Register />} />
-				<Route path='/home' element={
-					// <ProtectedPage> //TODO enable the protection when the signin will be finished
-					<Home />
-
-					// </ProtectedPage> //TODO add all the routes of the application
-				} />
+				<Route path='/signin' element={<SignIn />} />
 				<Route path='/chat' element={
-					// <ProtectedPage>
-					<Chat />
-
-					// </ProtectedPage>
+					<ProtectedPage>
+						<Chat />
+					</ProtectedPage>
 				} />
 				<Route path='/logout' element={<Logout />} />
 				<Route path='*' element={
