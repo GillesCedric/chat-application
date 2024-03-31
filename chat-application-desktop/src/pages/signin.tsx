@@ -1,7 +1,9 @@
 "use client"
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState } from "react";
 import API from "../modules/api/API";
 import { Link, useNavigate } from "react-router-dom";
+import { notify } from "../components/toastify";
+import { ToastContainer } from "react-toastify";
 export default function SignIn() {
 
   const navigate = useNavigate()
@@ -26,16 +28,19 @@ export default function SignIn() {
     })
       .then((data: any) => {
         console.log(data)
-        if(data.message)
+        if (data.message)
           setIsLoggedIn(true)
+        else {
+          if (data.error === "already authenticated")
+            notify("Redirection to the chat" , "info" , ()=> (navigate("/chat")) )
+        }
       })
-    //return true;
-
-
   };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
+      <ToastContainer />
+      
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
