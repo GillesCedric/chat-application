@@ -101,22 +101,23 @@ export default class App {
                 mongoUrl: process.env.DATABASE_URL,
             })
 
-            this.app.use(session({
-                name: 'chat-application',
-                secret: process.env.SESSION_SECRET,
-                resave: false,
-                saveUninitialized: true,
-                store: store,
-                cookie: {
-                    secure: process.env.NODE_ENV == 'production',
-                    httpOnly: true,
-                    maxAge: 4 * 60 * 60 * 1000, //4h, //should be the same as TOKEN_DELAY
-                    path: "/",
-                    sameSite: process.env.NODE_ENV == 'production',
-                    //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug
-                    signed: true
-                }
-            }))
+            // this.app.use(session({
+            //     name: 'chat-application',
+            //     secret: process.env.SESSION_SECRET,
+            //     resave: false,
+            //     saveUninitialized: true,
+            //     store: store,
+            //     cookie: {
+            //         secure: process.env.NODE_ENV == 'production',
+            //         httpOnly: true,
+            //         maxAge: 30 * 24 * 1 * 60 * 60 * 1000, //30j, //should be the same as TOKEN_DELAY
+            //         path: "/",
+            //         sameSite: process.env.NODE_ENV == 'production',
+            //         domain: `localhost`,
+            //         //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug
+            //         signed: true
+            //     }
+            // }))
         } catch (error) {
             Logger.error(error.message)
             process.exit(1)

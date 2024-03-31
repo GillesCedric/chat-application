@@ -1,22 +1,27 @@
 import { Request, Response, NextFunction } from 'express'
+import JWTUtils from '../modules/jwt/JWT'
+import { Services, Tokens } from '../utils/Keywords'
+import { Method, protocol } from '../utils/HTTP'
+import SERVICES from '../config/services.json'
 
 
 export default class Session {
 
-    public static readonly authenticate = (req: Request, res: Response, next: NextFunction): any => {
-        if (req.session && req.session['token']) {
+    public static readonly authenticate = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+        if (req.body.access_token && JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken) != undefined) {
             if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin') {
-                res.status(401).json({message: 'already authenticated'})
+                return res.status(401).json({ error: 'already authenticated' })
             } else {
-                next()
+                return next()
             }
+        } else if (req.body.refresh_token && JWTUtils.getUserFromToken(req.body.refresh_token, Tokens.refreshToken) != undefined && req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'token') {
+            return next()
+        } else if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin' || req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signup') {
+            return next()
         } else {
-            if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin' || req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signup') {
-                next()
-            } else {
-                res.status(401).json({ message: 'unauthenticated' })
-            }
+            return res.status(401).json({ error: 'unauthenticated' })
         }
+
     }
 
 }

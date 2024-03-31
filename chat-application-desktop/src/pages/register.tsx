@@ -1,10 +1,11 @@
-// A rajouter : quand on back , reset les fields ou pas , à voir , reste les messags d'erreur
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import API from "../modules/api/API";
 import { Link } from "react-router-dom";
+import UserRepository from "../modules/repository/UserRepository";
+import FormValidator from "../modules/validator/form/FormValidator";
+import { ToastContainer } from "react-toastify";
+import { notify } from "../components/toastify";
 export default function Register() {
-
   const emailRef = useRef<HTMLInputElement | null>(null);
   const firstnameRef = useRef<HTMLInputElement | null>(null);
   const lastnameRef = useRef<HTMLInputElement | null>(null);
@@ -18,7 +19,6 @@ export default function Register() {
   const telSectionRef = useRef<HTMLDivElement | null>(null);
   const usernameSectionRef = useRef<HTMLDivElement | null>(null);
   const passwordSectionRef = useRef<HTMLDivElement | null>(null);
-
   const firstnamecheckRef = useRef<HTMLDivElement | null>(null);
   const lastnamecheckRef = useRef<HTMLDivElement | null>(null);
   const emailcheckRef = useRef<HTMLDivElement | null>(null);
@@ -29,13 +29,8 @@ export default function Register() {
   const backButtonRef = useRef<HTMLButtonElement | null>(null);
   const nextButtonRef = useRef<HTMLButtonElement | null>(null);
   const signupRef = useRef<HTMLButtonElement | null>(null);
-
-  const registrationFailSectionRef = useRef<HTMLInputElement | null>(null);
-  const registrationSuccessSectionRef = useRef<HTMLInputElement | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [etape, setEtape] = useState(1);
-
   useEffect(() => {
     if (1 === etape) {
       backButtonVisible(false);
@@ -63,14 +58,6 @@ export default function Register() {
     }
   };
 
-  const preventLetter = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (telRef.current) {
-      const inputValue = event.target.value;
-      const sanitizedValue = inputValue.replace(/[^0-9-]/g, "");
-      telRef.current.value = sanitizedValue;
-    }
-  };
-
   const nextButtonVisible = (visibility: boolean) => {
     if (nextButtonRef.current) {
       if (visibility) {
@@ -80,47 +67,6 @@ export default function Register() {
         nextButtonRef.current.className = "hidden";
       }
     }
-  };
-
-  const checkEmail = () => {
-    setErrorMessage("");
-    if (emailRef.current && emailcheckRef.current) {
-      const email = emailRef.current.value;
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (email !== "" && emailRegex.test(email)) {
-        // Check if email is unique
-        // code ...
-        emailcheckRef.current.className = "hidden";
-        return true;
-      } else {
-        if (email.trim() === "") {
-          emailcheckRef.current.className = "block";
-          setErrorMessage("This field can not be empty !");
-          return false;
-        } else if (!emailRegex.test(email)) {
-          emailcheckRef.current.className = "block";
-          setErrorMessage("Email should match this format : name@domain.org");
-          return false;
-        }
-      }
-    }
-    return false;
-  };
-
-  const checkTel = () => {
-    setErrorMessage("");
-    if (telRef.current && telCheckRef.current) {
-      const tel = telRef.current.value;
-      if (tel.trim() !== "") {
-        telCheckRef.current.className = "hidden";
-        return true;
-      } else {
-        setErrorMessage("This field can not be empty !");
-        telCheckRef.current.className = "block";
-        return false;
-      }
-    }
-    return false;
   };
 
   const signupButtonVisible = (visibility: boolean) => {
@@ -133,62 +79,6 @@ export default function Register() {
       }
     }
   };
-  const checkPassword = () => {
-    setErrorMessage("");
-    if (
-      passwordCheckRef.current &&
-      passwordRef.current &&
-      confirmpasswordRef.current
-    ) {
-      const password = passwordRef.current.value;
-      const confirmPassword = confirmpasswordRef.current.value;
-      if (
-        password.trim() !== "" &&
-        confirmPassword.trim() !== "" &&
-        password === confirmPassword
-      ) {
-        passwordCheckRef.current.className = "hidden";
-        return true;
-      } else {
-        if (password.trim() === "") {
-          setErrorMessage("Please fill all the fields !");
-          passwordCheckRef.current.className =
-            "text-sm text-red-600 dark:text-red-500";
-          return false;
-        }
-        if (confirmPassword.trim() === "") {
-          setErrorMessage("Please fill all the fields !");
-          passwordCheckRef.current.className =
-            "text-sm text-red-600 dark:text-red-500";
-          return false;
-        }
-        if (password !== confirmPassword) {
-          setErrorMessage("Fields does not match !");
-          passwordCheckRef.current.className =
-            "text-sm text-red-600 dark:text-red-500";
-          return false;
-        }
-      }
-    }
-  };
-
-  const checkUsername = () => {
-    setErrorMessage("");
-    if (usernameRef.current && usernameCheckRef.current) {
-      const username = usernameRef.current.value;
-      if (username !== "") {
-        usernameCheckRef.current.className = "hidden";
-        return true;
-      } else {
-        setErrorMessage("This field can not be empty !");
-        usernameCheckRef.current.className =
-          "text-sm text-red-600 dark:text-red-500";
-        return false;
-      }
-    }
-    return false;
-  };
-
   const moveOn = () => {
     if (
       emailSectionRef.current &&
@@ -201,7 +91,7 @@ export default function Register() {
       nextButtonRef.current.blur();
       switch (etape) {
         case 1:
-          console.log("Etape :" + etape);
+
           if (checkNames()) {
             emailSectionRef.current.className = "hidden";
             telSectionRef.current.className = "hidden";
@@ -213,7 +103,7 @@ export default function Register() {
           break;
         case 2:
           if (checkUsername()) {
-            console.log("Etape :" + etape);
+
             telSectionRef.current.className = "hidden";
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
@@ -224,7 +114,7 @@ export default function Register() {
           break;
         case 3:
           if (checkEmail()) {
-            console.log("Etape :" + etape);
+
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
@@ -235,7 +125,7 @@ export default function Register() {
           break;
         case 4:
           if (checkTel()) {
-            console.log("Etape :" + etape);
+
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
             telSectionRef.current.className = "hidden";
@@ -249,7 +139,6 @@ export default function Register() {
       }
     }
   };
-
   const moveBack = () => {
     if (
       emailSectionRef.current &&
@@ -261,6 +150,7 @@ export default function Register() {
       backButtonRef.current
     ) {
       backButtonRef.current.blur();
+
       switch (etape) {
         case 2:
           nameSectionRef.current.className = "flex flex-col mb-5";
@@ -300,26 +190,7 @@ export default function Register() {
       }
     }
   };
-
-  const signUp = () => {
-    if (checkPassword()) {
-      API.register({
-        firstname: firstnameRef.current?.value,
-        lastname: lastnameRef.current?.value,
-        username: usernameRef.current?.value,
-        email: emailRef.current?.value,
-        password: passwordRef.current?.value,
-        tel: telRef.current?.value
-      })
-        .then((data: any) => {
-          console.log(data)
-        })
-      return true;
-    }
-    return false;
-  };
-
-  function checkNames() {
+  const checkNames = () => {
     if (
       firstnameRef.current &&
       lastnameRef.current &&
@@ -328,21 +199,20 @@ export default function Register() {
       lastnamecheckRef.current &&
       firstnamecheckRef.current
     ) {
-      if (
-        firstnameRef.current.value !== "" &&
-        lastnameRef.current.value !== ""
-      ) {
+      const firstname = firstnameRef.current.value.trim();
+      const lastname = lastnameRef.current.value.trim();
+      if (!FormValidator.oneEmpty(firstname, lastname)) {
         firstnamecheckRef.current.className = "hidden";
         lastnamecheckRef.current.className = "hidden ";
         return true;
       } else {
-        if (firstnameRef.current.value === "") {
+        if (FormValidator.isEmpty(firstname)) {
           firstnamecheckRef.current.className = "text-sm  text-red-500 ";
           setErrorMessage("This field can not be empty !");
         } else {
           firstnamecheckRef.current.className = "hidden";
         }
-        if (lastnameRef.current.value === "") {
+        if (FormValidator.isEmpty(lastname)) {
           lastnamecheckRef.current.className = "text-sm  text-red-500 ";
           setErrorMessage("This field can not be empty !");
         } else {
@@ -352,10 +222,136 @@ export default function Register() {
       }
     }
     return false;
-  }
-
+  };
+  const checkUsername = () => {
+    setErrorMessage("");
+    if (usernameRef.current && usernameCheckRef.current) {
+      const username = usernameRef.current.value.trim();
+      if (FormValidator.hasMininmumLength(6, username)) {
+        usernameCheckRef.current.className = "hidden";
+        return true;
+      }
+      setErrorMessage("Username must be minimum 6 characters !");
+      usernameCheckRef.current.className =
+        "text-sm text-red-600 dark:text-red-500";
+      return false;
+    }
+    return false;
+  };
+  const checkEmail = () => {
+    setErrorMessage("");
+    if (emailRef.current && emailcheckRef.current) {
+      const email = emailRef.current.value.trim();
+      if (FormValidator.hasEmailFormat(email)) {
+        // Check if email is unique
+        // code ...
+        emailcheckRef.current.className = "hidden";
+        return true;
+      } else {
+        if (FormValidator.isEmpty(email)) {
+          emailcheckRef.current.className = "block";
+          setErrorMessage("This field can not be empty !");
+          return false;
+        } else {
+          emailcheckRef.current.className = "block";
+          setErrorMessage("Email should match this format : name@domain.org");
+          return false;
+        }
+      }
+    }
+    return false;
+  };
+  const checkTel = () => {
+    setErrorMessage(""); // Reset the error message
+    if (telRef.current && telCheckRef.current) {
+      const tel = telRef.current.value.trim();
+      if (FormValidator.isEmpty(tel)) {
+        setErrorMessage("Phone number cannot be empty!");
+        telCheckRef.current.className =
+          "block text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else if (!FormValidator.containsOnlyDigit(tel.replace(/-/g, ""))) {
+        setErrorMessage("The phone number must be digits and '-' !");
+        telCheckRef.current.className =
+          "block text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else if (!FormValidator.isFrNumber(tel.replace(/-/g, ""))) {
+        setErrorMessage(
+          "The phone number must be 10 digit long and start with " +
+            FormValidator.FR_NUMBER_STARTER.join(" or ")
+        );
+        telCheckRef.current.className =
+          "block text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else {
+        telCheckRef.current.className = "hidden";
+        return true;
+      }
+    }
+    return false;
+  };
+  const checkPassword = () => {
+    setErrorMessage("");
+    if (
+      passwordRef.current &&
+      confirmpasswordRef.current &&
+      passwordCheckRef.current
+    ) {
+      const password = passwordRef.current.value.trim();
+      const confirmPassword = confirmpasswordRef.current.value.trim();
+      // Check if both passwords are not empty, match, and meet the password policy
+      if (FormValidator.oneEmpty(password, confirmPassword)) {
+        setErrorMessage("Please fill all the fields!");
+        passwordCheckRef.current.className =
+          "text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else if (!FormValidator.areSame(password, confirmPassword)) {
+        setErrorMessage("Passwords do not match!");
+        passwordCheckRef.current.className =
+          "text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else if (!FormValidator.isValidPassword(password)) {
+        setErrorMessage(
+          "Password must contain at least 8 characters, including 1 lowercase, 1 uppercase, and 1 symbol."
+        );
+        passwordCheckRef.current.className =
+          "text-sm text-red-600 dark:text-red-500";
+        return false;
+      } else {
+        passwordCheckRef.current.className = "hidden";
+        return true;
+      }
+    }
+    // Default return false if refs are not set properly
+    return false;
+  };
+  const signUp = () => {
+    if (checkPassword()) {
+      const userdata = {
+        firstname: firstnameRef.current?.value,
+        lastname: lastnameRef.current?.value,
+        username: usernameRef.current?.value.replace(/_/g , ""),
+        email: emailRef.current?.value,
+        password: passwordRef.current?.value,
+        tel: telRef.current?.value.replace(/-/g, ""),
+      };
+      UserRepository.register(userdata).then((response: any) => {
+        if (!response.message)
+        {
+          notify(response.error, "error");
+        }
+        else {
+          notify(response.message, "success");
+        }
+      }).catch((error) => {
+        notify("An error occured", "error");
+        console.log(error);
+      })      
+    }
+  };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
+      <ToastContainer/>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -437,11 +433,11 @@ export default function Register() {
                     placeholder="_trafalgar_D"
                     onKeyUp={checkUsername}
                   />
-                  <div ref={usernameCheckRef} className="hidden">
-                    <p className="text-sm text-red-600 dark:text-red-500">
-                      <span className="font-medium">Oops!</span> {errorMessage}
-                    </p>
-                  </div>
+                </div>
+                <div ref={usernameCheckRef} className="hidden">
+                  <p className="text-sm text-red-600 dark:text-red-500">
+                    <span className="font-medium">Oops!</span> {errorMessage}
+                  </p>
                 </div>
               </div>
               <div className="hidden" ref={emailSectionRef}>
@@ -472,11 +468,11 @@ export default function Register() {
                     placeholder="name@company.com"
                     onKeyUp={checkEmail}
                   />
-                  <div ref={emailcheckRef} className="hidden">
-                    <p className="text-sm text-red-600 dark:text-red-500">
-                      <span className="font-medium">Oops!</span> {errorMessage}
-                    </p>
-                  </div>
+                </div>
+                <div ref={emailcheckRef} className="hidden">
+                  <p className="text-sm text-red-600 dark:text-red-500">
+                    {errorMessage}
+                  </p>
                 </div>
               </div>
               <div className="hidden" ref={telSectionRef}>
@@ -509,16 +505,13 @@ export default function Register() {
                     id="telephone"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="06-89-09-32-02"
-                    onChange={() => {
-                      checkTel;
-                      preventLetter;
-                    }}
+                    onChange={checkTel}
                   />
-                  <div ref={telCheckRef}>
-                    <p className="text-sm text-red-600 dark:text-red-500">
-                      <span className="font-medium">Oops!</span> {errorMessage}
-                    </p>
-                  </div>
+                </div>
+                <div ref={telCheckRef}>
+                  <p className="text-sm text-red-600 dark:text-red-500">
+                    {errorMessage}
+                  </p>
                 </div>
               </div>
               <div ref={passwordSectionRef} className="hidden">
@@ -541,7 +534,7 @@ export default function Register() {
                   htmlFor="password"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Password
+                  Confirm password
                 </label>
                 <input
                   type="password"
@@ -556,7 +549,7 @@ export default function Register() {
                   ref={passwordCheckRef}
                   className="hidden text-sm text-red-600 dark:text-red-500"
                 >
-                  <span className="font-medium">Oops!</span> {errorMessage}
+                  {errorMessage}
                 </p>
               </div>
               <div className="flex">

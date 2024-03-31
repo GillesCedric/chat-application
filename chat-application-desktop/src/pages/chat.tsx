@@ -1,5 +1,5 @@
 import Conversation from '../components/conversation'
-import { ToastContainer, toast } from 'react-toastify'
+import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { notify } from '../components/toastify'
 import { useEffect, useState } from 'react';
@@ -66,8 +66,7 @@ export default function Home() {
             <textarea className={`w-full h-20 p-4 text-gray-400 ${darkMode ? 'bg-gray-800' : 'bg-gray-200'} resize-none`} placeholder='Commencez à taper ici...'></textarea>
           </div>
         </div>
-
       </div>
     </div>
-  )
+  );
 }

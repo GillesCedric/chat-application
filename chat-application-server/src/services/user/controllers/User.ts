@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
 import { Crypto } from "../../../modules/crypto/Crypto";
 import { Code } from "../../../utils/HTTP";
+import { Tokens } from "../../../utils/Keywords";
 
 
 export default class UserController {
@@ -93,7 +94,8 @@ export default class UserController {
 
           return res.status(200).json({
             message: 'connection success',
-            token: JWTUtils.generateTokenForUser(userFound.id)
+            access_token: JWTUtils.generateTokenForUser(userFound.id, Tokens.accessToken),
+            refresh_token: JWTUtils.generateTokenForUser(userFound.id, Tokens.refreshToken)
           });
         })
         .catch(error => {
@@ -151,6 +153,46 @@ export default class UserController {
         error: "Impossible d'enregistrer l'utilisateur",
       });
     }
+  };
+
+  public readonly updateTokens = (req: Request, res: Response): Response => {
+
+    const refreshToken = req.body.refresh_token
+
+    if (!refreshToken) return res.status(401).json({ error: "Missing refresh token" });
+
+    const userId = JWTUtils.getUserFromToken(refreshToken, Tokens.refreshToken)
+
+    // Vérifier si le refreshToken est stocké et valide
+    if (userId == undefined) return res.status(403).json({ error: "Invalid refresh token" });
+
+    const newAccessToken = JWTUtils.generateTokenForUser(userId, Tokens.accessToken)
+    const newRefreshToken = JWTUtils.generateTokenForUser(userId, Tokens.accessToken)
+
+    return res.status(200).json({
+      message: "refresh success",
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken
+    })
+  };
+
+  public readonly isValidTokens = (req: Request, res: Response): Response => {
+
+    const accessToken = req.body.access_token
+    const refreshToken = req.body.refresh_token
+
+    if (!accessToken || !refreshToken) return res.status(401).json({ error: "Missing tokens" });
+
+    const accessTokenUserId = JWTUtils.getUserFromToken(accessToken, Tokens.accessToken)
+    const refreshTokenUserId = JWTUtils.getUserFromToken(refreshToken, Tokens.refreshToken)
+
+    // Vérifier si le refreshToken est stocké et valide
+    if (refreshTokenUserId == undefined) return res.status(403).json({ error: "Invalid tokens" });
+
+    if (accessTokenUserId == undefined) return res.status(403).json({ error: "Invalid access token" });
+
+    return res.status(200).json({ message: "Valid Tokens" });
+
   };
 
   public readonly addFriend = (req: Request, res: Response): Response => { return null }
