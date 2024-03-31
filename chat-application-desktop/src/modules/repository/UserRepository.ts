@@ -10,7 +10,6 @@ export default class UserRepository {
     tel: string;
   }): Promise<any> {
     try {
-      console.log(userData)
       const response = await API.register({
         firstname: userData.firstname,
         lastname: userData.lastname,
@@ -30,5 +29,10 @@ export default class UserRepository {
       console.error("Error in registration:", error);
       return false;
     }
+  }
+
+  public static async checkUnique(data: any) {
+    const response = await API.checkIfExist(data);
+    console.log(response)
   }
 }

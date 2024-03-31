@@ -9,6 +9,7 @@ import '../styles/global.css'
 import Register from './pages/register'
 import Chat from './pages/chat'
 import SignIn from './pages/signin'
+import ChatPage from './pages/ChatPage'
 
 
 export default class App extends React.Component<{}, {}> {
@@ -25,6 +26,7 @@ export default class App extends React.Component<{}, {}> {
 				<Route path='/' element={<Navigate to={'/chat'} />} />
 				<Route path='/register' element={<Register />} />
 				<Route path='/signin' element={<SignIn />} />
+				<Route path='/chatPage' element={<ChatPage />} />
 				<Route path='/chat' element={
 					<ProtectedPage>
 						<Chat />
