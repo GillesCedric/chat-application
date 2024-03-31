@@ -15,17 +15,15 @@ export class Crypto {
 
 	protected static readonly randomLength: number = 10
 
-	static readonly encode = (text: string): string => Buffer
-		.from(text, 'binary')
-		.toString('base64')
-	static readonly btoa = this.encode //preserved for backwards compatibility
+	static readonly encode = (text: string): string => {
+		return btoa(text)
+
+	}
 
 
-	static readonly decode = (text: string): string => Buffer
-		.from(text, 'base64')
-		.toString('binary')
-	static readonly atob = this.decode //preserved for backwards compatibility
-
+	static readonly decode = (text: string): string => {
+		return atob(text)
+	}
 
 	public static readonly random = (length: number = this.randomLength): string => {
 		let text = ''

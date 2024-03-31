@@ -5,6 +5,7 @@ import { Crypto } from '../modules/crypto/Crypto'
 export default class BasicAuthentication {
 
     public static readonly authenticate = (request: Request, response: Response, next: NextFunction): any => {
+
         // check for basic auth header
         if (request.headers.authorization && request.headers.authorization.indexOf('Basic ') != -1) {
             const authorization = Crypto.atob(request.headers.authorization.split(' ')[1]).split(':')

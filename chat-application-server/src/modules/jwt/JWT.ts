@@ -1,5 +1,7 @@
 import * as jwt from "jsonwebtoken";
 
+export type TokenType = "access_token" | "refresh_token"
+
 /**
  * @class JWTUtils
  * @author Gilles Cédric
@@ -10,26 +12,11 @@ import * as jwt from "jsonwebtoken";
  * @since 22/05/2022
  */
 export default abstract class JWTUtils {
-  /**
-   * @method generateTokenForUser
-   * @description this method is used to generate and sign a token for a specific user
-<<<<<<< HEAD:chat-application-server/src/utils/JWTUtils.ts
-<<<<<<< HEAD
-   * @param {User} user the user
-=======
-   * @param {string} id the user id
->>>>>>> 8aed3ad3a7a2c5547b6d516fbe78001a97f485ac
-=======
-   * @param {string} id the user id
->>>>>>> 61faf41140fb10ab0cb29c72231596f2d97f42e5:chat-application-server/src/modules/jwt/JWT.ts
-   * @readonly
-   * @static
-   * @private
-   * @returns {string} the generated token
-   */
-  public static readonly generateTokenForUser: (id: string) => string = (id: string): string => {
-    return jwt.sign({ userId: id }, process.env.TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.TOKEN_DELAY })
+
+  public static readonly generateTokenForUser: (id: string | number, tokenType: TokenType) => string = (id: string, tokenType: TokenType): string => {
+    return jwt.sign({ userId: id }, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY, { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY })
   }
+
 
   /**
    * @method parseToken
@@ -53,18 +40,24 @@ export default abstract class JWTUtils {
    * @private
    * @returns {number}
    */
-  public static readonly getUserFromToken: (token: string) => number = (
-    token: string
-  ): number => {
-    token = this.parseToken(token);
-    let userId = -1;
+  public static readonly getUserFromToken: (token: string, tokenType: TokenType) => string | undefined = (
+    token: string,
+    tokenType: TokenType
+  ): string | undefined => {
+    token = this.parseToken(token)
+    let userId = undefined;
     try {
-      const jwtToken = jwt.verify(token, process.env.TOKEN_ENCRYPTION_KEY);
-      //@ts-ignore
-      userId = jwtToken.userId as unknown as number;
+      const jwtToken = jwt.verify(token, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY);
+
+      if (jwtToken) {
+        //@ts-ignore
+        userId = jwtToken.userId as unknown as number;
+      }
+
     } catch (error) {
       console.log(error);
     }
     return userId;
   };
+
 }
