@@ -12,7 +12,7 @@ export default function SignIn() {
   useEffect(() => {
     // Checking if user is not loggedIn
     if (isLoggedIn) {
-      navigate("/chat")
+      notify("Connexion réussie", "success", () => (navigate("/chat")))
     }
   }, [navigate, isLoggedIn])
 
