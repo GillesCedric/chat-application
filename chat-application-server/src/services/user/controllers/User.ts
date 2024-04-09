@@ -229,23 +229,23 @@ export default class UserController {
     req: Request,
     res: Response
   ): Promise<Response> => {
-    const { username , tel, email } = req.query;
+    const { username, tel, email } = req.query;
 
     try {
-       const emailParam = req.query.email;
-       const usernameParam = req.query.username;
-       const telParam = req.query.tel;
+      const emailParam = req.query.email;
+      const usernameParam = req.query.username;
+      const telParam = req.query.tel;
 
-       const encryptedEmail: string =
-         typeof emailParam === "string"
-           ? Crypto.encrypt(emailParam, "email")
-           : null;
-       const encryptedUsername: string =
-         typeof usernameParam === "string"
-           ? Crypto.encrypt(usernameParam, "username")
-           : null;
-       const encryptedTel: string =
-         typeof telParam === "string" ? Crypto.encrypt(telParam, "tel") : null;
+      const encryptedEmail: string =
+        typeof emailParam === "string"
+          ? Crypto.encrypt(emailParam, "email")
+          : null;
+      const encryptedUsername: string =
+        typeof usernameParam === "string"
+          ? Crypto.encrypt(usernameParam, "username")
+          : null;
+      const encryptedTel: string =
+        typeof telParam === "string" ? Crypto.encrypt(telParam, "tel") : null;
       const query: any = {};
       if (encryptedEmail) query.email = encryptedEmail;
       if (encryptedUsername) query.username = encryptedUsername;
