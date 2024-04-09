@@ -4,17 +4,10 @@ import API from "../modules/api/API";
 import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
 export default function SignIn() {
 
-  const navigate = useNavigate()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    // Checking if user is not loggedIn
-    if (isLoggedIn) {
-      notify("Connexion réussie", "success", () => (navigate("/chat")))
-    }
-  }, [navigate, isLoggedIn])
+  const { authUser, setAuthUser } = useAuthContext()
 
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -27,12 +20,14 @@ export default function SignIn() {
       password: passwordRef.current?.value,
     })
       .then((data: any) => {
-        console.log(data)
-        if (data.message)
-          setIsLoggedIn(true)
-        else {
-          if (data.error === "already authenticated")
-            notify("Redirection to the chat" , "info" , ()=> (navigate("/chat")) )
+        if (data.message) {
+          window.electron.store.set('chat-application-access_token', data.access_token)
+          window.electron.store.set('chat-application-refresh_token', data.refresh_token)
+          setAuthUser(data.access_token)
+        }else {
+          if (data.error === "already authenticated") {
+            setAuthUser(true)
+          }
         }
       })
   };

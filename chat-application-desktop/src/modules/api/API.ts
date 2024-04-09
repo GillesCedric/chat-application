@@ -59,7 +59,7 @@ export default class API {
 			const response = await fetch(this.apiUrl + '/users/token', {
 				method: 'PUT',
 				headers: this.headers,
-				body: data
+				body: JSON.stringify(data)
 			})
 			responseData = await response.json()
 		} catch (error) {
