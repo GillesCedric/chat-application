@@ -8,8 +8,9 @@ export class Logout extends React.Component {
 	 * @returns {React.ReactNode}
 	 */
 	render = (): React.ReactNode => {
-		// if(Cookies.get('user')) Cookies.remove('user')
-		return <Navigate to="/authenticate" />
+		window.electron.store.set('chat-application-access_token', "")
+		window.electron.store.set('chat-application-refresh_token', "")
+		return <Navigate to="/signin" />
 		
 	}
 }
