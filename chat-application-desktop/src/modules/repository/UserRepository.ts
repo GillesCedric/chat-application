@@ -20,19 +20,32 @@ export default class UserRepository {
       });
       if (response.message) {
         console.log("Registration successful");
-        return {message : userData.username +" registration successful"};
-      } else {
-        console.error("Registration failed with error message:", response.error);
-        return {error : response.error};
+        return { message: userData.username + " registration successful" };
+      }
+      if (response.error) {
+        console.error(
+          "Registration failed with error message:",
+          response.error
+        );
+        return { error: response.error };
+      } else if (response.errors) {
+        const errors: any[] = response.errors;
+        const finalError: any[] = [];
+        errors.forEach((error) => {
+          finalError.push(error.msg + " for " + error.path, "error");
+        });
+        return finalError.reduce(
+          (accumulation: [], current: []) => accumulation + " " + current,
+          ""
+        );
       }
     } catch (error) {
       console.error("Error in registration:", error);
       return false;
     }
   }
-
   public static async checkUnique(data: any) {
     const response = await API.checkIfExist(data);
-    console.log(response)
+    console.log(response);
   }
 }

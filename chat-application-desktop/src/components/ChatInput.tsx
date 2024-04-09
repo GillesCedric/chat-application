@@ -28,11 +28,11 @@ const ChatInput = ({
   };
 
   return (
-    <form onSubmit={handleSend}>
+    <form onSubmit={handleSend} className=" rounded-b-lg ">
       <label htmlFor="chat" className="sr-only">
         Your message
       </label>
-      <div className="flex items-center py-2 px-3 bg-gray-50 rounded-lg dark:bg-gray-700">
+      <div className="flex items-center py-2 px-3 bg-gray-50 dark:bg-gray-700">
         <button
           type="submit"
           className="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"

@@ -37,7 +37,6 @@ export default function SignIn() {
           errors.forEach(error => {
             notify(error.msg + " for " +error.path , "error")
           });
-         
         }
       }
     });

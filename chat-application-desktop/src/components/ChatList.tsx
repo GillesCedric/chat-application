@@ -30,9 +30,8 @@ const ChatListItem = ({ chat } : {chat : Chat}) => {
 
 const ChatList = ({ chats } : {chats : Chat[]}) => {
   return (
-		<div className="w-80">
-			<SearchBar/>
-      <div className="overflow-y-auto">
+		<div className="w-70 z-10 ">
+      <div className="overflow-y-auto mt-3">
         {chats.map((chat) => (
           <ChatListItem key={chat.id} chat={chat} />
         ))}

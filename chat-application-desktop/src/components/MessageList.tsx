@@ -1,7 +1,7 @@
 import React from "react";
 
 const MessageList = ({ messages }: { messages: any[] }) => (
-  <div className="message-list flex flex-col space-y-2 p-3 overflow-y-auto bg-custom-gray">
+  <div className="flex flex-col space-y-2 p-3 overflow-y-auto bg-custom-gray">
     {messages.map((message, index) => (
       <MessageItem key={index} message={message} />
     ))}

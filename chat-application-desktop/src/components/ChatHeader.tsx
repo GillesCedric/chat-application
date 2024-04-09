@@ -1,45 +1,42 @@
-import React from "react";
+import { faBell, faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisVertical, faSearch } from "@fortawesome/free-solid-svg-icons";
-const MessageListHeader = ({ name, isOnline, avatar } : {name : string , isOnline : boolean , avatar : string}) => {
+import React from "react";
+const NavLink = ({ children, href }: { children: any; href: string }) => {
   return (
-    <div className="py-2 px-3 bg-grey-lighter flex justify-between items-center border-b-2">
+    <a
+      href={href}
+      className=" relative inline-block transition-colors duration-300 ease-in-out hover:text-blue-500"
+    >
+      {children}
+      <span className="text-white relative inline-block transition-colors duration-300 ease-in-out hover:text-blue-500"></span>
+    </a>
+  );
+};
+const ChatHeader = () => {
+  return (
+    <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
       <div className="flex items-center">
-        <img className="w-10 h-10 rounded-full" src={avatar} alt={`${name}`} />
-        <div className="ml-4">
-          <p className="text-grey-darkest font-semibold">{name}</p>
-          <p
-            className={`text-grey-darker text-xs mt-1 ${
-              isOnline ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {isOnline ? "Online" : "Offline"}
-          </p>
+        <div className="">
+          <FontAwesomeIcon
+            icon={faComments}
+            className="bg-blue-500 rounded-full p-2 mr-2"
+          />
         </div>
+        <span className="font-semibold text-lg">ChatBOT</span>
       </div>
-
-      <div className="flex space-x-2">
-        <button
-          type="button"
-          className="p-2 text-gray-500 hover:bg-gray-200 rounded-full focus:outline-none"
-        >
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
-        <button
-          type="button"
-          className="p-2 text-gray-500 hover:bg-gray-200 rounded-full focus:outline-none"
-        >
-          <FontAwesomeIcon icon={faEllipsisVertical} />
-        </button>
-        <button
-          type="button"
-          className="p-2 text-gray-500 hover:bg-gray-200 rounded-full focus:outline-none"
-        >
-          {/* SVG icon or any other icon component */}
-        </button>
-      </div>
-    </div>
+      <nav className="flex space-x-4 text-sm">
+        <NavLink href="/">Home</NavLink>
+        <NavLink href="/chat">Chat</NavLink>
+        <NavLink href="/chat">Contacts</NavLink>
+        <NavLink href="/chat">Settings</NavLink>
+        <a href="/chat">
+          <FontAwesomeIcon
+            icon={faBell}
+          />
+        </a>
+      </nav>
+    </header>
   );
 };
 
-export default MessageListHeader;
+export default ChatHeader;
