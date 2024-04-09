@@ -28,6 +28,15 @@ export default function Home() {
             Sign in
           </Link>
         </p>
+        <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+          Already have an account ?
+          <Link
+            to="/chatPage"
+            className="font-medium text-blue-600 hover:underline dark:text-blue-500 ml-1"
+          >
+            Chat Page
+          </Link>
+        </p>
         <div className="flex justify-center items-center h-1/6 border-b border-gray-300 bg-blue-100">
           <h1 className="text-lg font-bold text-blue-800">
             Votre conversation avec{" "}

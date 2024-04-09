@@ -20,7 +20,7 @@ export default function App() {
 				<Route path='/' element={<Navigate to={'/chat'} />} />
 				<Route path='/register' element={authUser ? <Navigate to="/" /> : <Register />} />
 				<Route path='/signin' element={authUser ? <Navigate to="/" /> : <SignIn />} />
-				<Route path='/chat' element={authUser ? <Chat /> : <Navigate to="/signin" />} />
+				<Route path='/chatPage' element={authUser ? <Chat /> : <Navigate to="/signin" />} />
 				<Route path='/logout' element={<Logout />} />
 				<Route path='*' element={
 					<NotFound />

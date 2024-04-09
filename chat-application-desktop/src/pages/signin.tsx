@@ -1,5 +1,5 @@
-"use client"
-import React, {useEffect, useRef, useState } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 import API from "../modules/api/API";
 import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../components/toastify";
@@ -13,8 +13,8 @@ export default function SignIn() {
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
   const signIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    console.log(passwordRef.current?.value)
-    event.preventDefault()
+    console.log(passwordRef.current?.value);
+    event.preventDefault();
     API.login({
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
@@ -24,18 +24,25 @@ export default function SignIn() {
           window.electron.store.set('chat-application-access_token', data.access_token)
           window.electron.store.set('chat-application-refresh_token', data.refresh_token)
           setAuthUser(data.access_token)
-        }else {
+        } else if (data.error) {
           if (data.error === "already authenticated") {
             setAuthUser(true)
+          } else {
+            notify(data.error, "error");
           }
+        } else if (data.errors) {
+          const errors: any[] = data.errors;
+          errors.forEach(error => {
+            notify(error.msg + " for " + error.path, "error")
+          });
         }
-      })
+      });
   };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <ToastContainer />
-      
+
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -50,7 +57,15 @@ export default function SignIn() {
                 >
                   Your email
                 </label>
-                <input ref={emailRef} type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required />
+                <input
+                  ref={emailRef}
+                  type="email"
+                  name="email"
+                  id="email"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="name@company.com"
+                  required
+                />
               </div>
               <div>
                 <label
@@ -98,7 +113,9 @@ export default function SignIn() {
               <button
                 type="submit"
                 className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => signIn(event)}
+                onClick={(
+                  event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+                ) => signIn(event)}
               >
                 Sign in
               </button>
