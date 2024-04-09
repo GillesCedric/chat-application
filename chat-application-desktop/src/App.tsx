@@ -9,6 +9,7 @@ import Register from './pages/register'
 import Chat from './pages/chat'
 import SignIn from './pages/signin'
 import { useAuthContext } from './context/AuthContext'
+import ChatPage from './pages/ChatPage'
 
 
 export default function App() {
@@ -17,10 +18,10 @@ export default function App() {
 		//TODO add all the routes of the application
 		return <>
 			<Routes>
-				<Route path='/' element={<Navigate to={'/chat'} />} />
+				<Route path='/' element={<Navigate to={'/chatPage'} />} />
 				<Route path='/register' element={authUser ? <Navigate to="/" /> : <Register />} />
 				<Route path='/signin' element={authUser ? <Navigate to="/" /> : <SignIn />} />
-				<Route path='/chatPage' element={authUser ? <Chat /> : <Navigate to="/signin" />} />
+				<Route path='/chatPage' element={authUser ? <ChatPage /> : <Navigate to="/signin" />} />
 				<Route path='/logout' element={<Logout />} />
 				<Route path='*' element={
 					<NotFound />

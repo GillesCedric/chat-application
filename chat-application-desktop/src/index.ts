@@ -15,8 +15,8 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-secureStore.set("chat-application-access_token", "null")
-secureStore.set("chat-application-refresh_token", "null")
+//secureStore.set("chat-application-access_token", "null")
+//secureStore.set("chat-application-refresh_token", "null")
 
 // IPC listener
 ipcMain.on('electron-store-get', (event, val) => {

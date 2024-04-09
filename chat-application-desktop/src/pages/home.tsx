@@ -21,7 +21,7 @@ export default function HomePage() {
         </Link>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
-        <Link to="/chat">
+        <Link to="/chatPage">
           Go to chat Page
         </Link>
       </div>
