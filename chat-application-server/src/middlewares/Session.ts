@@ -16,10 +16,17 @@ export default class Session {
             }
         } else if (req.body.refresh_token && JWTUtils.getUserFromToken(req.body.refresh_token, Tokens.refreshToken) != undefined && req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'token') {
             return next()
-        } else if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin' || req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signup') {
-            return next()
+        } else if (
+          req.path.substring(req.path.lastIndexOf("/") + 1, req.path.length) ==
+            "signin" ||
+          req.path.substring(req.path.lastIndexOf("/") + 1, req.path.length) ==
+            "signup" ||
+          req.path.substring(req.path.lastIndexOf("/") + 1, req.path.length) ==
+            "checkUnique"
+        ) {
+          return next();
         } else {
-            return res.status(401).json({ error: 'unauthenticated' })
+          return res.status(401).json({ error: "unauthenticated" });
         }
 
     }

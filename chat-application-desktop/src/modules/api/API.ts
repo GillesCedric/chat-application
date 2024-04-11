@@ -31,11 +31,11 @@ export default class API {
 	}
 
 	private static handleRequest = async (responseData: any) => {
-		if (responseData.message && responseData.access_token && responseData.refresh_token){
+		if (responseData.message && responseData.access_token && responseData.refresh_token) {
 			window.electron.store.set('chat-application-access_token', responseData.access_token)
 			window.electron.store.set('chat-application-refresh_token', responseData.refresh_token)
 			return false
-		}else if (responseData.error && responseData.error == "unauthenticated") {
+		} else if (responseData.error && responseData.error == "unauthenticated") {
 			const access_token = await window.electron.store.get('chat-application-access_token')
 			const refresh_token = await window.electron.store.get('chat-application-refresh_token')
 			const response = await this.refreshTokens({
@@ -59,7 +59,7 @@ export default class API {
 			const response = await fetch(this.apiUrl + '/users/token', {
 				method: 'PUT',
 				headers: this.headers,
-				body: data
+				body: JSON.stringify(data)
 			})
 			responseData = await response.json()
 		} catch (error) {
@@ -82,6 +82,22 @@ export default class API {
 		}
 		return responseData
 	}
+
+	public static readonly checkIfExist: (data: any) => Promise<any> =
+		async (data: any): Promise<any> => {
+			let responseData = null;
+			try {
+				const response = await fetch(this.apiUrl + "/users/checkUnique", {
+					method: "POST",
+					headers: this.headers,
+					body: JSON.stringify(data),
+				});
+				responseData = await response.json();
+			} catch (error) {
+				console.log("error " + error);
+			}
+			return responseData;
+		};
 
 
 

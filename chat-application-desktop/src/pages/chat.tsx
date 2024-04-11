@@ -38,9 +38,42 @@ export default function Home() {
       <div className='flex flex-col h-full'>
 
         {/* Top */}
+<<<<<<< HEAD
         <div className={`flex justify-center items-center h-1/6 border-b border-gray-300 ${darkMode ? 'bg-gray-900' : 'bg-blue-100'}`}>
           <h1 className='text-lg font-bold'>{darkMode ? 'Votre conversation en mode sombre' : 'Votre conversation avec'}</h1>
           <button onClick={() => notify("Notification", "error")} className={`ml-2 ${darkMode ? 'bg-blue-500' : 'bg-blue-500 text-white'} text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-700 transition duration-300`}>Test Notification</button>
+=======
+        <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+          Already have an account ?
+          <Link
+            to="/signin"
+            className="font-medium text-blue-600 hover:underline dark:text-blue-500 ml-1"
+          >
+            Sign in
+          </Link>
+        </p>
+        <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+          Already have an account ?
+          <Link
+            to="/chatPage"
+            className="font-medium text-blue-600 hover:underline dark:text-blue-500 ml-1"
+          >
+            Chat Page
+          </Link>
+        </p>
+        <div className="flex justify-center items-center h-1/6 border-b border-gray-300 bg-blue-100">
+          <h1 className="text-lg font-bold text-blue-800">
+            Votre conversation avec{" "}
+          </h1>
+          <button
+            onClick={() => {
+              notify("Test Notification", "error" )
+            }}
+            className="ml-2 bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-red-600 focus:outline-none focus:ring focus:border-blue-700 transition duration-300"
+          >
+            Test Notification
+          </button>
+>>>>>>> 52a1c70bf4ff39cbefd010f7276e9bfbc0554b0d
         </div>
 
         {/* Middle */}

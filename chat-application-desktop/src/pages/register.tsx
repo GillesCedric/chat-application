@@ -229,6 +229,7 @@ export default function Register() {
       const username = usernameRef.current.value.trim();
       if (FormValidator.hasMininmumLength(6, username)) {
         usernameCheckRef.current.className = "hidden";
+        UserRepository.checkUnique({ username: username });
         return true;
       }
       setErrorMessage("Username must be minimum 6 characters !");
