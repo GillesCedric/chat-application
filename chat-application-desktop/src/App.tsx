@@ -10,22 +10,22 @@ import Chat from './pages/chat'
 import SignIn from './pages/signin'
 import { useAuthContext } from './context/AuthContext'
 import ChatPage from './pages/ChatPage'
-
-
+import LoggingPage from './pages/testlog';
 export default function App() {
-	const {authUser} = useAuthContext()
-	
-		//TODO add all the routes of the application
-		return <>
-			<Routes>
-				<Route path='/' element={<Navigate to={'/chatPage'} />} />
-				<Route path='/register' element={authUser ? <Navigate to="/" /> : <Register />} />
-				<Route path='/signin' element={authUser ? <Navigate to="/" /> : <SignIn />} />
-				<Route path='/chatPage' element={authUser ? <ChatPage /> : <Navigate to="/signin" />} />
-				<Route path='/logout' element={<Logout />} />
-				<Route path='*' element={
-					<NotFound />
-				} />
-			</Routes>
-		</>
-	}
+	const { authUser } = useAuthContext()
+
+	//TODO add all the routes of the application
+	return <>
+		<Routes>
+			<Route path='/' element={<Navigate to={'/chatPage'} />} />
+			<Route path='/register' element={authUser ? <Navigate to="/" /> : <Register />} />
+			<Route path='/signin' element={authUser ? <Navigate to="/" /> : <SignIn />} />
+			<Route path='/chatPage' element={authUser ? <ChatPage /> : <Navigate to="/signin" />} />
+			<Route path='/logout' element={<Logout />} />
+			<Route path='/testlog' element={<LoggingPage />} />
+			<Route path='*' element={
+				<NotFound />
+			} />
+		</Routes>
+	</>
+}

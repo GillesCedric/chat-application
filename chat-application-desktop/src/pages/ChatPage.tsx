@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Importez le composant Link
 import ChatList from "../components/ChatList";
 import MessageList from "../components/MessageList";
 import ChatInput from "../components/ChatInput";
@@ -60,6 +61,8 @@ const ChatPage = () => {
             <SearchBar />
           </div>
           <ChatList chats={chats} />
+          {/* Ajoutez le lien ici */}
+          <Link to="/testlog">Test Log</Link>
         </aside>
 
         {/* Chat Area */}
@@ -85,6 +88,7 @@ const ChatPage = () => {
         </main>
       </div>
     </div>
+
   );
 };
 
