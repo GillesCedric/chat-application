@@ -1,4 +1,5 @@
 import { UserModel } from "../../../models/User";
+import { FriendsRequestModel } from "../../../models/FriendsRequest";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
@@ -70,93 +71,82 @@ export default class UserController {
       });
     }
   };
-  public readonly signIn = (req: Request, res: Response): Response => {
-    const email = req.body.email;
-    const password = req.body.password;
+  public readonly signIn = async (req: Request, res: Response): Promise<Response> => {
+
     try {
-      UserModel.findOne({ email: Crypto.encrypt(email, "email") })
-        .then((userFound) => {
-          if (!userFound) {
-            return res.status(401).json({
-              error: "Incorrect email",
-            });
-          }
-
-          const passwordMatches = bcrypt.compareSync(
-            password,
-            userFound.password
-          );
-
-          if (!passwordMatches) {
-            return res.status(401).json({
-              error: "Incorrect password",
-            });
-          }
-
-          return res.status(200).json({
-            message: "connection success",
-            access_token: JWTUtils.generateTokenForUser(
-              userFound.id,
-              Tokens.accessToken
-            ),
-            refresh_token: JWTUtils.generateTokenForUser(
-              userFound.id,
-              Tokens.refreshToken
-            ),
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-          return res.status(500).json({
-            error: "Cet utilisateur n'existe pas",
-          });
+      const user = await UserModel.findOne({ email: Crypto.encrypt(req.body.email, "email") })
+      if (!user) {
+        return res.status(401).json({
+          error: "Incorrect email",
         });
+      }
+
+      const passwordMatches = bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
+
+      if (!passwordMatches) {
+        return res.status(401).json({
+          error: "Incorrect password",
+        });
+      }
+
+      return res.status(200).json({
+        message: "connection success",
+        access_token: JWTUtils.generateTokenForUser(
+          user.id,
+          Tokens.accessToken
+        ),
+        refresh_token: JWTUtils.generateTokenForUser(
+          user.id,
+          Tokens.refreshToken
+        ),
+      })
+
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        error: "User verification impossible",
+        error: "Cet utilisateur n'existe pas",
       });
     }
   };
 
-  public readonly signUp = (req: Request, res: Response): Response => {
+  public readonly signUp = async (req: Request, res: Response): Promise<Response> => {
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
-    const firstname = Crypto.encrypt(req.body.firstname, "database");
-    const lastname = Crypto.encrypt(req.body.lastname, "database");
-    const username = Crypto.encrypt(req.body.username, "username");
-    const tel = Crypto.encrypt(req.body.tel, "tel");
-    const email = Crypto.encrypt(req.body.email, "email");
-    const password = bcrypt.hashSync(
-      req.body.password,
-      Number.parseInt(process.env.SALT_ROUNDS)
-    );
-    const isVerified = Crypto.encrypt("false", "database");
-    const picture = Crypto.encrypt("/default/profile/" + req.body.picture, "database");
 
     //TODO add username, tel and email unique verification
     try {
-      UserModel.insertMany({
-        lastname: lastname,
-        firstname: firstname,
-        username: username,
-        tel: tel,
-        email: email,
-        password: password,
-        isVerified: isVerified,
+      const user = await UserModel.insertMany({
+        lastname: Crypto.encrypt(req.body.lastname, "database"),
+        firstname: Crypto.encrypt(req.body.firstname, "database"),
+        username: Crypto.encrypt(req.body.username, "username"),
+        tel: Crypto.encrypt(req.body.tel, "tel"),
+        email: Crypto.encrypt(req.body.email, "email"),
+        password: bcrypt.hashSync(
+          req.body.password,
+          Number.parseInt(process.env.SALT_ROUNDS)
+        ),
+        isEmailVerified: Crypto.encrypt("false", "database"),
+        isTelVerified: Crypto.encrypt("false", "database"),
+        is2FAEnabled: Crypto.encrypt("false", "database"),
+        picture: Crypto.encrypt("/default/profile/" + req.body.picture, "database"),
+        status: Crypto.encrypt("false", "database"),
         friends: [],
-        picture: picture
+
       })
-        .then((user) => {
-          return res.status(200).json({
-            message: "success",
-          });
-        })
-        .catch((error) => {
-          //TODO log the error
-          return res.status(401).json({
-            error: "Cet utilisateur existe déjà",
-          });
+
+      if (user) {
+        return res.status(200).json({
+          message: "success",
         });
+      }
+
+      //TODO log the error
+      return res.status(401).json({
+        error: "Cet utilisateur existe déjà",
+      });
+
     } catch (error) {
       //TODO log the error
       return res.status(401).json({
@@ -236,22 +226,34 @@ export default class UserController {
         })
       }
 
-      if (user.friends.includes(friend._id)) {
+      if (user.friends.includes(friend.id)) {
         return res.status(403).json({
           error: "Vous êtes déjà amis avec cet Utilisateur",
         })
       }
 
-      await UserModel.findByIdAndUpdate(user._id, {
-        $push: { amis: friend._id }
-      }, { new: true }) // 'new: true' pour renvoyer le document après la mise à jour
+      const friendRequest = await FriendsRequestModel.insertMany({
+        sender: user.id,
+        receiver: friend.id,
+        comment: Crypto.encrypt(req.body.comment, "database") ,
+        status: Crypto.encrypt('PENDING', "database")
+      })
+
+      //TODO make the request to the notification module
+
+      // await UserModel.findByIdAndUpdate(user.id, {
+      //   $push: { amis: friend.id }
+      // }, { new: true }) // 'new: true' pour renvoyer le document après la mise à jour
 
       return res.status(200).json({
-        message: "Amis ajouté avec succès",
+        message: "Demande d'amis envoyée avec succèss",
       })
 
     } catch (error) {
       console.log(error)
+      return res.status(401).json({
+        error: "Impossible d'envoyer la demande d'amis",
+      });
     }
 
   };

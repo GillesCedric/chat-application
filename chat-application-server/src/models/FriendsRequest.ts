@@ -44,4 +44,4 @@ const friendsRequestSchema = new mongoose.Schema({
 
 friendsRequestSchema.index({ sender: 1, receiver: 1 }, { unique: true });
 
-export const UserModel = mongoose.model<IFriendsRequest>("FriendsRequest", friendsRequestSchema);
+export const FriendsRequestModel = mongoose.model<IFriendsRequest>("FriendsRequest", friendsRequestSchema);
