@@ -38,7 +38,7 @@ export default abstract class Logger {
           format: winston.format.cli()
         }),
       ] : [
-          new DailyRotateFile({
+        new DailyRotateFile({
           dirname: this.logsPath,
           filename: `${this.serviceName}-%DATE%.log`,
           datePattern: this.datePattern,

@@ -1,4 +1,4 @@
-import { UserModel } from "../../../schemas/UserModel";
+import { UserModel } from "../../../models/User";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
@@ -131,6 +131,7 @@ export default class UserController {
       Number.parseInt(process.env.SALT_ROUNDS)
     );
     const isVerified = Crypto.encrypt("false", "database");
+    const picture = Crypto.encrypt("/default/profile/" + req.body.picture, "database");
 
     //TODO add username, tel and email unique verification
     try {
@@ -143,6 +144,7 @@ export default class UserController {
         password: password,
         isVerified: isVerified,
         friends: [],
+        picture: picture
       })
         .then((user) => {
           return res.status(200).json({
@@ -217,8 +219,41 @@ export default class UserController {
     return res.status(200).json({ message: "Valid Tokens" });
   };
 
-  public readonly addFriend = (req: Request, res: Response): Response => {
-    return null;
+  public readonly addFriend = async (req: Request, res: Response): Promise<Response> => {
+    //salt should always be in number for because bcrypt generate salt only for salt in number not string
+    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+    const username = Crypto.encrypt(req.body.username, "username");
+    const comment = Crypto.encrypt(req.body.comment, "database");
+
+    //check if the username exits
+    try {
+      const user = await UserModel.findById(userId)
+      const friend = await UserModel.findOne({ username: username })
+
+      if (!friend) {
+        return res.status(401).json({
+          error: "Cet utilisateur n'existe pas",
+        })
+      }
+
+      if (user.friends.includes(friend._id)) {
+        return res.status(403).json({
+          error: "Vous êtes déjà amis avec cet Utilisateur",
+        })
+      }
+
+      await UserModel.findByIdAndUpdate(user._id, {
+        $push: { amis: friend._id }
+      }, { new: true }) // 'new: true' pour renvoyer le document après la mise à jour
+
+      return res.status(200).json({
+        message: "Amis ajouté avec succès",
+      })
+
+    } catch (error) {
+      console.log(error)
+    }
+
   };
 
   public readonly deleteFriend = (req: Request, res: Response): Response => {
