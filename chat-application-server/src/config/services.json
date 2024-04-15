@@ -19,6 +19,11 @@
 			"name": "notification",
 			"domain": "localhost",
 			"port": 6002
+		},
+		"socket": {
+			"name": "socket",
+			"domain": "localhost",
+			"port": 6003
 		}
 	},
 	"production": {
@@ -40,6 +45,11 @@
 		"notification": {
 			"name": "notification",
 			"domain": "notification",
+			"port": 3000
+		},
+		"socket": {
+			"name": "socket",
+			"domain": "socket",
 			"port": 3000
 		}
 	}

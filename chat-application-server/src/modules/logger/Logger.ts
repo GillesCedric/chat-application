@@ -38,7 +38,7 @@ export default abstract class Logger {
           format: winston.format.cli()
         }),
       ] : [
-          new DailyRotateFile({
+        new DailyRotateFile({
           dirname: this.logsPath,
           filename: `${this.serviceName}-%DATE%.log`,
           datePattern: this.datePattern,
@@ -142,3 +142,12 @@ class NOTIFICATIONLogger extends Logger {
 }
 
 export const NotificationLogger = new NOTIFICATIONLogger()
+
+class SocketLogger extends Logger {
+  constructor() {
+    super()
+    this.serviceName = SERVICES[this.env][Services.socket].name
+  }
+}
+
+export const socketLogger = new SocketLogger()

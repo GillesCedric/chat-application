@@ -72,12 +72,28 @@
 			}
 		},
 		{
+			"label": "7. Start Socket Service",
+			"detail": "Start the Socket Microservice App",
+			"type": "shell",
+			"command": "npm run socket",
+			"options": {
+				"cwd": "./chat-application-server"
+			},
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			}
+		},
+		{
 			"label": "2. Start Back-End",
 			"detail": "Start the whole back-end : API GW and all the microservices",
 			"dependsOn": [
 				"3. Start API GW Service",
 				"4. Start Chat Service",
 				"5. Start User Service",
+				"6. Start Notification Service",
+				"7. Start Socket Service",
 			],
 			"presentation": {
 				"reveal": "always",

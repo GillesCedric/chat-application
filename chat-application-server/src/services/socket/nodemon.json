@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "src/models",
+    "src/schemas",
+    "src/middlewares",
+    "src/modules",
+    "src/utils",
+    "src/services/socket",
+    "src/config"
+  ],
+  "ext": "ts,json",
+  "ignore": [
+    "*.spec.ts"
+  ],
+  "exec": "ts-node ./src/services/socket/Server.ts"
+}

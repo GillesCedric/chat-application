@@ -8,8 +8,10 @@ import SERVICES from '../config/services.json'
 export default class Session {
 
     public static readonly authenticate = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-        if (req.body.access_token && JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken) != undefined) {
-            if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin') {
+      if (req.body.access_token && JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken) != undefined) {
+        if (req.path.substring(req.path.indexOf('/') + 1, req.path.length) == 'images') {
+          return next()
+        }else if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin') {
                 return res.status(401).json({ error: 'already authenticated' })
             } else {
                 return next()

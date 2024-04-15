@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "src/models",
+    "src/schemas",
+    "src/middlewares",
+    "src/modules",
+    "src/utils",
+    "src/services/notification",
+    "src/config"
+  ],
+  "ext": "ts,json",
+  "ignore": [
+    "*.spec.ts"
+  ],
+  "exec": "ts-node ./src/services/notification/Server.ts"
+}
