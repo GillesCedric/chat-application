@@ -79,9 +79,9 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
-        //this.app.use(BasicAuthentication.authenticate)
+        this.app.use(BasicAuthentication.authenticate)
 
-        //this.app.use(Session.authenticate)
+        this.app.use(Session.authenticate)
 
         try {
             if (process.env.NODE_ENV == "development")
