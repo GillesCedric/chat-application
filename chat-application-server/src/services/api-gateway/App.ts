@@ -94,7 +94,7 @@ export default class App {
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
         // serving static files 
-        //this.app.use(express.static('public'))
+        this.app.use("/images", express.static('data/users'))
 
         try {
             const store = MongoStore.create({
@@ -132,9 +132,9 @@ export default class App {
             legacyHeaders: false,
         }))
 
-        this.app.use(BasicAuthentication.authenticate)
+        //this.app.use(BasicAuthentication.authenticate)
 
-        this.app.use(Session.authenticate)
+        //this.app.use(Session.authenticate)
 
         Proxy.serve(this.app)
 
