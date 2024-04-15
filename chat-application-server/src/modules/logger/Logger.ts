@@ -142,3 +142,12 @@ class NOTIFICATIONLogger extends Logger {
 }
 
 export const NotificationLogger = new NOTIFICATIONLogger()
+
+class SocketLogger extends Logger {
+  constructor() {
+    super()
+    this.serviceName = SERVICES[this.env][Services.socket].name
+  }
+}
+
+export const socketLogger = new SocketLogger()

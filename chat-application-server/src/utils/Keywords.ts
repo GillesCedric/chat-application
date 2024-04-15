@@ -9,6 +9,7 @@ export enum Services {
 	chat = "chat",
 	notification = "notification",
 	apigw = "api-gateway",
+	socket = "socket",
 }
 
 export enum Tokens {

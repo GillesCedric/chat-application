@@ -8,6 +8,7 @@
     "user": "nodemon --config ./src/services/user/nodemon.json",
     "notification": "nodemon --config ./src/services/notification/nodemon.json",
     "api": "nodemon --config ./src/services/api-gateway/nodemon.json",
+    "socket": "nodemon --config ./src/services/socket/nodemon.json",
     "test": ""
   },
   "dependencies": {
