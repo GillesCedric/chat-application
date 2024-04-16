@@ -29,5 +29,24 @@ export default class Proxy {
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.apigw) : undefined
 		}))
 
+		app.use('/api/v1/notifications', createProxyMiddleware({
+			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}`,
+			changeOrigin: true,
+			pathRewrite: { '^/api/v1/notifications': '' },
+			onProxyReq: fixRequestBody,
+			secure: true,
+			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined
+		}))
+
+		app.use('/api/v1/sockets', createProxyMiddleware({
+			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}`,
+			changeOrigin: true,
+			pathRewrite: { '^/api/v1/sockets': '' },
+			onProxyReq: fixRequestBody,
+			secure: true,
+			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined,
+			ws: true
+		}))
+
 	};
 }
