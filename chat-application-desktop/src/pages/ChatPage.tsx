@@ -7,6 +7,16 @@ import { ChatDataTest } from "../components/ChatDataTest";
 import MessageListHeader from "../components/MessageListHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
+import { Logger, LogLevel } from '../utils/Logs';
+const logger = new Logger(LogLevel.INFO);
+
+logger.log('Ceci est un message INFO', LogLevel.INFO);
+logger.log('Ceci est un message WARNING', LogLevel.WARNING);
+logger.log('Ceci est un message ERROR', LogLevel.ERROR);
+const logs = logger.getLogs();
+console.log(logs);
+logger.clearLogs();
+
 const ChatPage = () => {
   const [chats, setChats] = useState(ChatDataTest);
   const [messages, setMessages] = useState<any[]>([
@@ -62,7 +72,6 @@ const ChatPage = () => {
           </div>
           <ChatList chats={chats} />
           {/* Ajoutez le lien ici */}
-          <Link to="/testlog">Test Log</Link>
         </aside>
 
         {/* Chat Area */}
