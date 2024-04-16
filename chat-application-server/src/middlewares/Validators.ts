@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { ValidationChain, body, validationResult } from 'express-validator'
+import { ValidationChain, body, param, validationResult } from 'express-validator'
 import { Code } from '../utils/HTTP'
 
 
-export default class Validators {
+export default abstract class Validators {
 
     public static readonly errors = (req: Request, res: Response, next: NextFunction): Response => {
         const errors = validationResult(req)
@@ -14,6 +14,10 @@ export default class Validators {
         }
 
     }
+
+}
+
+export abstract class UserValidators extends Validators {
 
     public static readonly signUp = [
 
@@ -28,6 +32,27 @@ export default class Validators {
     public static readonly signIn = [
         body('email').escape().trim().stripLow().isEmail(),
         body('password').escape().trim().stripLow(),
+    ]
+
+}
+export abstract class ChatValidators extends Validators {
+
+}
+
+export abstract class NotificationValidators extends Validators {
+    public static readonly sendNotification = [
+        body('receiver').escape().trim().stripLow().isLength({
+            min: 24,
+            max: 24
+        }),
+        body('content').escape().trim().stripLow(),
+    ]
+
+    public static readonly updateNotification = [
+        param('id').escape().trim().stripLow().isLength({
+            min: 24,
+            max: 24
+        }),
     ]
 
 }
