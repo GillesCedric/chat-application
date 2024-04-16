@@ -4,8 +4,9 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
 import { Crypto } from "../../../modules/crypto/Crypto";
-import { Code } from "../../../utils/HTTP";
-import { Tokens } from "../../../utils/Keywords";
+import { Code, headers, protocol } from "../../../utils/HTTP";
+import { Services, Tokens } from "../../../utils/Keywords";
+import SERVICES from '../../../config/services.json'
 
 
 export default class UserController {
@@ -212,13 +213,11 @@ export default class UserController {
   public readonly addFriend = async (req: Request, res: Response): Promise<Response> => {
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
     const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
-    const username = Crypto.encrypt(req.body.username, "username");
-    const comment = Crypto.encrypt(req.body.comment, "database");
 
     //check if the username exits
     try {
       const user = await UserModel.findById(userId)
-      const friend = await UserModel.findOne({ username: username })
+      const friend = await UserModel.findOne({ username: Crypto.encrypt(req.body.username, "username") })
 
       if (!friend) {
         return res.status(401).json({
@@ -235,15 +234,19 @@ export default class UserController {
       const friendRequest = await FriendsRequestModel.insertMany({
         sender: user.id,
         receiver: friend.id,
-        comment: Crypto.encrypt(req.body.comment, "database") ,
+        comment: Crypto.encrypt(req.body.comment, "database"),
         status: Crypto.encrypt('PENDING', "database")
       })
 
-      //TODO make the request to the notification module
-
-      // await UserModel.findByIdAndUpdate(user.id, {
-      //   $push: { amis: friend.id }
-      // }, { new: true }) // 'new: true' pour renvoyer le document après la mise à jour
+      fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          access_token: req.body.access_token,
+          receiver: friend.id,
+          content: `Vous avez reçu une nouvelle demande d'amis de ${user.username}`
+        })
+      })
 
       return res.status(200).json({
         message: "Demande d'amis envoyée avec succèss",
