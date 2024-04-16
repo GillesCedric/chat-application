@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+export enum ChatStatus {
+  pending = 'PENDING',
+  received = 'RECEIVED',
+  viewed = 'VIEWED'
+}
+
 interface IChat extends mongoose.Document {
   conversation: mongoose.Types.ObjectId[];
   message: mongoose.Types.ObjectId[];

@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
-export type FriendsRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
+export enum NotificationStatus {
+  pending = 'PENDING',
+  accepted = 'ACCEPTED',
+  rejected = 'REJECTED'
+}
 
 interface IFriendsRequest extends mongoose.Document {
   sender: mongoose.Types.ObjectId;

@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
-export type UserStatus = 'ONLINE' | 'OFFLINE'
+export enum UserStatus {
+  online = 'ONLINE',
+  offline = 'OFFLINE'
+}
 
 interface IUser extends mongoose.Document {
   lastname: string;
