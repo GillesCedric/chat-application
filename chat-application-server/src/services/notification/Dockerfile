@@ -13,7 +13,7 @@ COPY package*.json dist ${WORKDIR}
 # Installer les dépendances, incluant les 'devDependencies' nécessaires pour la construction
 RUN npm ci --only=production && \
 	npm cache clean --force && \
-	rm -rf services/user services/api-gateway services/notification services/socket
+	rm -rf services/chat services/api-gateway services/user services/socket
 
 # Étape 6: Étape finale pour l'image de production
 FROM node:lts-slim
@@ -34,4 +34,4 @@ COPY --from=builder ${WORKDIR} ${WORKDIR}
 EXPOSE 3000
 
 # Définir la commande pour démarrer l'application
-CMD ["node", "services/chat/Server.js"]
+CMD ["node", "services/notification/Server.js"]

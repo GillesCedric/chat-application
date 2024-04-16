@@ -13,7 +13,7 @@ COPY package*.json dist ${WORKDIR}
 # Installer les dépendances, incluant les 'devDependencies' nécessaires pour la construction
 RUN npm ci --only=production && \
 	npm cache clean --force && \
-	rm -rf services/chat services/api-gateway services/notification
+	rm -rf services/chat services/api-gateway services/notification services/socket
 
 # Étape 6: Étape finale pour l'image de production
 FROM node:lts-slim
