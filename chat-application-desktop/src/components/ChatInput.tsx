@@ -14,13 +14,21 @@ const ChatInput = ({
       onSendMessage(message);
       setMessage("");
     }
+    resetTextAreaToDefault(event);
   };
 
-  // Function to adjust the textarea height
+  function resetTextAreaToDefault(event : React.FormEvent) : void  {
+    const textarea = event.currentTarget.querySelector("textarea");
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.rows = 1; 
+    }
+  }
+
+  // Function to adjust the textarea height while typing
   const textAreaAdjust = (element: HTMLTextAreaElement) => {
     element.style.height = "1px";
     element.style.height = `${element.scrollHeight}px`;
-
     // If you want to limit the growth to the height equivalent to 3 rows
     if (element.scrollHeight > element.clientHeight && element.rows < 4) {
       element.rows += 1;

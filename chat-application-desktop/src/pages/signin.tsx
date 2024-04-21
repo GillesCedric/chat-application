@@ -4,6 +4,7 @@ import API from "../modules/api/API";
 import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/AuthContext";
 export default function SignIn() {
 
