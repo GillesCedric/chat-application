@@ -1,4 +1,4 @@
-import { UserModel } from "../schemas/UserModel";
+import { UserModel } from "../models/User";
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
 import JWTUtils from "../modules/jwt/JWT";

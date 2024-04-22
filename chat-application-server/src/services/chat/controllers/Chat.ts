@@ -1,4 +1,4 @@
-import { ChatModel } from "../../../schemas/ChatModel";
+import { ChatModel } from "../../../models/Chat";
 import { Request, Response } from "express";
 
 

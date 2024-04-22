@@ -8,16 +8,13 @@ import fs from 'fs'
 import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import { Server as SocketServer } from "socket.io"
-import session from "express-session"
-import mongoose from 'mongoose'
-import MongoStore from 'connect-mongo'
-import rateLimit from 'express-rate-limit'
-import Proxy from './Proxy'
+import Socket from './Socket'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
-import { apiGWLogger as Logger } from '../../modules/logger/Logger'
+import { socketLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import { Services } from '../../utils/Keywords'
+import rateLimit from 'express-rate-limit'
 
 
 export default class App {
@@ -92,38 +89,7 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
-        // serving static files 
-        this.app.use("/images", express.static('data/users'))
-
-        try {
-            const store = MongoStore.create({
-                mongoUrl: process.env.DATABASE_URL,
-            })
-
-            // this.app.use(session({
-            //     name: 'chat-application',
-            //     secret: process.env.SESSION_SECRET,
-            //     resave: false,
-            //     saveUninitialized: true,
-            //     store: store,
-            //     cookie: {
-            //         secure: process.env.NODE_ENV == 'production',
-            //         httpOnly: true,
-            //         maxAge: 30 * 24 * 1 * 60 * 60 * 1000, //30j, //should be the same as TOKEN_DELAY
-            //         path: "/",
-            //         sameSite: process.env.NODE_ENV == 'production',
-            //         domain: `localhost`,
-            //         //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug
-            //         signed: true
-            //     }
-            // }))
-        } catch (error) {
-            Logger.error(error.message)
-            process.exit(1)
-        }
-
-
-
+        //TODO refexion about the rate limit of the notification service
         this.app.use(rateLimit({
             windowMs: 10 * 60 * 1000, // 10 minutes
             limit: 100, // 100 calls,
@@ -135,33 +101,27 @@ export default class App {
 
         this.app.use(Session.authenticate)
 
-        Proxy.serve(this.app)
-
         try {
             if (process.env.NODE_ENV == "development")
                 //if (process.env.NODE_ENV == "production")
                 this._httpServer = createHTTPServer(this._app)
             else
                 this._httpsServer = createHTTPSServer({
-                    key: fs.readFileSync(path.join(process.cwd(), 'certs', Services.apigw, `${Services.apigw}-key.pem`)),
-                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', Services.apigw, `${Services.apigw}-cert.pem`))
+                    key: fs.readFileSync(path.join(process.cwd(), 'certs', Services.socket, `${Services.socket}-key.pem`)),
+                    cert: fs.readFileSync(path.join(process.cwd(), 'certs', Services.socket, `${Services.socket}-cert.pem`))
                 }, this._app)
         } catch (error) {
             Logger.error(error.message)
             process.exit(1)
         }
 
-        //connection to the database
-        try {
-            mongoose
-                .connect(process.env.DATABASE_URL)
-                .then(() => Logger.log("connected to mongodb"))
-                .catch((err) => Logger.error("can't connect to mongodb: " + err, 'error'));
+        this._socketServer = new SocketServer(this._webServer, {
+            cors: {
+                origin: `${protocol()}://${process.env.CLIENT_URL}`
+            }
+        })
 
-        } catch (error) {
-            Logger.error(error.message)
-            process.exit(1)
-        }
+        this.socketServer.use(Socket.serve)
 
     }
 

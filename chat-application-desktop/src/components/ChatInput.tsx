@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane  , faFaceSmile , faFile} from "@fortawesome/free-regular-svg-icons";
+import { faPaperPlane, faFaceSmile, faFile } from "@fortawesome/free-regular-svg-icons";
+
 const ChatInput = ({
   onSendMessage,
 }: {
@@ -17,26 +18,8 @@ const ChatInput = ({
     resetTextAreaToDefault(event);
   };
 
-  function resetTextAreaToDefault(event : React.FormEvent) : void  {
-    const textarea = event.currentTarget.querySelector("textarea");
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.rows = 1; 
-    }
-  }
-
-  // Function to adjust the textarea height while typing
-  const textAreaAdjust = (element: HTMLTextAreaElement) => {
-    element.style.height = "1px";
-    element.style.height = `${element.scrollHeight}px`;
-    // If you want to limit the growth to the height equivalent to 3 rows
-    if (element.scrollHeight > element.clientHeight && element.rows < 4) {
-      element.rows += 1;
-    }
-  };
-
   return (
-    <form onSubmit={handleSend} className=" rounded-b-lg ">
+    <form onSubmit={handleSend} className="rounded-b-lg">
       <label htmlFor="chat" className="sr-only">
         Your message
       </label>
@@ -45,25 +28,22 @@ const ChatInput = ({
           type="submit"
           className="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
         >
-         <FontAwesomeIcon icon={faFile} className="h-5"/>
+          <FontAwesomeIcon icon={faFile} className="h-5" />
         </button>
         <button
           type="submit"
           className="inline-flex justify-center p-2 text-blue-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
         >
-          <FontAwesomeIcon icon={faFaceSmile} className="h-5"/>
+          <FontAwesomeIcon icon={faFaceSmile} className="h-5" />
         </button>
         <textarea
           id="chat"
-          rows={1}
+          rows={4} // Change the initial rows to your desired height
           className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Your message..."
           value={message}
-          onChange={(e) => {
-            setMessage(e.target.value);
-            textAreaAdjust(e.target);
-          }}
-          style={{ maxHeight: "6rem" }} // Adjust the max height for 3 rows as per your styling
+          onChange={(e) => setMessage(e.target.value)}
+          style={{ resize: "none" }} // Disable resizing
         ></textarea>
         <button
           type="submit"

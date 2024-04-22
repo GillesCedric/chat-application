@@ -23,6 +23,7 @@ secureStore.set("chat-application-refresh_token", "null") */
 ipcMain.on('electron-store-get', (event, val) => {
   event.returnValue = secureStore.get(val);
 });
+
 ipcMain.on('electron-store-set', (event, key, val) => {
   secureStore.set(key, val);
 });

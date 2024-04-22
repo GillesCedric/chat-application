@@ -1,4 +1,4 @@
-import { ChatModel } from "../schemas/ChatModel";
+import { ChatModel } from "../models/Chat";
 import { Request, Response } from "express";
 /**
  * @class ChatController
@@ -48,12 +48,12 @@ export default class ChatController {
         { sender: userId, receiver: friendId, deleted: false },
         { sender: friendId, receiver: userId, deleted: false },
       ],
-    }) .populate('sender', 'firstname lastname') 
-    .sort({ timestamp: 'asc' }).then((chats) => {
-      // console.log(chats);
-      return res.status(200).json({
-        chats: chats,
+    }).populate('sender', 'firstname lastname')
+      .sort({ timestamp: 'asc' }).then((chats) => {
+        // console.log(chats);
+        return res.status(200).json({
+          chats: chats,
+        });
       });
-    });
   };
 }
