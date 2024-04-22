@@ -5,7 +5,8 @@ type Chat = {
   name: string;
   avatar: string;
   lastMessage: string;
-	time: string;
+  time: string;
+  unreadMessages:number
 };
 
 const ChatListItem = ({ chat } : {chat : Chat}) => {
@@ -21,9 +22,13 @@ const ChatListItem = ({ chat } : {chat : Chat}) => {
         <p className="text-grey-dark text-sm">{chat.lastMessage}</p>
       </div>
       <span className="ml-auto text-grey-dark text-sm">{chat.time}</span>
-			<span className="bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full ml-4">
-			5	
-      </span>
+      {chat.unreadMessages > 0 && (
+        <>
+          <span className="bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full ml-4">
+            {chat.unreadMessages}
+          </span>
+        </>
+      )}
     </div>
   );
 };

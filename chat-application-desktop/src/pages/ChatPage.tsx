@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ChatList from "../components/ChatList";
 import MessageList from "../components/MessageList";
 import ChatInput from "../components/ChatInput";
@@ -7,31 +7,24 @@ import MessageListHeader from "../components/MessageListHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
 import Socket from "../modules/socket/Socket";
+import { friend } from "../components/FriendDataTest";
+import { conversation } from "../components/ConversationDataTest";
+import { useCheckOnlineStatus } from "../Hooks/useCheckOnlineStatus";
+import { notify } from "../components/toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { OfflineBanner } from "../components/OfflineBanner";
+import { EmptySection } from "../components/EmptySection";
+import { AddFriend } from "../components/AddFriend";
+import MyComponent from "../components/Test";
+import UserRepository from "../modules/repository/UserRepository";
 const ChatPage = () => {
 
   //Socket connection to the server
   Socket.connect()
 
   const [chats, setChats] = useState(ChatDataTest);
-  const [messages, setMessages] = useState<any[]>([
-    // Replace this with your actual message data
-    { id: 1, content: "Hello World", time: "10:00", isOwn: true },
-    { id: 2, content: "Hello World", time: "10:00", isOwn: false },
-    {
-      id: 2,
-      content:
-        "Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.",
-      time: "10:00",
-      isOwn: false,
-    },
-    {
-      id: 2,
-      content:
-        "Le Lorem Ipsum est simplement du faux texte employé dans la composition et la mise en page avant impression. Le Lorem Ipsum est le faux texte standard de l'imprimerie depuis les années 1500, quand un imprimeur anonyme assembla ensemble des morceaux de texte pour réaliser un livre spécimen de polices de texte. Il n'a pas fait que survivre cinq siècles, mais s'est aussi adapté à la bureautique informatique, sans que son contenu n'en soit modifié. Il a été popularisé dans les années 1960 grâce à la vente de feuilles Letraset contenant des passages du Lorem Ipsum, et, plus récemment, par son inclusion dans des applications de mise en page de texte, comme Aldus PageMaker.",
-      time: "10:00",
-      isOwn: true,
-    },
-  ]);
+  const [messages, setMessages] = useState<any[]>([]);
 
   const handleSendMessage = (newMessage: string) => {
     // Add new message to the messages state
@@ -44,50 +37,89 @@ const ChatPage = () => {
     setMessages([...messages, newMsg]);
   };
 
-  const friend = {
-    name: "Yumilys✨",
-    isOnline: true,
-    avatar:
-      "https://i.pinimg.com/736x/75/0e/16/750e1674e3801c6eeba5a8ca12d97df2.jpg",
-  };
+  /* useEffect(() => {
+    const data = {
+      username : "lilo"
+    };
+    UserRepository.getUsersFriends(data).
+      then((response) => {
+        if (response.message) {
+          setChats(response.message);
+        }
+        else {
+          notify("Failed to load user's chat list " , "error");
+        }
+      }).
+      catch((error) => {
+        notify("Failed to load user's chat list" , "error");
+        console.log(error);
+      })
+  },[chats]) */
+  const [showBanner, setShowBanner] = useState(false);
+  const isOnline = useCheckOnlineStatus();
+  const wasOnlineRef = useRef(isOnline);
+  useEffect(() => {
+    if (wasOnlineRef.current !== isOnline) {
+      if (!isOnline) {
+        // If we've just gone offline
+        setShowBanner(true);
+      } else {
+        // If we've just come back online
+        setShowBanner(true);
+        setTimeout(() => {
+          // Hide the banner after 3 seconds
+          setShowBanner(false);
+        }, 3000);
+      }
+      // Update the reference to the current status for the next render
+      wasOnlineRef.current = isOnline;
+    }
+  }, [isOnline]);
+
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
+      {showBanner && <OfflineBanner isOnline={isOnline} />}
+      <ToastContainer />
+      {/* <MyComponent /> */}
       <div className="sticky top-0 z-10">
         <ChatHeader />
       </div>
-
-      {/* Content Area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Chat List Sidebar */}
-        <aside className="w-1/4 flex-none p-2 overflow-y-auto scrollbar  scrollbar-corner-rose-800">
-          <div className="sticky top-0 z-40">
-            <SearchBar />
-          </div>
-          <ChatList chats={chats} />
-        </aside>
+        {chats.length === 0 ? (
+          <>
+            <EmptySection />
+          </>
+        ) : (
+          <>
+            <aside
+              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${
+                chats.length === 0 ? "" : "flex-none"
+              }`}
+            >
+              <div className="sticky top-0">
+                <SearchBar />
+              </div>
+              <ChatList chats={chats} />
+            </aside>
+            <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
+              <div className="flex-none">
+                <MessageListHeader
+                  name={friend.name}
+                  isOnline={isOnline}
+                  avatar={friend.avatar}
+                />
+              </div>
 
-        {/* Chat Area */}
-        <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
-          {/* Message List Header */}
-          <div className="flex-none">
-            <MessageListHeader
-              name={friend.name}
-              isOnline={friend.isOnline}
-              avatar={friend.avatar}
-            />
-          </div>
+              <div className="flex-grow overflow-y-auto scrollbar-none">
+                <MessageList messages={messages} />
+              </div>
 
-          {/* Messages */}
-          <div className="flex-grow overflow-y-auto  scrollbar-none">
-            <MessageList messages={messages} />
-          </div>
-
-          {/* Chat Input */}
-          <div className="flex-none">
-            <ChatInput onSendMessage={handleSendMessage} />
-          </div>
-        </main>
+              <div className="flex-none">
+                <ChatInput onSendMessage={handleSendMessage} />
+              </div>
+            </main>
+          </>
+        )}
       </div>
     </div>
   );
