@@ -6,7 +6,12 @@ import { ChatDataTest } from "../components/ChatDataTest";
 import MessageListHeader from "../components/MessageListHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
+import Socket from "../modules/socket/Socket";
 const ChatPage = () => {
+
+  //Socket connection to the server
+  Socket.connect()
+
   const [chats, setChats] = useState(ChatDataTest);
   const [messages, setMessages] = useState<any[]>([
     // Replace this with your actual message data
