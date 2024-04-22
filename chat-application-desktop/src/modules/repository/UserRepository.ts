@@ -34,18 +34,99 @@ export default class UserRepository {
         errors.forEach((error) => {
           finalError.push(error.msg + " for " + error.path, "error");
         });
-        return finalError.reduce(
-          (accumulation: [], current: []) => accumulation + " " + current,
-          ""
-        );
+        return {
+          error: finalError.reduce(
+            (accumulation: [], current: []) => accumulation + " " + current,
+            ""
+          ),
+        };
       }
     } catch (error) {
       console.error("Error in registration:", error);
-      return false;
+      return { error: error };
     }
   }
   public static async checkUnique(data: any) {
     const response = await API.checkIfExist(data);
     console.log(response);
+  }
+
+  public static async addFriend(data: {
+    username: string;
+    comment: string;
+  }): Promise<any> {
+    try {
+      const response = await API.register({
+        username: data.username,
+        comment : data.comment
+      });
+      if (response.message) {
+        console.log("Friend successfully added");
+        return {
+          message: data.username + " successfully added to your friends",
+        };
+      }
+      if (response.error) {
+        console.error(
+          "Failed to add friend with error message:",
+          response.error
+        );
+        return { error: response.error };
+      } else if (response.errors) {
+        const errors: any[] = response.errors;
+        const finalError: any[] = [];
+        errors.forEach((error) => {
+          finalError.push(error.msg + " for " + error.path, "error");
+        });
+        console.log(
+          finalError.reduce(
+            (accumulation: [], current: []) => accumulation + " " + current,
+            ""
+          )
+        );
+        return { error: finalError };
+      }
+    } catch (error) {
+      console.error("Error while adding friend", error);
+      return { error: error };
+    }
+  }
+  public static async getUsersFriends(data: {
+    username : string
+  }): Promise<any> {
+    try {
+      const response = await API.register({
+        username: data.username,
+      });
+      if (response.message) {
+        console.log("Friend list successfully loaded.");
+        return {
+          message: response.message,
+        };
+      }
+      if (response.error) {
+        console.error(
+          "Failed to load friend list with error message :",
+          response.error
+        );
+        return { error: response.error };
+      } else if (response.errors) {
+        const errors: any[] = response.errors;
+        const finalError: any[] = [];
+        errors.forEach((error) => {
+          finalError.push(error.msg + " for " + error.path, "error");
+        });
+        console.log(
+          finalError.reduce(
+            (accumulation: [], current: []) => accumulation + " " + current,
+            ""
+          )
+        );
+        return { error: finalError };
+      }
+    } catch (error) {
+      console.error("Error while loading friend list:", error);
+      return { error: error };
+    }
   }
 }

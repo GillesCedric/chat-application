@@ -15,6 +15,7 @@ const ChatInput = ({
       onSendMessage(message);
       setMessage("");
     }
+    resetTextAreaToDefault(event);
   };
 
   return (
