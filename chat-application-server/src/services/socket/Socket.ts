@@ -18,7 +18,7 @@ export default class Socket {
 		})
 
 
-		socket.on('connect', data => {
+		socket.on('connection', data => {
 			console.log('test')
 		})
 

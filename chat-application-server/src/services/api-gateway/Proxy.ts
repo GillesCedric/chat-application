@@ -40,10 +40,7 @@ export default class Proxy {
 
 		app.use('/api/v1/sockets', createProxyMiddleware({
 			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}`,
-			changeOrigin: true,
-			pathRewrite: { '^/api/v1/sockets': '' },
-			onProxyReq: fixRequestBody,
-			secure: true,
+			changeOrigin: true, 
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined,
 			ws: true
 		}))

@@ -36,6 +36,10 @@ export default class App {
         return this._socketServer
     }
 
+    public set socketServer(socketServer: SocketServer) {
+        this._socketServer = socketServer
+    }
+
     public get webServer(): HTTPServer | HTTPSServer {
         return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
         //return this._httpServer
