@@ -15,6 +15,8 @@ import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import { Services } from '../../utils/Keywords'
 import rateLimit from 'express-rate-limit'
+import Routes from './routes/Routes'
+import mongoose from 'mongoose'
 
 
 export default class App {
@@ -33,6 +35,10 @@ export default class App {
         return this._socketServer
     }
 
+    public set socketServer(socketServer: SocketServer) {
+        this._socketServer = socketServer
+    }
+
     public get webServer(): HTTPServer | HTTPSServer {
         return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
         //return this._httpServer
@@ -48,6 +54,8 @@ export default class App {
     constructor() {
 
         this.config()
+
+        Routes.routes(this.app)
 
     }
 
@@ -87,7 +95,7 @@ export default class App {
 
         //body parser configuration
         this.app.use(bodyParser.json())
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.urlencoded({ extended: true }))
 
         //TODO refexion about the rate limit of the notification service
         this.app.use(rateLimit({
@@ -115,13 +123,17 @@ export default class App {
             process.exit(1)
         }
 
-        this._socketServer = new SocketServer(this._webServer, {
-            cors: {
-                origin: `${protocol()}://${process.env.CLIENT_URL}`
-            }
-        })
+        //connection to the database
+        try {
+            mongoose
+                .connect(process.env.DATABASE_URL)
+                .then(() => Logger.log("connected to mongodb"))
+                .catch((err) => Logger.error("can't connect to mongodb: " + err, 'error'));
 
-        this.socketServer.use(Socket.serve)
+        } catch (error) {
+            Logger.error(error.message)
+            process.exit(1)
+        }
 
     }
 

@@ -1,13 +1,14 @@
 import { Application } from "express"
-import NotificationController from "../controllers/Socket"
+import SocketController from "../controllers/Socket"
 
 
 
 export default class Routes {
 
-  private static readonly notificationController: NotificationController = new NotificationController()
+  private static readonly socketController: SocketController = new SocketController()
 
   public static readonly routes = (app: Application): void => {
-    app.route("/").post( this.notificationController.emit)
+    app.route("/").post(this.socketController.sendEventToUser)
+  
   }
 }
