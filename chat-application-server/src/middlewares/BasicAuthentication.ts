@@ -12,9 +12,9 @@ export default class BasicAuthentication {
             if (authorization[0] == process.env.BASIC_APP_USERNAME && authorization[1] == process.env.BASIC_APP_PASSWORD)
                 next()
             else
-                return response.status(401).json({ message: 'Incorrect Authorization Header' });
+                return response.status(401).json({ error: 'Incorrect Authorization Header' });
         } else {
-            return response.status(401).json({ message: 'Missing Authorization Header' });
+            return response.status(401).json({ error: 'Missing Authorization Header' });
         }
     }
 

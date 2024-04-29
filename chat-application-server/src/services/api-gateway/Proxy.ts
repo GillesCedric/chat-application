@@ -29,5 +29,14 @@ export default class Proxy {
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.apigw) : undefined
 		}))
 
+		app.use('/api/v1/notifications', createProxyMiddleware({
+			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}`,
+			changeOrigin: true,
+			pathRewrite: { '^/api/v1/notifications': '' },
+			onProxyReq: fixRequestBody,
+			secure: true,
+			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined
+		}))
+
 	};
 }

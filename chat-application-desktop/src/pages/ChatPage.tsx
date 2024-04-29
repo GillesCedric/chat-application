@@ -6,6 +6,7 @@ import { ChatDataTest } from "../components/ChatDataTest";
 import MessageListHeader from "../components/MessageListHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
+import Socket from "../modules/socket/Socket";
 import { friend } from "../components/FriendDataTest";
 import { conversation } from "../components/ConversationDataTest";
 import { useCheckOnlineStatus } from "../Hooks/useCheckOnlineStatus";
@@ -18,6 +19,10 @@ import { AddFriend } from "../components/AddFriend";
 import MyComponent from "../components/Test";
 import UserRepository from "../modules/repository/UserRepository";
 const ChatPage = () => {
+
+  //Socket connection to the server
+  Socket.connect()
+
   const [chats, setChats] = useState(ChatDataTest);
   const [messages, setMessages] = useState<any[]>([]);
 

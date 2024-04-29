@@ -33,4 +33,10 @@ const conversationSchema = new mongoose.Schema({
   timestamps: true // Gère automatiquement les champs createdAt et updatedAt
 });
 
+conversationSchema.pre('save', function (next) {
+  // Tri des membres par leur ID avant de sauvegarder la conversation
+  this.members.sort();
+  next();
+});
+
 export const ConversationModel = mongoose.model<IConversation>('Conversations', conversationSchema);

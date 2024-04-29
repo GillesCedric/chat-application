@@ -1,8 +1,8 @@
-import { Socket } from 'socket.io'
 import App from './App'
-import { Services, SocketKeywords } from '../../utils/Keywords'
+import { Services, SocketKeywords, Tokens } from '../../utils/Keywords'
 import { apiGWLogger as Logger } from '../../modules/logger/Logger'
 import SERVICES from '../../config/services.json'
+
 
 class Server {
 

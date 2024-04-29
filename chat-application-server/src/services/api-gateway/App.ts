@@ -36,6 +36,10 @@ export default class App {
         return this._socketServer
     }
 
+    public set socketServer(socketServer: SocketServer) {
+        this._socketServer = socketServer
+    }
+
     public get webServer(): HTTPServer | HTTPSServer {
         return process.env.NODE_ENV == "development" ? this._httpServer : this._httpsServer
         //return this._httpServer
@@ -51,6 +55,8 @@ export default class App {
     constructor() {
 
         this.config()
+
+        Proxy.serve(this.app)
 
     }
 
@@ -90,7 +96,7 @@ export default class App {
 
         //body parser configuration
         this.app.use(bodyParser.json())
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.urlencoded({ extended: true }))
 
         // serving static files 
         this.app.use("/images", express.static('data/users'))
@@ -134,8 +140,6 @@ export default class App {
         this.app.use(BasicAuthentication.authenticate)
 
         this.app.use(Session.authenticate)
-
-        Proxy.serve(this.app)
 
         try {
             if (process.env.NODE_ENV == "development")

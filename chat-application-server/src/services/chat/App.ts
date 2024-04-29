@@ -77,7 +77,7 @@ export default class App {
 
         //body parser configuration
         this.app.use(bodyParser.json())
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.urlencoded({ extended: true }))
 
         this.app.use(BasicAuthentication.authenticate)
 

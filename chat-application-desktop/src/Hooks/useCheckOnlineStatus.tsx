@@ -14,6 +14,7 @@ export const useCheckOnlineStatus = (): boolean => {
     // Call the async function
     checkOnlineStatus();
 
+    
     // Optionally set up an interval to regularly check the status
     const intervalId = setInterval(checkOnlineStatus, 3000); // Check every 3 seconds
 

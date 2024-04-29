@@ -2,6 +2,7 @@ import https from 'https'
 import fs from 'fs'
 import path from 'path'
 import { Services } from './Keywords'
+import { Crypto } from '../modules/crypto/Crypto'
 
 export enum Method {
 	options = 'OPTIONS',
@@ -34,3 +35,12 @@ export const httpsAgent = (service: Services) => new https.Agent({
 	cert: fs.readFileSync(path.join(process.cwd(), 'certs', service, `${service}-cert.pem`)),
 	ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'ca', 'ca-cert.pem')),
 })
+
+export const headers: () => HeadersInit = () =>  {
+	return {
+		accept: "application/json",
+		"content-type": "application/json; charset=utf-8",
+		["authorization"]: "Basic " + Crypto.encode(`${process.env.BASIC_APP_USERNAME}:${process.env.BASIC_APP_PASSWORD}`),
+		credentials: 'include'
+	}
+}

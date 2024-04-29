@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
-export type NotificationStatus = 'PENDING' | 'DELETED'
+export enum NotificationStatus{
+  pending = 'PENDING',
+  deleted = 'DELETED'
+}
 
 interface INotification extends mongoose.Document {
   sender: mongoose.Types.ObjectId;
@@ -13,7 +16,8 @@ interface INotification extends mongoose.Document {
 
 const notificationSchema = new mongoose.Schema({
   sender: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
     required: true,
   },
   receiver: {

@@ -1,6 +1,10 @@
 export enum SocketKeywords {
 	join = "join",
 	connection = "connection",
+	disconnect = "disconnect",
+	newNotification = "new-notification",
+	newConversation = "new-conversation",
+	newMessage = "new-message",
 	emit = "emit",
 }
 

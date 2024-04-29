@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
-export type FriendsRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
+export enum FriendsRequestStatus {
+  pending = 'PENDING',
+  accepted = 'ACCEPTED',
+  rejected = 'REJECTED',
+  deleted = 'DELETED'
+}
 
 interface IFriendsRequest extends mongoose.Document {
   sender: mongoose.Types.ObjectId;
@@ -14,12 +19,12 @@ interface IFriendsRequest extends mongoose.Document {
 const friendsRequestSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Users',
     required: true
   },
   receiver: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Users',
     required: true
   },
   comment: {

@@ -1,23 +1,18 @@
 import { Application } from "express"
-import UserController from "../controllers/Notification"
-import Validators from "../../../middlewares/Validators"
+import NotificationController from "../controllers/Notification"
+import {NotificationValidators} from "../../../middlewares/Validators"
 
 
 
 export default class Routes {
 
-  private static readonly userController: UserController = new UserController()
+  private static readonly notificationController: NotificationController = new NotificationController()
 
   public static readonly routes = (app: Application): void => {
-    app.route("/").get(this.userController.getAll)
-    app.route("/token").put(this.userController.updateTokens)
-    app.route("/token").post(this.userController.isValidTokens)
-    app.route("/me").get(this.userController.me)
-    app.route("/signin").post(...Validators.signIn, Validators.errors, this.userController.signIn)
-    app.route("/signup").post(...Validators.signUp, Validators.errors, this.userController.signUp)
-    app.route("/friends").get(this.userController.getUserFriends)
-    app.route("/friends").post(this.userController.addFriend)
-    app.route("/friends/:id").delete(this.userController.deleteFriend)
-    app.route("/checkUnique").post(this.userController.checkIfExists)
+    app.route("/:id").put(...NotificationValidators.updateNotification, NotificationValidators.errors, this.notificationController.updateNotification)
+    app.route("/")
+      .post(...NotificationValidators.sendNotification, NotificationValidators.errors, this.notificationController.sendNotification)
+      .get(this.notificationController.getUserNotifications)
+  
   }
 }
