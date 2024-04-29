@@ -36,9 +36,11 @@ export const httpsAgent = (service: Services) => new https.Agent({
 	ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'ca', 'ca-cert.pem')),
 })
 
-export const headers: HeadersInit = {
-	accept: "application/json",
-	'content-type': "application/json",
-	['authorization']: 'Basic ' + Crypto.encode(`${process.env.BASIC_APP_USERNAME}:${process.env.BASIC_APP_PASSWORD}`),
-	credentials: 'include'
+export const headers: () => HeadersInit = () =>  {
+	return {
+		accept: "application/json",
+		"content-type": "application/json; charset=utf-8",
+		["authorization"]: "Basic " + Crypto.encode(`${process.env.BASIC_APP_USERNAME}:${process.env.BASIC_APP_PASSWORD}`),
+		credentials: 'include'
+	}
 }

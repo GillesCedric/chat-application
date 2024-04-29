@@ -11,18 +11,24 @@ export default class SocketAuthentication {
     public static readonly authenticate = (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>, next: (err?: ExtendedError) => void): any => {
 
         // check for basic auth header
-        if (socket.handshake.headers['authorization'] && socket.handshake.headers['authorization'].indexOf('Basic ') != -1) {
-            const authorization = Crypto.atob(socket.handshake.headers.authorization.split(' ')[1]).split(':')
+        if (socket.handshake.auth.authorization && socket.handshake.auth.authorization.indexOf('Basic ') != -1) {
+            const authorization = Crypto.atob(socket.handshake.auth.authorization.split(' ')[1]).split(':')
             if (authorization[0] == process.env.BASIC_APP_USERNAME && authorization[1] == process.env.BASIC_APP_PASSWORD) {
-                if (socket.handshake.headers['access-token'] && JWTUtils.getUserFromToken(socket.handshake.headers['access-token'] as string, Tokens.accessToken) != undefined) {
-                    next()
+                if (socket.handshake.auth.token) {
+                    const userId = JWTUtils.getUserFromToken(socket.handshake.auth.token as string, Tokens.accessToken)
+                    if (userId) {
+                        socket.data.userId = userId
+                        next()
+                    } else {
+                        return next(new Error('Incorrect Authentication Token'))
+                    }
                 } else {
-                    next(new Error('Unauthenticated'))
+                    return next(new Error('Missing Authentication Token'))
                 }
             } else
-                next(new Error('Incorrect Authorization Header'))
+                return next(new Error('Incorrect Authorization Token'))
         } else {
-            next(new Error('Missing Authorization Header'))
+            return next(new Error('Missing Authorization Token'))
         }
 
 
