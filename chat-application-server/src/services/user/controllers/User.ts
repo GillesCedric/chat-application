@@ -1,12 +1,13 @@
-import { UserModel } from "../../../models/User";
-import { FriendsRequestModel } from "../../../models/FriendsRequest";
+import { UserModel, UserStatus } from "../../../models/User";
+import { FriendsRequestModel, FriendsRequestStatus } from "../../../models/FriendsRequest";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
 import { Crypto } from "../../../modules/crypto/Crypto";
-import { Code, headers, protocol } from "../../../utils/HTTP";
-import { Services, Tokens } from "../../../utils/Keywords";
+import { Code, Method, headers, protocol } from "../../../utils/HTTP";
+import { Services, SocketKeywords, Tokens } from "../../../utils/Keywords";
 import SERVICES from '../../../config/services.json'
+import { ConversationModel } from "../../../models/Conversation";
 
 
 export default class UserController {
@@ -36,7 +37,7 @@ export default class UserController {
           return res.status(404).json({ error: "User not found" });
         }
         var friendsId = user.friends;
-        UserModel.find({ _id: { $in: friendsId } }).then((friends) => {
+        UserModel.find({ id: { $in: friendsId } }).then((friends) => {
           // console.log(friends);
           return res.status(200).json({
             frineds: friends,
@@ -49,22 +50,31 @@ export default class UserController {
       });
   };
 
-  public readonly me = (req: Request, res: Response): Response => {
-    const token = req.session["token"];
-    const userId = req.body.id;
+  public readonly me = async (req: Request, res: Response): Promise<Response> => {
+    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
     try {
-      UserModel.findById(userId)
-        .then((user) => {
-          return res.status(200).json({
-            user,
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-          return res.status(500).json({
-            error: "Impossible de récupérer les informations",
-          });
+      const user = await UserModel.findById(userId).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status")
+
+      if (!user) {
+        return res.status(500).json({
+          error: "Cet utilisateur n'existe pas",
         });
+      }
+
+      user.lastname = Crypto.decrypt(user.lastname, "database")
+      user.firstname = Crypto.decrypt(user.firstname, "database")
+      user.username = Crypto.decrypt(user.username, "username")
+      user.tel = Crypto.decrypt(user.tel, "tel")
+      user.email = Crypto.decrypt(user.email, "email")
+      user.isEmailVerified = Crypto.decrypt(user.isEmailVerified, "database")
+      user.isTelVerified = Crypto.decrypt(user.isTelVerified, "database")
+      user.is2FAEnabled = Crypto.decrypt(user.is2FAEnabled, "database")
+      user.picture = Crypto.decrypt(user.picture, "database")
+      user.status = Crypto.decrypt(user.status, "database")
+
+      return res.status(200).json({
+        user,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -78,7 +88,7 @@ export default class UserController {
       const user = await UserModel.findOne({ email: Crypto.encrypt(req.body.email, "email") })
       if (!user) {
         return res.status(401).json({
-          error: "Incorrect email",
+          error: "Incorrect email or password",
         });
       }
 
@@ -89,9 +99,12 @@ export default class UserController {
 
       if (!passwordMatches) {
         return res.status(401).json({
-          error: "Incorrect password",
+          error: "Incorrect email or password",
         });
       }
+
+      user.status = Crypto.encrypt(UserStatus.online, "status")
+      await user.save()
 
       return res.status(200).json({
         message: "connection success",
@@ -128,18 +141,18 @@ export default class UserController {
           req.body.password,
           Number.parseInt(process.env.SALT_ROUNDS)
         ),
-        isEmailVerified: Crypto.encrypt("false", "database"),
-        isTelVerified: Crypto.encrypt("false", "database"),
-        is2FAEnabled: Crypto.encrypt("false", "database"),
+        isEmailVerified: Crypto.encrypt("false", "boolean"),
+        isTelVerified: Crypto.encrypt("false", "boolean"),
+        is2FAEnabled: Crypto.encrypt("false", "boolean"),
         picture: Crypto.encrypt("/default/profile/" + req.body.picture, "database"),
-        status: Crypto.encrypt("false", "database"),
+        status: Crypto.encrypt(UserStatus.offline, "status"),
         friends: [],
 
       })
 
       if (user) {
         return res.status(200).json({
-          message: "success",
+          message: "Inscription réussie avec success",
         });
       }
 
@@ -150,6 +163,8 @@ export default class UserController {
 
     } catch (error) {
       //TODO log the error
+      console.log("sign up error")
+      console.log(error)
       return res.status(401).json({
         error: "Impossible d'enregistrer l'utilisateur",
       });
@@ -158,9 +173,6 @@ export default class UserController {
 
   public readonly updateTokens = (req: Request, res: Response): Response => {
     const refreshToken = req.body.refresh_token;
-
-    if (!refreshToken)
-      return res.status(401).json({ error: "Missing refresh token" });
 
     const userId = JWTUtils.getUserFromToken(refreshToken, Tokens.refreshToken);
 
@@ -188,9 +200,6 @@ export default class UserController {
     const accessToken = req.body.access_token;
     const refreshToken = req.body.refresh_token;
 
-    if (!accessToken || !refreshToken)
-      return res.status(401).json({ error: "Missing tokens" });
-
     const accessTokenUserId = JWTUtils.getUserFromToken(
       accessToken,
       Tokens.accessToken
@@ -210,8 +219,8 @@ export default class UserController {
     return res.status(200).json({ message: "Valid Tokens" });
   };
 
-  public readonly addFriend = async (req: Request, res: Response): Promise<Response> => {
-    //salt should always be in number for because bcrypt generate salt only for salt in number not string
+  public readonly sendFriendRequest = async (req: Request, res: Response): Promise<Response> => {
+
     const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
 
     //check if the username exits
@@ -225,28 +234,35 @@ export default class UserController {
         })
       }
 
+      if (friend.id == user.id) {
+        return res.status(401).json({
+          error: "Vous ne pouvez pas vous envoyer une demande d'amitié à vous même",
+        })
+      }
+
       if (user.friends.includes(friend.id)) {
         return res.status(403).json({
           error: "Vous êtes déjà amis avec cet Utilisateur",
         })
       }
 
-      const friendRequest = await FriendsRequestModel.insertMany({
-        sender: user.id,
-        receiver: friend.id,
-        comment: Crypto.encrypt(req.body.comment, "database"),
-        status: Crypto.encrypt('PENDING', "database")
-      })
-
-      fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          access_token: req.body.access_token,
+      await Promise.all([
+        FriendsRequestModel.insertMany({
+          sender: user.id,
           receiver: friend.id,
-          content: `Vous avez reçu une nouvelle demande d'amis de ${user.username}`
+          comment: Crypto.encrypt(req.body.comment, "database"),
+          status: Crypto.encrypt(FriendsRequestStatus.pending, "status")
+        }),
+        fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`, {
+          method: 'POST',
+          headers: headers(),
+          body: JSON.stringify({
+            access_token: req.body.access_token,
+            receiver: friend.id,
+            content: `Vous avez reçu une nouvelle demande d'amis de ${Crypto.decrypt(user.username, 'username')}`
+          })
         })
-      })
+      ])
 
       return res.status(200).json({
         message: "Demande d'amis envoyée avec succèss",
@@ -256,6 +272,98 @@ export default class UserController {
       console.log(error)
       return res.status(401).json({
         error: "Impossible d'envoyer la demande d'amis",
+      });
+    }
+
+  };
+
+  public readonly updateFriendRequest = async (req: Request, res: Response): Promise<Response> => {
+    //salt should always be in number for because bcrypt generate salt only for salt in number not string
+
+
+    //check if the username exits
+    try {
+
+      const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+
+      const user = await UserModel.findById(userId)
+
+      const friendRequest = await FriendsRequestModel.findById(req.params.id)
+
+      if (!friendRequest) {
+        return res.status(401).json({
+          error: "Cette demande d'amis n'existe pas",
+        })
+      }
+
+      if (Crypto.decrypt(friendRequest.status, 'database') != FriendsRequestStatus.pending) {
+        return res.status(403).json({
+          error: "Cette demande d'amis a déjà été mise à jour",
+        })
+      } else if ((user.id == friendRequest.sender && req.body.status == FriendsRequestStatus.deleted) || (user.id == friendRequest.receiver && req.body.status == FriendsRequestStatus.rejected)) {
+        friendRequest.status = Crypto.encrypt(req.body.status, 'status')
+        await friendRequest.save()
+      } else if (user.id == friendRequest.receiver && req.body.status == FriendsRequestStatus.accepted) {
+
+        friendRequest.status = Crypto.encrypt(req.body.status, 'status')
+
+        // const friend = await UserModel.findById(friendRequest.sender)
+
+        // if (!friend.friends.includes(friendRequest.receiver)) friend.friends.push(friendRequest.receiver)
+
+        // if (!user.friends.includes(friendRequest.sender)) user.friends.push(friendRequest.sender)
+
+        // Promise.all([
+        //   user.save(),
+        //   friend.save(),
+        //   friendRequest.save(),
+        // ])
+
+        await Promise.all([
+          UserModel.findByIdAndUpdate(
+            friendRequest.receiver,
+            { $addToSet: { friends: friendRequest.sender } },  // Utilise $addToSet pour éviter les doublons
+            { new: true, upsert: false }
+          ),
+          UserModel.findByIdAndUpdate(
+            friendRequest.sender,
+            { $addToSet: { friends: friendRequest.receiver } },  // Utilise $addToSet pour éviter les doublons
+            { new: true, upsert: false }
+          ),
+          friendRequest.save(),
+          fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain}:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`, {
+            method: 'POST',
+            headers: headers(),
+            body: JSON.stringify({
+              access_token: req.body.access_token,
+              receiver: friendRequest.sender,
+              content: `${Crypto.decrypt(user.username, 'username')} a accepté votre demande d'amis`
+            })
+          }),
+          fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.chat].domain}:${SERVICES[process.env.NODE_ENV][Services.chat].port}/conversations`, {
+            method: Method.post,
+            headers: headers(),
+            body: JSON.stringify({
+              access_token: req.body.access_token,
+              members: [friendRequest.sender, friendRequest.receiver],
+            })
+          })
+        ])
+
+        return res.status(200).json({
+          message: "Demande d'amis mise à jour avec succèss",
+        })
+
+      } else {
+        return res.status(403).json({
+          error: "Vous n'avez pas le droit d'accéder à cette ressource",
+        })
+      }
+
+    } catch (error) {
+      console.log(error)
+      return res.status(401).json({
+        error: "Impossible de mettre à jour la demande d'amis",
       });
     }
 

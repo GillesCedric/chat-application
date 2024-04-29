@@ -3,7 +3,7 @@ import CONFIG from '../../config/config.json'
 
 export type encryptionKeys = 'token' | 'password' | 'database'
 
-export type deterministEncryptionKeys = 'username' | 'tel' | 'email'
+export type deterministEncryptionKeys = 'username' | 'tel' | 'email' | 'status' | 'boolean'
 /**
  * @class Crypto
  * @author Gilles Cédric
@@ -98,8 +98,7 @@ export class Crypto {
 
 		let determinist = false
 
-		if (key == 'username' || key == 'email' || key == 'tel')
-			determinist = true
+		if (key == 'username' || 'email' || 'tel') determinist = true
 
 		const encryptionKey = Buffer.from(process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`], 'hex')
 		const initializationVector = determinist ? Buffer.from(this.hash.sha256(data.toLowerCase() + CONFIG.appname + process.env[`${key.toUpperCase()}_DETERMINISTE_IV_GENERATION_KEY`]).slice(0, 32), 'hex') : crypto.randomBytes(16)
@@ -120,10 +119,10 @@ export class Crypto {
 	* @param {string} message s.e.
 	* @returns {string} the decoded string
 	*/
-	public static readonly decrypt: (data: string, key: encryptionKeys) => any = (data: string, key: encryptionKeys): any => {
+	public static readonly decrypt: (data: string, key: encryptionKeys | deterministEncryptionKeys) => any = (data: string, key: encryptionKeys | deterministEncryptionKeys): any => {
 		const encryptionKey = Buffer.from(process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`], 'hex')
 
-		if (process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`].length != 32)
+		if (encryptionKey.length != 32)
 			throw new Error("Invalid Key Size") //TODO: Log the error
 
 		const iv = Buffer.from(data.substring(data.lastIndexOf('.') + 1, data.length), 'base64')

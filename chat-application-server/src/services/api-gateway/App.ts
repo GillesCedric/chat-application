@@ -56,6 +56,8 @@ export default class App {
 
         this.config()
 
+        Proxy.serve(this.app)
+
     }
 
     private readonly config = (): void => {
@@ -94,7 +96,7 @@ export default class App {
 
         //body parser configuration
         this.app.use(bodyParser.json())
-        this.app.use(bodyParser.urlencoded({ extended: false }))
+        this.app.use(bodyParser.urlencoded({ extended: true }))
 
         // serving static files 
         this.app.use("/images", express.static('data/users'))
@@ -138,8 +140,6 @@ export default class App {
         this.app.use(BasicAuthentication.authenticate)
 
         this.app.use(Session.authenticate)
-
-        Proxy.serve(this.app)
 
         try {
             if (process.env.NODE_ENV == "development")

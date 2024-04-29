@@ -1,3 +1,4 @@
+import { Crypto } from "../modules/crypto/Crypto";
 import mongoose from "mongoose";
 
 export enum UserStatus {
@@ -13,10 +14,10 @@ interface IUser extends mongoose.Document {
   email: string;
   password: string;
   isEmailVerified: string;
-  isTelVerified: string; 
-  is2FAEnabled: string; 
-  twoFASecret: string; 
-  twoFASecretExpiration: Date; 
+  isTelVerified: string;
+  is2FAEnabled: string;
+  twoFASecret: string;
+  twoFASecretExpiration: Date;
   picture: string;
   status: string
   friends: mongoose.Types.ObjectId[];
@@ -84,6 +85,7 @@ const userSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Users',
+      default: []
     },
   ],
   createdAt: {
