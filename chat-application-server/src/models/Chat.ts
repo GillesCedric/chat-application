@@ -7,8 +7,10 @@ export enum ChatStatus {
 }
 
 interface IChat extends mongoose.Document {
-  conversation: mongoose.Types.ObjectId[];
-  message: mongoose.Types.ObjectId[];
+  conversation: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  message: string;
+  status: string
   deleted: string
   createdAt: Date;
   updatedAt: Date;
@@ -19,7 +21,15 @@ const chatSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Conversations',
   },
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+  },
   message: {
+    type: String,
+    required: true,
+  },
+  status: {
     type: String,
     required: true,
   },
