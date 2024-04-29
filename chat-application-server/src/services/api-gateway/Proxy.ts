@@ -38,12 +38,5 @@ export default class Proxy {
 			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined
 		}))
 
-		app.use('/api/v1/sockets', createProxyMiddleware({
-			target: `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}`,
-			changeOrigin: true, 
-			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined,
-			ws: true
-		}))
-
 	};
 }
