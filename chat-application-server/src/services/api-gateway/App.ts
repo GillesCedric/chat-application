@@ -18,6 +18,7 @@ import { apiGWLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import { Services } from '../../utils/Keywords'
+import Mailer from '../../modules/mailer/Mailer'
 
 
 export default class App {
@@ -137,9 +138,9 @@ export default class App {
             legacyHeaders: false,
         }))
 
-        this.app.use(BasicAuthentication.authenticate)
+        //this.app.use(BasicAuthentication.authenticate)
 
-        this.app.use(Session.authenticate)
+        //this.app.use(Session.authenticate)
 
         try {
             if (process.env.NODE_ENV == "development")

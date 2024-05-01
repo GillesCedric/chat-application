@@ -14,6 +14,7 @@ import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
 import { Services } from '../../utils/Keywords'
+import Mailer from '../../modules/mailer/Mailer'
 
 
 
@@ -62,6 +63,8 @@ export default class App {
             process.exit(1)
         }
 
+        Mailer.config()
+
         //this.app.use(cors())
 
         //cors configuration
@@ -79,9 +82,9 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: true }))
 
-        this.app.use(BasicAuthentication.authenticate)
+        //this.app.use(BasicAuthentication.authenticate)
 
-        this.app.use(Session.authenticate)
+        //this.app.use(Session.authenticate)
 
         try {
             if (process.env.NODE_ENV == "development")

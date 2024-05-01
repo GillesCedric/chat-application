@@ -1,4 +1,3 @@
-import { Crypto } from "../modules/crypto/Crypto";
 import mongoose from "mongoose";
 
 export enum UserStatus {

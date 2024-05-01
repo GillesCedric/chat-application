@@ -1,7 +1,7 @@
 import * as crypto from 'crypto'
 import CONFIG from '../../config/config.json'
 
-export type encryptionKeys = 'token' | 'password' | 'database'
+export type encryptionKeys = 'token' | 'password' | 'database' | 'data'
 
 export type deterministEncryptionKeys = 'username' | 'tel' | 'email' | 'status' | 'boolean'
 /**
@@ -167,9 +167,9 @@ export class Crypto {
 	 * @param {number} length {10} the length of the word
 	 * @returns {string} s.e.
 	 */
-	public static readonly random = (length: number = this.randomLength): string => {
+	public static readonly random = (length: number = this.randomLength, specialCharacters: boolean = false): string => {
 		let text = ''
-		for (let i = 0; i < length; i++) text += this.chars2[Math.random() * this.chars.length]
+		for (let i = 0; i < length; i++) text += specialCharacters ? this.chars2[Math.random() * this.chars.length] : this.chars[Math.floor(Math.random() * this.chars.length)]
 		return text
 	}
 
