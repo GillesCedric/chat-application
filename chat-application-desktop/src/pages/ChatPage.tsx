@@ -9,21 +9,18 @@ import { SearchBar } from "../components/SearchBar";
 import Socket from "../modules/socket/Socket";
 import { friend } from "../components/FriendDataTest";
 import { conversation } from "../components/ConversationDataTest";
-import { useCheckOnlineStatus } from "../Hooks/useCheckOnlineStatus";
+import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
-import MyComponent from "../components/Test";
-import UserRepository from "../modules/repository/UserRepository";
 const ChatPage = () => {
-
   //Socket connection to the server
-  Socket.connect()
+  Socket.connect();
 
-  const [chats, setChats] = useState(ChatDataTest);
+  const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
 
   const handleSendMessage = (newMessage: string) => {
@@ -41,8 +38,8 @@ const ChatPage = () => {
     const data = {
       username : "lilo"
     };
-    UserRepository.getUsersFriends(data).
-      then((response) => {
+    User.getUsersFriends(data).
+      then((response:any) => {
         if (response.message) {
           setChats(response.message);
         }
@@ -50,7 +47,7 @@ const ChatPage = () => {
           notify("Failed to load user's chat list " , "error");
         }
       }).
-      catch((error) => {
+      catch((error:any) => {
         notify("Failed to load user's chat list" , "error");
         console.log(error);
       })

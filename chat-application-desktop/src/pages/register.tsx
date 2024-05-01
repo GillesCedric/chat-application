@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import UserRepository from "../modules/repository/UserRepository";
+import User from "../modules/manager/User";
 import FormValidator from "../modules/validator/form/FormValidator";
 import { ToastContainer } from "react-toastify";
 import { notify } from "../components/toastify";
@@ -91,7 +91,6 @@ export default function Register() {
       nextButtonRef.current.blur();
       switch (etape) {
         case 1:
-
           if (checkNames()) {
             emailSectionRef.current.className = "hidden";
             telSectionRef.current.className = "hidden";
@@ -103,7 +102,6 @@ export default function Register() {
           break;
         case 2:
           if (checkUsername()) {
-
             telSectionRef.current.className = "hidden";
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
@@ -114,7 +112,6 @@ export default function Register() {
           break;
         case 3:
           if (checkEmail()) {
-
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
@@ -125,7 +122,6 @@ export default function Register() {
           break;
         case 4:
           if (checkTel()) {
-
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
             telSectionRef.current.className = "hidden";
@@ -229,7 +225,7 @@ export default function Register() {
       const username = usernameRef.current.value.trim();
       if (FormValidator.hasMininmumLength(6, username)) {
         usernameCheckRef.current.className = "hidden";
-        UserRepository.checkUnique({ username: username });
+        User.checkUnique({ username: username });
         return true;
       }
       setErrorMessage("Username must be minimum 6 characters !");
@@ -331,28 +327,28 @@ export default function Register() {
       const userdata = {
         firstname: firstnameRef.current?.value,
         lastname: lastnameRef.current?.value,
-        username: usernameRef.current?.value.replace(/_/g , ""),
+        username: usernameRef.current?.value.replace(/_/g, ""),
         email: emailRef.current?.value,
         password: passwordRef.current?.value,
         tel: telRef.current?.value.replace(/-/g, ""),
       };
-      UserRepository.register(userdata).then((response: any) => {
-        if (!response.message)
-        {
-          notify(response.error, "error");
-        }
-        else {
-          notify(response.message, "success");
-        }
-      }).catch((error) => {
-        notify("An error occured", "error");
-        console.log(error);
-      })      
+      User.register(userdata)
+        .then((response: any) => {
+          if (!response.message) {
+            notify(response.error, "error");
+          } else {
+            notify(response.message, "success");
+          }
+        })
+        .catch((error: any) => {
+          notify("An error occured", "error");
+          console.log(error);
+        });
     }
   };
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

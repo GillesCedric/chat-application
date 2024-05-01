@@ -1,6 +1,6 @@
 import API from "../api/API";
 
-export default class UserRepository {
+export default class User {
   public static async register(userData: {
     firstname: string;
     lastname: string;
@@ -51,19 +51,19 @@ export default class UserRepository {
     console.log(response);
   }
 
-  public static async addFriend(data: {
+  public static async sendFriendRequest(data: {
     username: string;
     comment: string;
   }): Promise<any> {
     try {
-      const response = await API.register({
+      const response = await API.sendFriendRequest({
         username: data.username,
-        comment : data.comment
+        comment: data.comment,
       });
       if (response.message) {
-        console.log("Friend successfully added");
+        console.log(response.message);
         return {
-          message: data.username + " successfully added to your friends",
+          message:"Friend requests successfully sent to " + data.username,
         };
       }
       if (response.error) {
@@ -84,15 +84,77 @@ export default class UserRepository {
             ""
           )
         );
-        return { error: finalError };
+        return { error: "Username does not exist" };
       }
     } catch (error) {
       console.error("Error while adding friend", error);
       return { error: error };
     }
   }
+
+  public static async getFriendsRequests(): Promise<any> {
+    try {
+      const response = await API.getFriendsRequests();
+
+      if (response.error) {
+        console.error("Failed to load Friends requests :", response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        const errors: any[] = response.errors;
+        const finalError: any[] = [];
+        errors.forEach((error) => {
+          finalError.push(error.msg + " for " + error.path, "error");
+        });
+        console.log(
+          finalError.reduce(
+            (accumulation: [], current: []) => accumulation + " " + current,
+            ""
+          )
+        );
+        return { error: "Failed to load Friends requests" };
+      } else if (response.message) {
+        return {
+          message: response.data,
+        };
+      }
+    } catch (error) {
+      console.error("Failed to load Friends requests :", error);
+      return { error: error };
+    }
+  }
+
+  public static async updateFriendRequest(id: string, data: any): Promise<any> {
+    console.log(id);
+
+    const response = await API.updateFriendRequest(id, data);
+    console.log(response);
+    if (response.message) {
+      console.log(response.message);
+      return {
+        message: "Request successfully accpeted",
+      };
+    }
+    if (response.error) {
+      console.error("Failed to update friend request:", response.error);
+      return { error: response.error };
+    } else if (response.errors) {
+      const errors: any[] = response.errors;
+      const finalError: any[] = [];
+      errors.forEach((error) => {
+        finalError.push(error.msg + " for " + error.path, "error");
+      });
+      console.log(
+        finalError.reduce(
+          (accumulation: [], current: []) => accumulation + " " + current,
+          ""
+        )
+      );
+      return { error: "Username does not exist" };
+    }
+  }
+
   public static async getUsersFriends(data: {
-    username : string
+    username: string;
   }): Promise<any> {
     try {
       const response = await API.register({

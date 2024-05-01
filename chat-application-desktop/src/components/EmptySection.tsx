@@ -9,7 +9,7 @@ export const EmptySection = () => {
   };
   return (
     <div className="w-full flex items-center flex-wrap justify-center gap-10">
-      <div className="grid gap-4 w-60">
+      <div className="grid gap-4 w-72">
         <svg
           className="mx-auto"
           xmlns="http://www.w3.org/2000/svg"
@@ -130,15 +130,14 @@ export const EmptySection = () => {
             There are no friend in your list 
           </h2>
           <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
-            Try adding some to  <br />
-            start messaging
+            Try sending some to friend request to start messaging
           </p>
           <div className="flex gap-3">
             <button
               onClick={toggleModal} // Toggle modal on click
               className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 transition-all duration-500 rounded-full text-white text-xs font-semibold leading-4"
             >
-              Add Friend
+              Send invitation
             </button>
           </div>
           {isModalOpen && <AddFriend closeModal={toggleModal} />}

@@ -131,12 +131,12 @@ export default class App {
 
 
 
-        this.app.use(rateLimit({
-            windowMs: 10 * 60 * 1000, // 10 minutes
-            limit: 100, // 100 calls,
-            standardHeaders: 'draft-7',
-            legacyHeaders: false,
-        }))
+        // this.app.use(rateLimit({
+        //     windowMs: 10 * 60 * 1000, // 10 minutes
+        //     limit: 100, // 100 calls,
+        //     standardHeaders: 'draft-7',
+        //     legacyHeaders: false,
+        // }))
 
         //this.app.use(BasicAuthentication.authenticate)
 

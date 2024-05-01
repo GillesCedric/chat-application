@@ -2,27 +2,30 @@ import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
-import NotificationRepository from "../modules/repository/NotificationRepository";
+import NotificationRepository from "../modules/manager/NotificationRepository";  
+;
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
+import { useNavigate } from "react-router-dom";
 const NavLink = ({ children, href }: { children: any; href: string }) => {
+  const navigate = useNavigate();
   return (
-    <a
-      href={href}
-      className=" relative inline-block ease-in-out group transition duration-300 hover:text-blue-500"
+    <span
+      onClick={() => navigate(href)}
+      className="cursor-pointer relative inline-block ease-in-out group transition duration-300 hover:text-blue-500 cursor-pointer"
     >
       {children}
-      <span className=" max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 relative inline-block  ease-in-out hover:text-blue-500"></span>
-    </a>
+    </span>
   );
 };
+
 const ChatHeader = () => {
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
-  useEffect(() => {
-    NotificationRepository.getNotifications(data).then((response) => {
+/*   useEffect(() => {
+    NotificationRepository.getNotifications(data).then((response: any) => {
       if (response.message) {
         setNotifications(response.message);
         setNotificationCount(notifications.length);
@@ -30,7 +33,7 @@ const ChatHeader = () => {
         notify(response.error, "error");
       }
     });
-  });
+  }); */
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
@@ -49,7 +52,7 @@ const ChatHeader = () => {
       </div>
       <nav className="flex space-x-4">
         <NavLink href="/">Home</NavLink>
-        <NavLink href="/chat">Chat</NavLink>
+        <NavLink href="/friendsRequests">Friends Request</NavLink>
         <NavLink href="/chat">Contacts</NavLink>
         <NavLink href="/chat">Settings</NavLink>
         <NotificationIcon count={notificatonCount} onClick={toggleDrawer} />

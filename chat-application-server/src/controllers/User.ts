@@ -43,7 +43,7 @@ export default class UserController {
           });
         });
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error);
         return res.status(500).json({ error: "Internal Server Error" });
       });
@@ -96,7 +96,7 @@ export default class UserController {
             token: JWTUtils.generateTokenForUser(userFound.id),
           });
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.log(error);
           return res.status(500).json({
             error: "User verification impossible",

@@ -1,12 +1,9 @@
-import { Application } from "express"
-import UserController from "../controllers/User"
-import {UserValidators} from "../../../middlewares/Validators"
-
-
+import { Application } from "express";
+import UserController from "../controllers/User";
+import { UserValidators } from "../../../middlewares/Validators";
 
 export default class Routes {
-
-  private static readonly userController: UserController = new UserController()
+  private static readonly userController: UserController = new UserController();
 
   public static readonly routes = (app: Application): void => {
     app.route("/").get(this.userController.getAll)

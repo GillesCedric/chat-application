@@ -98,6 +98,7 @@ export default class ChatController {
       }
 
       return res.status(200).json({
+        message: 'success',
         data: chats.map(chat => ({
           _id: chat._id,
           sender: chat.sender,
@@ -240,7 +241,8 @@ export default class ChatController {
 
 
       return res.status(200).json({
-        conversations,
+        message: 'success',
+        data: conversations,
       })
 
     } catch (error) {
