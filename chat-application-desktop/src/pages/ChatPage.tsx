@@ -16,14 +16,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
-import MyComponent from "../components/Test";
-import UserRepository from "../modules/repository/UserRepository";
 const ChatPage = () => {
 
   //Socket connection to the server
   Socket.connect()
 
-  const [chats, setChats] = useState(ChatDataTest);
+  const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
 
   const handleSendMessage = (newMessage: string) => {

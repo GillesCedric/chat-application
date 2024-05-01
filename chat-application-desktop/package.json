@@ -64,4 +64,5 @@
     "react-toastify": "^10.0.5",
     "socket.io-client": "^4.7.5"
   }
+  
 }

@@ -6,17 +6,19 @@ import NotificationRepository from "../modules/repository/NotificationRepository
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
+import { useNavigate } from "react-router-dom";
 const NavLink = ({ children, href }: { children: any; href: string }) => {
+  const navigate = useNavigate();
   return (
-    <a
-      href={href}
-      className=" relative inline-block ease-in-out group transition duration-300 hover:text-blue-500"
+    <span
+      onClick={() => navigate(href)}
+      className="cursor-pointer relative inline-block ease-in-out group transition duration-300 hover:text-blue-500 cursor-pointer"
     >
       {children}
-      <span className=" max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 relative inline-block  ease-in-out hover:text-blue-500"></span>
-    </a>
+    </span>
   );
 };
+
 const ChatHeader = () => {
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
@@ -48,10 +50,10 @@ const ChatHeader = () => {
         <span className="font-semibold">ChatBOT</span>
       </div>
       <nav className="flex space-x-4">
-        <NavLink href="/">Home</NavLink>
-        <NavLink href="/chat">Chat</NavLink>
-        <NavLink href="/chat">Contacts</NavLink>
-        <NavLink href="/chat">Settings</NavLink>
+        <NavLink  href="/">Home</NavLink>
+        <NavLink  href="/friendsRequests">Friends Request</NavLink>
+        <NavLink  href="/chat">Contacts</NavLink>
+        <NavLink  href="/chat">Settings</NavLink>
         <NotificationIcon count={notificatonCount} onClick={toggleDrawer} />
         <NotificationDrawer
           isOpen={isDrawerOpen}
