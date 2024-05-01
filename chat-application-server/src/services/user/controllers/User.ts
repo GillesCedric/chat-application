@@ -109,7 +109,7 @@ export default class UserController {
         });
       }
 
-      if (!(Crypto.decrypt(user.isEmailVerified, 'boolean') as boolean)) {
+      if (Crypto.decrypt(user.isEmailVerified, 'boolean') == "false") {
         return res.status(403).json({
           error: "Votre compte n'est pas encore activé! Vous ne pouvez pas encore vous connecter",
         });
@@ -153,7 +153,12 @@ export default class UserController {
       userToken.purpose = Crypto.decrypt(userToken.purpose, 'data')
       userToken.code = Crypto.decrypt(userToken.code, 'data')
 
-      console.log(userToken)
+      const user = await UserModel.findById(userToken.userId)
+
+      if (Crypto.decrypt(user.isEmailVerified, 'boolean') == "true") {
+        res.sendFile(path.join(process.cwd(), 'public', 'EmailAlreadyVerified.html'))
+        return
+      }
 
       const token = await TokenModel.findOne({
         user: userToken.userId,
