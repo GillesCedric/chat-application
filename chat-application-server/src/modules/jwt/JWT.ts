@@ -17,6 +17,10 @@ export default abstract class JWTUtils {
     return jwt.sign({ userId: id }, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY, { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY })
   }
 
+  public static readonly generateTokenWithData: (data: any) => string = (data: any): string => {
+    return jwt.sign(data, process.env.VERIFY_EMAIL_TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.VERIFY_EMAIL_TOKEN_DELAY })
+  }
+
 
   /**
    * @method parseToken
@@ -58,6 +62,25 @@ export default abstract class JWTUtils {
       console.log(error);
     }
     return userId;
+  };
+
+  public static readonly getDataFromToken: (token: string) => any | undefined = (
+    token: string): string | undefined => {
+
+    let data = undefined;
+
+    try {
+      const jwtToken = jwt.verify(token, process.env.VERIFY_EMAIL_TOKEN_ENCRYPTION_KEY);
+
+      if (jwtToken) {
+        //@ts-ignore
+        data = jwtToken
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+    return data;
   };
 
 }
