@@ -63,7 +63,7 @@ export default class User {
       if (response.message) {
         console.log(response.message);
         return {
-          message: data.username + " successfully added to your friends",
+          message:"Friend requests successfully sent to " + data.username,
         };
       }
       if (response.error) {
@@ -95,7 +95,7 @@ export default class User {
   public static async getFriendsRequests(): Promise<any> {
     try {
       const response = await API.getFriendsRequests();
-     
+
       if (response.error) {
         console.error("Failed to load Friends requests :", response.error);
         return { error: response.error };
@@ -112,10 +112,9 @@ export default class User {
           )
         );
         return { error: "Failed to load Friends requests" };
-      } else{
-        console.log(response);
+      } else if (response.message) {
         return {
-          message: " Friends requests successfully loaded",
+          message: response.data,
         };
       }
     } catch (error) {
@@ -125,7 +124,10 @@ export default class User {
   }
 
   public static async updateFriendRequest(id: string, data: any): Promise<any> {
+    console.log(id);
+
     const response = await API.updateFriendRequest(id, data);
+    console.log(response);
     if (response.message) {
       console.log(response.message);
       return {

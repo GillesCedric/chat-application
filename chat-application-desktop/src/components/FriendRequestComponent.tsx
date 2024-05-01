@@ -2,26 +2,29 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
+import { notify } from "./toastify";
 
 export const FriendRequestComponent = ({
   friendRequest,
 }: {
   friendRequest: any;
 }) => {
-  const friendRequestId: string = friendRequest.id;
+  const friendRequestId: string = friendRequest._id;
   const handleAccept = () => {
-    User.updateFriendRequest(friendRequestId, {
+    const data = {
       status: FriendsRequestStatus.accepted,
-    })
+    }
+    User.updateFriendRequest(friendRequestId ,data )
       .then((response: any) => {
         if (response.message) {
           console.log(response.message);
         } else {
-          console.log(response.error);
+          notify(response.message, "error");
         }
       })
       .catch((error: any) => {
         console.log(error);
+        notify("An error occur !", "error");
       });
   };
 
@@ -57,6 +60,24 @@ export const FriendRequestComponent = ({
       });
   };
 
+  const formatDate = (isoString : string) : string => {
+    const date = new Date(isoString);
+    return (
+      date.toLocaleDateString("en-US", {
+        weekday: "long", 
+        year: "numeric", 
+        month: "long", 
+        day: "numeric", 
+      }) +
+      " " +
+      date.toLocaleTimeString("en-US", {
+        hour: "2-digit", // "02"
+        minute: "2-digit", // "00"
+        second: "2-digit", // "00"
+      })
+    );
+  };
+
   return (
     <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       <div className="flex justify-between p-4">
@@ -70,7 +91,7 @@ export const FriendRequestComponent = ({
           >
             <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
           </svg>
-          Since {friendRequest.createdAt}
+          Since { formatDate( friendRequest.createdAt)}
         </span>
         <button
           className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
@@ -90,7 +111,7 @@ export const FriendRequestComponent = ({
           alt="Friend's avatar"
         />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {friendRequest.sender.lastname} {friendRequest.sender.firstanme}
+          {friendRequest.sender.username}
         </h5>
         <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
           {friendRequest.comment}
@@ -106,7 +127,7 @@ export const FriendRequestComponent = ({
             className="py-2 px-4 ml-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
             onClick={handleReject}
           >
-            Decline
+            Reject
           </button>
         </div>
       </div>

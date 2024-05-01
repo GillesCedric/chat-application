@@ -214,14 +214,14 @@ export default class API {
       let responseData = null;
       let handleRequest = false;
       try {
+        const url  = await this.generateURL(this.apiUrl + "/users/friends/request");
         const response = await fetch(
-          this.apiUrl + "/users/friends/request/all",
+          url,
           {
-            method: "POST",
+            method: "GET",
             headers: {
               ...this.headers,
             },
-            body: await this.generateBody(""),
           }
         );
         responseData = await response.json();
@@ -232,17 +232,18 @@ export default class API {
       if (handleRequest) return this.getFriendsRequests();
       return responseData;
     };
- 
+
   public static readonly updateFriendRequest: (id : string , data : any) => Promise<any> =
     async (id : string , data : any): Promise<any> => {
-      async (data: any): Promise<any> => {
+        console.log(id)
         let responseData = null;
         let handleRequest = false;
+        const url = this.apiUrl +"/users/friends/request/" +id;
         try {
           const response = await fetch(
-            `${this.apiUrl}/users/friends/request/${id}`,
+            url,
             {
-              method: "POST",
+              method: "PUT",
               headers: {
                 ...this.headers,
               },
@@ -256,7 +257,6 @@ export default class API {
         handleRequest = await this.handleRequest(responseData);
         if (handleRequest) return this.updateFriendRequest(id, data);
         return responseData;
-      };
     };
   public static readonly loadConversation: (data: any) => Promise<any> = async (
     data: any

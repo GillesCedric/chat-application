@@ -86,7 +86,7 @@ export const NotificationDrawer = ({
   );
 };
 
-const EmptySectionNotification = () => {
+export const EmptySectionNotification = () => {
   return (
     <>
       <div className="w-full flex items-center flex-wrap justify-center gap-10 h-screen">

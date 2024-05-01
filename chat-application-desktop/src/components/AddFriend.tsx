@@ -107,7 +107,7 @@ export const AddFriend = ({ closeModal }: { closeModal: any }) => {
               icon={faPaperPlane}
               className="me-1 -ms-1 w-5 h-5"
             />
-            Send invitation
+            Send
           </button>
         </form>
       </div>

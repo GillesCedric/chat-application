@@ -24,7 +24,7 @@ const ChatHeader = () => {
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
-  useEffect(() => {
+/*   useEffect(() => {
     NotificationRepository.getNotifications(data).then((response: any) => {
       if (response.message) {
         setNotifications(response.message);
@@ -33,7 +33,7 @@ const ChatHeader = () => {
         notify(response.error, "error");
       }
     });
-  });
+  }); */
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {

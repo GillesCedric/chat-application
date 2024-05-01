@@ -9,7 +9,7 @@ import { SearchBar } from "../components/SearchBar";
 import Socket from "../modules/socket/Socket";
 import { friend } from "../components/FriendDataTest";
 import { conversation } from "../components/ConversationDataTest";
-import { useCheckOnlineStatus } from "../Hooks/useCheckOnlineStatus";
+import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
