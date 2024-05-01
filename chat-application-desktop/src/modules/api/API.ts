@@ -169,8 +169,8 @@ export default class API {
     return responseData;
   };
 
-  public static readonly sendFriendRequest: (data: any) => Promise<any> =
-    async (data: any): Promise<any> => {
+  public static readonly sendFriendRequest: (data:any) => Promise<any> =
+    async (data:any): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -189,26 +189,30 @@ export default class API {
       if (handleRequest) return this.sendFriendRequest(data);
       return responseData;
     };
-  public static readonly getUsersFriendsRequests: (data: any) => Promise<any> =
-    async (data: any): Promise<any> => {
+  public static readonly getFriendsRequests: () => Promise<any> =
+    async (): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
-        const response = await fetch(this.apiUrl + "/notifications/", {
-          method: "GET",
-          headers: {
-            ...this.headers,
-          },
-          body: await this.generateBody(data),
-        });
+        const response = await fetch(
+          this.apiUrl + "/users/friends/request/all",
+          {
+            method: "POST",
+            headers: {
+              ...this.headers,
+            },
+            body: await this.generateBody(""),
+          }
+        );
         responseData = await response.json();
       } catch (error) {
         console.log("error " + error);
       }
       handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.sendFriendRequest(data);
+      if (handleRequest) return this.getFriendsRequests();
       return responseData;
     };
+ 
   public static readonly updateFriendRequest: (id : string , data : any) => Promise<any> =
     async (id : string , data : any): Promise<any> => {
       async (data: any): Promise<any> => {
@@ -230,7 +234,7 @@ export default class API {
           console.log("error " + error);
         }
         handleRequest = await this.handleRequest(responseData);
-        if (handleRequest) return this.sendFriendRequest(data);
+        if (handleRequest) return this.updateFriendRequest(id, data);
         return responseData;
       };
     };

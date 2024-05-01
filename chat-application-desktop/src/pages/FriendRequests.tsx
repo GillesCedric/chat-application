@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FriendRequestComponent } from "../components/FriendRequestComponent";
 import ChatHeader from "../components/ChatHeader";
+import User from "../modules/manager/User";
 
 export const FriendRequest = () => {
-  const [friendRequests, setFriendRequests] = useState(
-    Array(5)
-      .fill(null)
-      .map((_, index) => ({
-        id: index,
-        sender: `Friend ${index + 1}`,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        createdAt: new Date().toISOString().slice(0, 10),
-      }))
-  );
-
+  const [friendRequests, setFriendRequests] = useState([]);
+  useEffect(() => {
+    User.getFriendsRequests()
+      .then((response: any) => {
+        if (response.message) {
+          setFriendRequests(response.message);
+          console.log(response.message);
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
+  });
   return (
     <div className="h-screen flex flex-col">
       <ChatHeader />

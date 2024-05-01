@@ -2,7 +2,7 @@ import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useRef, useState } from "react";
-import UserRepository from "../modules/repository/UserRepository";
+import  User  from "../modules/manager/User";
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { DEFAULT_COMMENT } from "../utils/keywords";
@@ -21,26 +21,26 @@ export const AddFriend = ({ closeModal }: { closeModal: any }) => {
   const handleSendFriendRequest = (e: React.FormEvent): void => {
     e.preventDefault();
     if (username.trim() === "") {
-      notify("Username cannot be empty" , "error");
+      notify("Username cannot be empty", "error");
       return;
     }
     if (comment.trim() === "") {
       setComment(DEFAULT_COMMENT);
     }
-    UserRepository.sendFriendRequest({
+    User.sendFriendRequest({
       username: username,
       comment: comment,
-    }).then((response: any) => {
-      if (response.message) {
-        notify(response.message, "success", closeModal);
-      }
-      else {
-        notify(response.error, "error");
-      }
-    }).catch((error: any) => {
-      notify(error, "error");
-    });
-
+    })
+      .then((response: any) => {
+        if (response.message) {
+          notify(response.message, "success", closeModal);
+        } else {
+          notify(response.error, "error");
+        }
+      })
+      .catch((error: any) => {
+        notify(error, "error");
+      });
   };
 
   return (

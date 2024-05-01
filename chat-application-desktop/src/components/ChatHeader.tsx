@@ -2,7 +2,8 @@ import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
-import NotificationRepository from "../modules/repository/NotificationRepository";
+import NotificationRepository from "../modules/manager/NotificationRepository";  
+;
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
@@ -24,7 +25,7 @@ const ChatHeader = () => {
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
   useEffect(() => {
-    NotificationRepository.getNotifications(data).then((response) => {
+    NotificationRepository.getNotifications(data).then((response: any) => {
       if (response.message) {
         setNotifications(response.message);
         setNotificationCount(notifications.length);
@@ -50,10 +51,10 @@ const ChatHeader = () => {
         <span className="font-semibold">ChatBOT</span>
       </div>
       <nav className="flex space-x-4">
-        <NavLink  href="/">Home</NavLink>
-        <NavLink  href="/friendsRequests">Friends Request</NavLink>
-        <NavLink  href="/chat">Contacts</NavLink>
-        <NavLink  href="/chat">Settings</NavLink>
+        <NavLink href="/">Home</NavLink>
+        <NavLink href="/friendsRequests">Friends Request</NavLink>
+        <NavLink href="/chat">Contacts</NavLink>
+        <NavLink href="/chat">Settings</NavLink>
         <NotificationIcon count={notificatonCount} onClick={toggleDrawer} />
         <NotificationDrawer
           isOpen={isDrawerOpen}

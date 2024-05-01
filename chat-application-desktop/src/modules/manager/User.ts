@@ -1,6 +1,6 @@
 import API from "../api/API";
 
-export default class UserRepository {
+export default class User {
   public static async register(userData: {
     firstname: string;
     lastname: string;
@@ -92,20 +92,12 @@ export default class UserRepository {
     }
   }
 
-  public static async updateFriendRequest( id : string , data :any): Promise<any> {
+  public static async getFriendsRequests(): Promise<any> {
     try {
-      const response = await API.updateFriendRequest(id , data);
-      if (response.message) {
-        console.log(response.message);
-        return {
-          message:"Request successfully accpeted",
-        };
-      }
+      const response = await API.getFriendsRequests();
+     
       if (response.error) {
-        console.error(
-          "Failed to update friend request:",
-          response.error
-        );
+        console.error("Failed to load Friends requests :", response.error);
         return { error: response.error };
       } else if (response.errors) {
         const errors: any[] = response.errors;
@@ -119,12 +111,43 @@ export default class UserRepository {
             ""
           )
         );
-        return { error: "Username does not exist" };
+        return { error: "Failed to load Friends requests" };
+      } else{
+        console.log(response);
+        return {
+          message: " Friends requests successfully loaded",
+        };
       }
     } catch (error) {
-      console.error(          "Failed to update friend request:",
-, error);
+      console.error("Failed to load Friends requests :", error);
       return { error: error };
+    }
+  }
+
+  public static async updateFriendRequest(id: string, data: any): Promise<any> {
+    const response = await API.updateFriendRequest(id, data);
+    if (response.message) {
+      console.log(response.message);
+      return {
+        message: "Request successfully accpeted",
+      };
+    }
+    if (response.error) {
+      console.error("Failed to update friend request:", response.error);
+      return { error: response.error };
+    } else if (response.errors) {
+      const errors: any[] = response.errors;
+      const finalError: any[] = [];
+      errors.forEach((error) => {
+        finalError.push(error.msg + " for " + error.path, "error");
+      });
+      console.log(
+        finalError.reduce(
+          (accumulation: [], current: []) => accumulation + " " + current,
+          ""
+        )
+      );
+      return { error: "Username does not exist" };
     }
   }
 

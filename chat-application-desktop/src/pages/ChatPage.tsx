@@ -17,9 +17,8 @@ import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
 const ChatPage = () => {
-
   //Socket connection to the server
-  Socket.connect()
+  Socket.connect();
 
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
@@ -39,8 +38,8 @@ const ChatPage = () => {
     const data = {
       username : "lilo"
     };
-    UserRepository.getUsersFriends(data).
-      then((response) => {
+    User.getUsersFriends(data).
+      then((response:any) => {
         if (response.message) {
           setChats(response.message);
         }
@@ -48,7 +47,7 @@ const ChatPage = () => {
           notify("Failed to load user's chat list " , "error");
         }
       }).
-      catch((error) => {
+      catch((error:any) => {
         notify("Failed to load user's chat list" , "error");
         console.log(error);
       })

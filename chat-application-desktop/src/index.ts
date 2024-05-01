@@ -16,9 +16,9 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 /* Acces token persitency here */
-/* secureStore.set("chat-application-access_token", "null")
+secureStore.set("chat-application-access_token", "null")
 secureStore.set("chat-application-refresh_token", "null")
- */
+
 // IPC listener
 ipcMain.on('electron-store-get', (event, val) => {
   event.returnValue = secureStore.get(val);

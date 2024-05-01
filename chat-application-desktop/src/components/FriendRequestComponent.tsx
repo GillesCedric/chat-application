@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import UserRepository from "../modules/repository/UserRepository";
+import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
 
 export const FriendRequestComponent = ({
@@ -10,49 +10,51 @@ export const FriendRequestComponent = ({
 }) => {
   const friendRequestId: string = friendRequest.id;
   const handleAccept = () => {
-    UserRepository.updateFriendRequest(friendRequestId, {
+    User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.accepted,
-    }).then((response: any) => {
-      if (response.message) {
-        console.log(response.message);
-      } else {
-        console.log(response.error);
-    }
-    }).catch((error: any) => {
-      console.log(error);
-    });
+    })
+      .then((response: any) => {
+        if (response.message) {
+          console.log(response.message);
+        } else {
+          console.log(response.error);
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
 
   const handleDelete = () => {
-     UserRepository.updateFriendRequest(friendRequestId, {
-       status: FriendsRequestStatus.deleted,
-     })
-       .then((response: any) => {
-         if (response.message) {
-           console.log(response.message);
-         } else {
-           console.log(response.error);
-         }
-       })
-       .catch((error: any) => {
-         console.log(error);
-       });
+    User.updateFriendRequest(friendRequestId, {
+      status: FriendsRequestStatus.deleted,
+    })
+      .then((response: any) => {
+        if (response.message) {
+          console.log(response.message);
+        } else {
+          console.log(response.error);
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
 
   const handleReject = () => {
-     UserRepository.updateFriendRequest(friendRequestId, {
-       status: FriendsRequestStatus.rejected,
-     })
-       .then((response: any) => {
-         if (response.message) {
-           console.log(response.message);
-         } else {
-           console.log(response.error);
-         }
-       })
-       .catch((error: any) => {
-         console.log(error);
-       });
+    User.updateFriendRequest(friendRequestId, {
+      status: FriendsRequestStatus.rejected,
+    })
+      .then((response: any) => {
+        if (response.message) {
+          console.log(response.message);
+        } else {
+          console.log(response.error);
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -88,16 +90,22 @@ export const FriendRequestComponent = ({
           alt="Friend's avatar"
         />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {friendRequest.sender}
+          {friendRequest.sender.lastname} {friendRequest.sender.firstanme}
         </h5>
         <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
           {friendRequest.comment}
         </span>
         <div className="flex mt-4">
-          <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={handleAccept}>
+          <button
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            onClick={handleAccept}
+          >
             Accept
           </button>
-          <button className="py-2 px-4 ml-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={handleReject}>
+          <button
+            className="py-2 px-4 ml-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+            onClick={handleReject}
+          >
             Decline
           </button>
         </div>
