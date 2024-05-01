@@ -12,8 +12,8 @@ export const FriendRequest = () => {
   const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
-      if (response && response.message) {
-        setFriendRequests(response.message);
+      if (response && response.data) {
+        setFriendRequests(response.data);
       }
     } catch (error) {
       console.error("Error fetching friend requests:", error);

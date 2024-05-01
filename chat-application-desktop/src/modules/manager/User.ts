@@ -63,7 +63,7 @@ export default class User {
       if (response.message) {
         console.log(response.message);
         return {
-          message:"Friend requests successfully sent to " + data.username,
+          message: "Friend requests successfully sent to " + data.username,
         };
       }
       if (response.error) {
@@ -113,9 +113,7 @@ export default class User {
         );
         return { error: "Failed to load Friends requests" };
       } else if (response.message) {
-        return {
-          message: response.data,
-        };
+        return response;
       }
     } catch (error) {
       console.error("Failed to load Friends requests :", error);
@@ -124,10 +122,7 @@ export default class User {
   }
 
   public static async updateFriendRequest(id: string, data: any): Promise<any> {
-    console.log(id);
-
     const response = await API.updateFriendRequest(id, data);
-    console.log(response);
     if (response.message) {
       console.log(response.message);
       return {
@@ -149,10 +144,36 @@ export default class User {
           ""
         )
       );
-      return { error: "Username does not exist" };
+      return { error: "Failed to update friend reqesst" };
     }
   }
 
+  public static async getConversations(): Promise<any> {
+
+    const response = await API.getUserConversations();
+    if (response.message) {
+      return {
+        data: response.data,
+      };
+    }
+    if (response.error) {
+      console.error("Failed to load conversations:", response.error);
+      return { error: response.error };
+    } else if (response.errors) {
+      const errors: any[] = response.errors;
+      const finalError: any[] = [];
+      errors.forEach((error) => {
+        finalError.push(error.msg + " for " + error.path, "error");
+      });
+      console.log(
+        finalError.reduce(
+          (accumulation: [], current: []) => accumulation + " " + current,
+          ""
+        )
+      );
+      return { error: "Failed to load conversations:" };
+    }
+  }
   public static async getUsersFriends(data: {
     username: string;
   }): Promise<any> {
