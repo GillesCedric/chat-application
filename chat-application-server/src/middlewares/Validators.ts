@@ -40,7 +40,7 @@ export abstract class UserValidators extends Validators {
     ]
 
     public static readonly getUserFriendRequests = [
-        body('access_token').escape().trim().stripLow().isJWT(),
+        query('access_token').escape().trim().stripLow().isJWT(),
     ]
 
     public static readonly updateFriendRequest = [
@@ -59,7 +59,7 @@ export abstract class UserValidators extends Validators {
     ]
 
     public static readonly me = [
-        body('access_token').escape().trim().stripLow().isJWT(),
+        query('access_token').escape().trim().stripLow().isJWT(),
     ]
 
     public static readonly verify = [
@@ -75,11 +75,11 @@ export abstract class ChatValidators extends Validators {
     ]
 
     public static readonly getUserConversations = [
-        body('access_token').escape().trim().stripLow().isJWT(),
+        query('access_token').escape().trim().stripLow().isJWT(),
     ]
     
     public static readonly getUserConversationChats = [
-        body('access_token').escape().trim().stripLow().isJWT(),
+        query('access_token').escape().trim().stripLow().isJWT(),
         param('id').escape().trim().stripLow().isMongoId(),
     ]
 

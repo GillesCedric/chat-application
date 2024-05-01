@@ -83,7 +83,7 @@ export default class ChatController {
 
   public readonly getUserConversationChats = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken)
+    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, Tokens.accessToken)
 
     try {
 
@@ -98,7 +98,7 @@ export default class ChatController {
       }
 
       return res.status(200).json({
-        chats: chats.map(chat => ({
+        data: chats.map(chat => ({
           _id: chat._id,
           sender: chat.sender,
           message: Crypto.decrypt(chat.message, "database"),
@@ -121,7 +121,7 @@ export default class ChatController {
 
     try {
 
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken)
+      const userId = JWTUtils.getUserFromToken(req.query.access_token as string, Tokens.accessToken)
 
       let conversations = await ConversationModel.aggregate([
         // Étape 1: Trouver toutes les conversations impliquant l'utilisateur
