@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ValidationChain, body, param, validationResult } from 'express-validator'
+import { body, param, query, validationResult } from 'express-validator'
 import { Code } from '../utils/HTTP'
 
 
@@ -39,6 +39,10 @@ export abstract class UserValidators extends Validators {
         body('content').trim().stripLow().isLength({ min: 0, max: 100 }),
     ]
 
+    public static readonly getUserFriendRequests = [
+        body('access_token').escape().trim().stripLow().isJWT(),
+    ]
+
     public static readonly updateFriendRequest = [
         body('access_token').escape().trim().stripLow().isJWT(),
         body('status').escape().trim().stripLow().isAlpha().isUppercase(),
@@ -56,6 +60,10 @@ export abstract class UserValidators extends Validators {
 
     public static readonly me = [
         body('access_token').escape().trim().stripLow().isJWT(),
+    ]
+
+    public static readonly verify = [
+        query('token').escape().trim().stripLow().isJWT()
     ]
 
 }

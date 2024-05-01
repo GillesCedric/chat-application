@@ -7,7 +7,10 @@ import { Crypto } from "../../../modules/crypto/Crypto";
 import { Code, Method, headers, protocol } from "../../../utils/HTTP";
 import { Services, SocketKeywords, Tokens } from "../../../utils/Keywords";
 import SERVICES from '../../../config/services.json'
-import { ConversationModel } from "../../../models/Conversation";
+import { Keys, Purposes, TokenModel } from "../../../models/Token";
+import Mailer from "../../../modules/mailer/Mailer";
+import fs from 'fs'
+import path from 'path'
 
 
 export default class UserController {
@@ -85,7 +88,10 @@ export default class UserController {
   public readonly signIn = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const user = await UserModel.findOne({ email: Crypto.encrypt(req.body.email, "email") })
+      const user = await UserModel.findOne({
+        email: Crypto.encrypt(req.body.email, "email")
+      })
+
       if (!user) {
         return res.status(401).json({
           error: "Incorrect email or password",
@@ -100,6 +106,12 @@ export default class UserController {
       if (!passwordMatches) {
         return res.status(401).json({
           error: "Incorrect email or password",
+        });
+      }
+
+      if (!(Crypto.decrypt(user.isEmailVerified, 'boolean') as boolean)) {
+        return res.status(403).json({
+          error: "Votre compte n'est pas encore activé! Vous ne pouvez pas encore vous connecter",
         });
       }
 
@@ -126,6 +138,61 @@ export default class UserController {
     }
   };
 
+  public readonly activate = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+      const userToken = JWTUtils.getDataFromToken(req.query.token as string)
+
+      if (userToken == undefined) {
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
+      }
+
+      userToken.userId = Crypto.decrypt(userToken.userId, 'data')
+      userToken.key = Crypto.decrypt(userToken.key, 'data')
+      userToken.purpose = Crypto.decrypt(userToken.purpose, 'data')
+      userToken.code = Crypto.decrypt(userToken.code, 'data')
+
+      console.log(userToken)
+
+      const token = await TokenModel.findOne({
+        user: userToken.userId,
+        key: Crypto.encrypt(userToken.key, 'status'),
+        purpose: Crypto.encrypt(userToken.purpose, 'status'),
+        validity: { $gt: new Date() }
+      }).sort({ createdAt: -1 })
+
+      if (!token) {
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
+      }
+
+      const tokenMatches = bcrypt.compareSync(
+        userToken.code,
+        token.token
+      );
+
+      if (!tokenMatches) {
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
+      }
+
+      await UserModel.findByIdAndUpdate(userToken.userId, {
+        isEmailVerified: Crypto.encrypt("true", "boolean")
+      })
+
+      res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailSuccess.html'))
+      return
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Internal server Error",
+      });
+    }
+  };
+
+
   public readonly signUp = async (req: Request, res: Response): Promise<Response> => {
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
 
@@ -151,6 +218,32 @@ export default class UserController {
       })
 
       if (user) {
+        const userCode = Crypto.random().toUpperCase()
+
+        const token = JWTUtils.generateTokenWithData({
+          userId: Crypto.encrypt(user[0].id, "data"),
+          code: Crypto.encrypt(userCode, 'data'),
+          key: Crypto.encrypt(Keys.email, 'data'),
+          purpose: Crypto.encrypt(Purposes.verification, 'data')
+        })
+
+        const validity = new Date()
+
+        await TokenModel.insertMany({
+          user: user[0]._id,
+          key: Crypto.encrypt(Keys.email, 'status'),
+          token: bcrypt.hashSync(userCode, Number.parseInt(process.env.SALT_ROUNDS)),
+          validity: validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.VERIFY_EMAIL_CODE_DELAY)),
+          purpose: Crypto.encrypt(Purposes.verification, 'status')
+        })
+
+        await Mailer.sendMail({
+          to: req.body.email, // Change to your recipient
+          from: process.env.TWILLIO_MAILER_EMAIL, // Change to your verified sender
+          subject: 'Chat-Application | Verification de compte',
+          html: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'EmailVerification.html'), 'utf8').replace('{{USERNAME}}', req.body.username).replace('{{VERIFICATION_URL}}', `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.apigw].domain}:${SERVICES[process.env.NODE_ENV][Services.apigw].port}/api/v1/users/activate?token=${token}`),
+        })
+
         return res.status(200).json({
           message: "Inscription réussie avec success",
         });
@@ -163,7 +256,6 @@ export default class UserController {
 
     } catch (error) {
       //TODO log the error
-      console.log("sign up error")
       console.log(error)
       return res.status(401).json({
         error: "Impossible d'enregistrer l'utilisateur",
@@ -277,7 +369,35 @@ export default class UserController {
 
   };
 
-  public readonly updateFriendRequest = async (req: Request, res: Response): Promise<Response> => {
+  public readonly getUserFriendRequests = async (req: Request, res: Response): Promise<Response> => {
+
+    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+
+    try {
+      const friendRequests = await FriendsRequestModel.find({
+        receiver: userId
+      })
+
+      if (!friendRequests) {
+        return res.status(401).json({
+          error: "Impossible de récupérer vos demandes d'amis",
+        })
+      }
+
+      return res.status(200).json({
+        friendRequests,
+      })
+
+    } catch (error) {
+      console.log(error)
+      return res.status(401).json({
+        error: "Internal server error",
+      });
+    }
+
+  };
+
+  public readonly updateUserFriendRequest = async (req: Request, res: Response): Promise<Response> => {
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
 
 
