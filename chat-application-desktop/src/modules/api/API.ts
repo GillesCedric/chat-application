@@ -3,6 +3,8 @@ import CONFIG from "../../config/config.json"
 import { Tokens } from "../..//utils/Tokens"
 import { redirect } from "react-router-dom"
 
+export type Method = "GET" | "HEAD" | "POST" | "OPTIONS"
+
 
 export default class API {
 	private static readonly tokenPrefix: string = "Bearer ";
@@ -33,6 +35,23 @@ export default class API {
 			access_token,
 			refresh_token,
 		});
+	};
+
+	private static readonly generateURL = async (url: string) => {
+
+		const urlObject = new URL(url)
+
+		const access_token = await window.electron.store.get(
+			"chat-application-access_token"
+		);
+		const refresh_token = await window.electron.store.get(
+			"chat-application-refresh_token"
+		);
+
+		urlObject.searchParams.set('access_token', access_token);
+		urlObject.searchParams.set('refresh_token', refresh_token);
+
+		return urlObject.toString()
 	};
 
 	private static handleRequest = async (responseData: any) => {

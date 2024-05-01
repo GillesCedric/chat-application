@@ -54,7 +54,7 @@ export default class UserController {
   };
 
   public readonly me = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, "access_token")
     try {
       const user = await UserModel.findById(userId).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status")
 
@@ -376,12 +376,13 @@ export default class UserController {
 
   public readonly getUserFriendRequests = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, "access_token")
 
     try {
       const friendRequests = await FriendsRequestModel.find({
-        receiver: userId
-      })
+        receiver: userId,
+        status: Crypto.encrypt(FriendsRequestStatus.pending, "status")
+      }).select("_id sender comment createdAt").populate("sender", "username picture")
 
       if (!friendRequests) {
         return res.status(401).json({
@@ -390,7 +391,21 @@ export default class UserController {
       }
 
       return res.status(200).json({
-        friendRequests,
+        data: friendRequests.map(friendRequest => {
+          return {
+            _id: friendRequest._id,
+            sender: {
+              _id: friendRequest.sender._id,
+              //@ts-ignore
+              username: Crypto.decrypt(friendRequest.sender.username, 'username'),
+              //@ts-ignore
+              picture: Crypto.decrypt(friendRequest.sender.picture, 'database'),
+            },
+            comment: Crypto.decrypt(friendRequest.comment, 'database'),
+            createdAt: friendRequest.createdAt
+          }
+
+        }),
       })
 
     } catch (error) {
