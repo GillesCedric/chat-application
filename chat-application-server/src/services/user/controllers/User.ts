@@ -446,6 +446,7 @@ export default class UserController {
       }
 
       return res.status(200).json({
+        message: 'success',
         data: friendRequests.map(friendRequest => {
           return {
             _id: friendRequest._id,
