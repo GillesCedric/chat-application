@@ -62,8 +62,17 @@ export abstract class UserValidators extends Validators {
         query('access_token').escape().trim().stripLow().isJWT(),
     ]
 
-    public static readonly verify = [
+    public static readonly activateEmail = [
         query('token').escape().trim().stripLow().isJWT()
+    ]
+
+    public static readonly activateTel = [
+        body('access_token').escape().trim().stripLow().isJWT(),
+        body('code').escape().trim().stripLow().isLength({ min: 6, max: 8 }).isAlphanumeric()
+    ]
+
+    public static readonly verifyTel = [
+        body('access_token').escape().trim().stripLow().isJWT(),
     ]
 
 }
@@ -71,13 +80,13 @@ export abstract class ChatValidators extends Validators {
 
     public static readonly addConversation = [
         body('access_token').escape().trim().stripLow().isJWT(),
-        body('members').escape().trim().stripLow().isArray({min: 2}), 
+        body('members').escape().trim().stripLow().isArray({ min: 2 }),
     ]
 
     public static readonly getUserConversations = [
         query('access_token').escape().trim().stripLow().isJWT(),
     ]
-    
+
     public static readonly getUserConversationChats = [
         query('access_token').escape().trim().stripLow().isJWT(),
         param('id').escape().trim().stripLow().isMongoId(),

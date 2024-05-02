@@ -30,7 +30,7 @@ class Server {
         })
 
         // Middleware pour vérifier le token Bearer
-        //this.app.socketServer.use(SocketAuthentication.authenticate)
+        this.app.socketServer.use(SocketAuthentication.authenticate)
 
         Socket.serve(this.app.socketServer)
 

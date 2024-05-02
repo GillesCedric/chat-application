@@ -115,6 +115,10 @@ export default class UserController {
         });
       }
 
+      if (Crypto.decrypt(user.is2FAEnabled, 'boolean') == "true") {
+        
+      }
+
       user.status = Crypto.encrypt(UserStatus.online, "status")
       await user.save()
 
@@ -138,7 +142,7 @@ export default class UserController {
     }
   };
 
-  public readonly activate = async (req: Request, res: Response): Promise<Response> => {
+  public readonly activateEmail = async (req: Request, res: Response): Promise<Response> => {
 
     try {
       const userToken = JWTUtils.getDataFromToken(req.query.token as string)
@@ -188,6 +192,96 @@ export default class UserController {
 
       res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailSuccess.html'))
       return
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Internal server Error",
+      });
+    }
+  };
+
+  public readonly activateTel = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+      const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+
+      const user = await UserModel.findById(userId)
+
+      if (Crypto.decrypt(user.isTelVerified, 'boolean') == "true") {
+        return res.status(403).json({
+          error: "Votre numéro de téléphone a déjà été vérifié",
+        });
+      }
+
+      const token = await TokenModel.findOne({
+        user: userId,
+        key: Crypto.encrypt(Keys.tel, 'status'),
+        purpose: Crypto.encrypt(Purposes.verification, 'status'),
+        validity: { $gt: new Date() }
+      }).sort({ createdAt: -1 })
+
+      if (!token) {
+        return res.status(403).json({
+          error: "Erreur lors de la vérification",
+        });
+      }
+
+      const tokenMatches = bcrypt.compareSync(
+        req.body.code,
+        token.token
+      );
+
+      if (!tokenMatches) {
+        return res.status(403).json({
+          error: "Le code saisie est invalide",
+        });
+      }
+
+      await UserModel.findByIdAndUpdate(userId, {
+        isTelVerified: Crypto.encrypt("true", "boolean")
+      })
+
+      return res.status(200).json({
+        message: "vérification effectuée avec succèss",
+      });
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Internal server Error",
+      });
+    }
+  };
+
+  public readonly verifyTel = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+      const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+
+      const user = await UserModel.findById(userId)
+
+      const userCode = Crypto.random(8).toUpperCase()
+
+      const validity = new Date()
+
+      await TokenModel.insertMany({
+        user: user._id,
+        key: Crypto.encrypt(Keys.tel, 'status'),
+        token: bcrypt.hashSync(userCode, Number.parseInt(process.env.SALT_ROUNDS)),
+        validity: validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.VERIFY_TEL_CODE_DELAY)),
+        purpose: Crypto.encrypt(Purposes.verification, 'status')
+      })
+
+      await Mailer.sendSMS({
+        to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
+        messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
+        body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application'),
+      })
+
+      return res.status(200).json({
+        message: "Message envoyé avec succèss",
+      });
 
     } catch (error) {
       console.log(error);
@@ -447,18 +541,6 @@ export default class UserController {
       } else if (user.id == friendRequest.receiver && req.body.status == FriendsRequestStatus.accepted) {
 
         friendRequest.status = Crypto.encrypt(req.body.status, 'status')
-
-        // const friend = await UserModel.findById(friendRequest.sender)
-
-        // if (!friend.friends.includes(friendRequest.receiver)) friend.friends.push(friendRequest.receiver)
-
-        // if (!user.friends.includes(friendRequest.sender)) user.friends.push(friendRequest.sender)
-
-        // Promise.all([
-        //   user.save(),
-        //   friend.save(),
-        //   friendRequest.save(),
-        // ])
 
         await Promise.all([
           UserModel.findByIdAndUpdate(
