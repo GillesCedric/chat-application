@@ -12,8 +12,8 @@ class Socket {
     this.socket.on("connect", () => {
       console.log("Connected to socket server");
     });
-  }
-
+  } 
+  
   public static disconnect() {
     if (this.socket) {
       this.socket.disconnect();

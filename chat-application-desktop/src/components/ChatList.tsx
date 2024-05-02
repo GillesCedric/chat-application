@@ -1,24 +1,24 @@
 import React from "react";
 import { SearchBar } from "./SearchBar";
-type Chat = {
-  id: number;
-  name: string;
+type Conversation = {
+  _id: number;
+  fullname: string;
   avatar: string;
   lastMessage: string;
   time: string;
   unreadMessages:number
 };
 
-const ChatListItem = ({ chat } : {chat : Chat}) => {
+const ChatListItem = ({ chat } : {chat : any}) => {
   return (
     <div className="flex items-center px-4 py-3 text-black hover:bg-grey-lighter cursor-pointer">
       <img
         className="h-12 w-12 rounded-full object-cover"
         src={chat.avatar}
-        alt={`${chat.name}`}
+        alt={`${chat.firstname}`}
       />
       <div className="ml-4">
-        <p className=" font-semibold">{chat.name}</p>
+        <p className=" font-semibold">{chat.username}</p>
         <p className="text-grey-dark text-sm">{chat.lastMessage}</p>
       </div>
       <span className="ml-auto text-grey-dark text-sm">{chat.time}</span>
@@ -33,13 +33,19 @@ const ChatListItem = ({ chat } : {chat : Chat}) => {
   );
 };
 
-const ChatList = ({ chats } : {chats : Chat[]}) => {
+const ChatList = (chats:any) => {
   return (
-		<div className="w-70 z-10 ">
+    <div className="w-70 z-10 ">
       <div className="overflow-y-auto mt-3">
-        {chats.map((chat) => (
-          <ChatListItem key={chat.id} chat={chat} />
-        ))}
+        {chats.length > 0 ? (
+          <>
+            {chats.map((chat: any) => (
+              <ChatListItem key={chat.id} chat={chat} />
+            ))}
+          </>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

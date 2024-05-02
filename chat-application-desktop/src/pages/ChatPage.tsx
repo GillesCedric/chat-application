@@ -39,6 +39,7 @@ const ChatPage = () => {
     User.getConversations()
       .then((response: any) => {
         if (response) {
+          console.log(response);
           setConversations(response.data);
         } else {
           notify(response.error, "error");
@@ -49,6 +50,8 @@ const ChatPage = () => {
       });
   }
   useEffect(() => {
+    console.log(conversations.length)
+    console.log(conversations)
     fetchConversations();
   }, [newConversation])
   
@@ -77,12 +80,11 @@ const ChatPage = () => {
     <div className="flex flex-col h-screen">
       {showBanner && <OfflineBanner isOnline={isOnline} />}
       <ToastContainer />
-      {/* <MyComponent /> */}
       <div className="sticky top-0 z-10">
         <ChatHeader />
       </div>
       <div className="flex flex-1 overflow-hidden">
-        {conversations.length === 0 ? (
+        {conversations.length == 0 ? (
           <>
             <EmptySection />
           </>

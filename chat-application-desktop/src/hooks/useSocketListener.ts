@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Socket from "../modules/socket/Socket"; // Verify this path
 
-export function useSocketListener(eventName : string) {
+export function useSocketListener(eventName: string) {
   const [eventTriggered, setEventTriggered] = useState(false);
 
   useEffect(() => {
@@ -12,10 +12,10 @@ export function useSocketListener(eventName : string) {
 
     const handleEvent = () => {
       setEventTriggered(true);
+      console.log("Listiners received new : " + eventName);
     };
 
     Socket.socket.on(eventName, handleEvent);
-
     return () => {
       Socket.socket.off(eventName, handleEvent);
     };

@@ -274,7 +274,7 @@ export default class API {
         console.log("error " + error);
       }
       handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.getFriendsRequests();
+      if (handleRequest) return this.getUserConversations();
       return responseData;
     };
   public static readonly getNotifications: (data: any) => Promise<any> = async (
