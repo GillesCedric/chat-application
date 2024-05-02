@@ -284,12 +284,12 @@ export default class ChatController {
           headers: headers(),
           body: JSON.stringify({
             access_token: req.body.access_token,
-            receivers: conversaton.members[0],
+            receivers: [conversaton.members[0]],
             data: {
               _id: savedChat._id,
               message: req.body.message,
               status: ChatStatus.received,
-              isOwnedByUser: savedChat.sender.toString() === userId
+              isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
             },
             event: SocketKeywords.newMessage
           })
@@ -299,12 +299,12 @@ export default class ChatController {
           headers: headers(),
           body: JSON.stringify({
             access_token: req.body.access_token,
-            receivers: conversaton.members[1],
+            receivers: [conversaton.members[1]],
             data: {
               _id: savedChat._id,
               message: req.body.message,
               status: ChatStatus.received,
-              isOwnedByUser: savedChat.sender.toString() === userId
+              isOwnedByUser: savedChat.sender.equals(conversaton.members[1])
             },
             event: SocketKeywords.newMessage
           })

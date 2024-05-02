@@ -18,7 +18,9 @@ export default class Routes {
       .get(...UserValidators.getUserFriendRequests, UserValidators.errors, this.userController.getUserFriendRequests)
     app.route("/friends/request/:id").put(...UserValidators.updateFriendRequest, UserValidators.errors, this.userController.updateUserFriendRequest)
     app.route("/checkUnique").post(this.userController.checkIfExists)
-    app.route("/activate").get(...UserValidators.verify, UserValidators.errors, this.userController.activate)
+    app.route("/activate/email").get(...UserValidators.activateEmail, UserValidators.errors, this.userController.activateEmail)
+    app.route("/activate/tel").post(...UserValidators.activateTel, UserValidators.errors, this.userController.activateTel)
+    app.route("/verify/tel").post(...UserValidators.verifyTel, UserValidators.errors, this.userController.verifyTel)
     //app.route("/connect").post(this.userController.connect)
   }
 }

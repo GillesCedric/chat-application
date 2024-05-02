@@ -1,0 +1,6 @@
+Bonjour {{USERNAME}},
+
+Veuillez confirmer votre numéro de téléphone en saisissant le code de vérification suivant sur notre site : {{CODE}}.
+
+Merci,
+L'Équipe de {{APPNAME}}
