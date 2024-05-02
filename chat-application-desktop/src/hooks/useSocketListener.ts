@@ -12,9 +12,8 @@ export function useSocketListener(eventName: string) {
 
     const handleEvent = () => {
       setEventTriggered(true);
-      console.log("Listiners received new : " + eventName);
+      console.log("Listeners received new : " + eventName);
     };
-
     Socket.socket.on(eventName, handleEvent);
     return () => {
       Socket.socket.off(eventName, handleEvent);

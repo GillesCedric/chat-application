@@ -49,11 +49,9 @@ const ChatPage = () => {
         notify(error , "error");
       });
   }
-  useEffect(() => {
-    console.log(conversations.length)
-    console.log(conversations)
+/*   useEffect(() => {
     fetchConversations();
-  }, [newConversation])
+  }, [newConversation]); */
   
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();

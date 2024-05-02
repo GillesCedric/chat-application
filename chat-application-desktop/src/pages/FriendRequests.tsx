@@ -15,6 +15,7 @@ export const FriendRequest = () => {
     try {
       const response = await User.getFriendsRequests();
       if (response && response.data) {
+        console.log(response.data)
         setFriendRequests(response.data);
         setNewShit(true);
         console.log("Set new shit to true");
