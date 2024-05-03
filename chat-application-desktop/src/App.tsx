@@ -8,6 +8,8 @@ import SignIn from './pages/signin'
 import { useAuthContext } from './context/AuthContext'
 import ChatPage from './pages/ChatPage'
 import { FriendRequest } from './pages/FriendRequests'
+import ForgotPassword from './components/ForgotPassword'
+import VerifyPage from './pages/VerifyPage'
 
 
 export default function App() {
@@ -34,6 +36,8 @@ export default function App() {
             path="/friendsRequests"
             element={authUser ? <FriendRequest /> : <Navigate to="/signin" />}
           />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/verifyPage" element={<VerifyPage isTelVerification = {true} />} />
 
           <Route path="/logout" element={<Logout />} />
           <Route path="*" element={<NotFound />} />

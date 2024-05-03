@@ -5,15 +5,20 @@ import User from "../modules/manager/User";
 import { useSocketListener } from "../hooks/useSocketListener"; // Make sure the path is correct
 import { SocketKeywords } from "../utils/keywords";
 import { EmptyFriendRequest } from "../components/EmptyFriendRequest";
+import Socket from "../modules/socket/Socket";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
-  const hasNewFriendRequest = useSocketListener(SocketKeywords.newNotification);
+  const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
+  const [newShit, setNewShit] = useState(false);
   const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
-      if (response && response.message) {
-        setFriendRequests(response.message);
+      if (response && response.data) {
+        console.log(response.data)
+        setFriendRequests(response.data);
+        setNewShit(true);
+        console.log("Set new shit to true");
       }
     } catch (error) {
       console.error("Error fetching friend requests:", error);
@@ -21,8 +26,12 @@ export const FriendRequest = () => {
   };
 
   useEffect(() => {
+    Socket.connect();
+    Socket.socket.on(SocketKeywords.newConversation, () => {
+      console.log("New conversation received on useEffect socket");
+    });
     fetchFriendRequests();
-  }, [hasNewFriendRequest]); // Re-fetch when new notifications arrive
+  }, [newShit, hasNewFriendRequest]); // Re-fetch when new notifications arrive
 
   return (
     <div className="h-screen flex flex-col">
@@ -34,25 +43,24 @@ export const FriendRequest = () => {
           </span>{" "}
           center
         </div>
-          <p className=" text-wrap text-xs font-normal text-gray-500 dark:text-gray-400">
-            Here you can manage all your friends request, it's better to respond
-            to all of them, either by accepting or rejecting.
-          </p>
+        <p className=" text-wrap text-xs font-normal text-gray-500 dark:text-gray-400">
+          Here you can manage all your friends request, it's better to respond
+          to all of them, either by accepting or rejecting.
+        </p>
       </div>
       <div className="overflow-y-auto flex-grow">
-          {friendRequests.length > 0 ? (
-            friendRequests.map((request) => (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
-
+        {friendRequests.length > 0 ? (
+          friendRequests.map((request) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
               <FriendRequestComponent
                 key={request.id}
                 friendRequest={request}
-                />
-                </div>
-            ))
-          ) : (
-              <EmptyFriendRequest/>
-          )}
+              />
+            </div>
+          ))
+        ) : (
+          <EmptyFriendRequest />
+        )}
       </div>
     </div>
   );

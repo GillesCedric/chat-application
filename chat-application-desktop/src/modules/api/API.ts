@@ -1,10 +1,9 @@
-import { Crypto } from "../crypto/Crypto"
-import CONFIG from "../../config/config.json"
-import { Tokens } from "../..//utils/Tokens"
-import { redirect } from "react-router-dom"
+import { Crypto } from "../crypto/Crypto";
+import CONFIG from "../../config/config.json";
+import { Tokens } from "../..//utils/Tokens";
+import { redirect } from "react-router-dom";
 
-export type Method = "GET" | "HEAD" | "POST" | "OPTIONS"
-
+export type Method = "GET" | "HEAD" | "POST" | "OPTIONS";
 
 export default class API {
   private static readonly tokenPrefix: string = "Bearer ";
@@ -30,29 +29,28 @@ export default class API {
       "chat-application-refresh_token"
     );
 
-		return JSON.stringify({
-			...data,
-			access_token,
-			refresh_token,
-		});
-	};
+    return JSON.stringify({
+      ...data,
+      access_token,
+      refresh_token,
+    });
+  };
 
-	private static readonly generateURL = async (url: string) => {
+  private static readonly generateURL = async (url: string) => {
+    const urlObject = new URL(url);
 
-		const urlObject = new URL(url)
+    const access_token = await window.electron.store.get(
+      "chat-application-access_token"
+    );
+    const refresh_token = await window.electron.store.get(
+      "chat-application-refresh_token"
+    );
 
-		const access_token = await window.electron.store.get(
-			"chat-application-access_token"
-		);
-		const refresh_token = await window.electron.store.get(
-			"chat-application-refresh_token"
-		);
+    urlObject.searchParams.set("access_token", access_token);
+    urlObject.searchParams.set("refresh_token", refresh_token);
 
-		urlObject.searchParams.set('access_token', access_token);
-		urlObject.searchParams.set('refresh_token', refresh_token);
-
-		return urlObject.toString()
-	};
+    return urlObject.toString();
+  };
 
   private static handleRequest = async (responseData: any) => {
     if (
@@ -189,8 +187,8 @@ export default class API {
     return responseData;
   };
 
-  public static readonly sendFriendRequest: (data:any) => Promise<any> =
-    async (data:any): Promise<any> => {
+  public static readonly sendFriendRequest: (data: any) => Promise<any> =
+    async (data: any): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -214,16 +212,15 @@ export default class API {
       let responseData = null;
       let handleRequest = false;
       try {
-        const url  = await this.generateURL(this.apiUrl + "/users/friends/request");
-        const response = await fetch(
-          url,
-          {
-            method: "GET",
-            headers: {
-              ...this.headers,
-            },
-          }
+        const url = await this.generateURL(
+          this.apiUrl + "/users/friends/request"
         );
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            ...this.headers,
+          },
+        });
         responseData = await response.json();
       } catch (error) {
         console.log("error " + error);
@@ -233,34 +230,53 @@ export default class API {
       return responseData;
     };
 
-  public static readonly updateFriendRequest: (id : string , data : any) => Promise<any> =
-    async (id : string , data : any): Promise<any> => {
-        console.log(id)
-        let responseData = null;
-        let handleRequest = false;
-        const url = this.apiUrl +"/users/friends/request/" +id;
-        try {
-          const response = await fetch(
-            url,
-            {
-              method: "PUT",
-              headers: {
-                ...this.headers,
-              },
-              body: await this.generateBody(data),
-            }
-          );
-          responseData = await response.json();
-        } catch (error) {
-          console.log("error " + error);
-        }
-        handleRequest = await this.handleRequest(responseData);
-        if (handleRequest) return this.updateFriendRequest(id, data);
-        return responseData;
-    };
-  public static readonly loadConversation: (data: any) => Promise<any> = async (
+  public static readonly updateFriendRequest: (
+    id: string,
     data: any
-  ): Promise<any> => {};
+  ) => Promise<any> = async (id: string, data: any): Promise<any> => {
+    console.log(id);
+    let responseData = null;
+    let handleRequest = false;
+    const url = this.apiUrl + "/users/friends/request/" + id;
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          ...this.headers,
+        },
+        body: await this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.updateFriendRequest(id, data);
+    return responseData;
+  };
+
+  public static readonly getUserConversations: () => Promise<any> =
+    async (): Promise<any> => {
+      let responseData = null;
+      let handleRequest = false;
+      try {
+        const url = await this.generateURL(
+          this.apiUrl + "/chats/conversations/"
+        );
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            ...this.headers,
+          },
+        });
+        responseData = await response.json();
+      } catch (error) {
+        console.log("error " + error);
+      }
+      handleRequest = await this.handleRequest(responseData);
+      if (handleRequest) return this.getUserConversations();
+      return responseData;
+    };
   public static readonly getNotifications: (data: any) => Promise<any> = async (
     data: any
   ): Promise<any> => {};

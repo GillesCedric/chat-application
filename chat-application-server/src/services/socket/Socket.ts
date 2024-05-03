@@ -32,10 +32,10 @@ export default class Socket {
 		this.socket = socketServer
 
 		this.socket.on(SocketKeywords.connection, async (socket) => {
-
+			console.log("connection client")
 			try {
 
-				const userId = JWTUtils.getUserFromToken(socket.handshake.headers['access-token'] as string, Tokens.accessToken)
+				const userId = JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, Tokens.accessToken)
 
 				// Enregistrer une nouvelle association socketId
 				//await new UserSocketModel({ user: socket.data.userId, socket: socket.id }).save()
