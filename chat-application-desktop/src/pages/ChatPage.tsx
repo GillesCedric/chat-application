@@ -19,9 +19,15 @@ import { AddFriend } from "../components/AddFriend";
 import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
 import User from "../modules/manager/User";
+import { EmptyFriendRequest } from "../components/EmptyFriendRequest";
 const ChatPage = () => {
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
+  const newConversation = useSocketListener(SocketKeywords.newConversation);
+  const [showBanner, setShowBanner] = useState(false);
+  const isOnline = useCheckOnlineStatus();
+  const wasOnlineRef = useRef(isOnline);
+  const [curentFriend, setCurrentFriend] = useState(null);
 
   const handleSendMessage = (newMessage: string) => {
     // Add new message to the messages state
@@ -34,12 +40,11 @@ const ChatPage = () => {
     setMessages([...messages, newMsg]);
   };
 
-  const newConversation = useSocketListener(SocketKeywords.newConversation);
   const fetchConversations = () => {
     User.getConversations()
       .then((response: any) => {
-        if (response) {
-          console.log(response);
+        console.log(response);
+        if (!response.error) {
           setConversations(response.data);
         } else {
           notify(response.error, "error");
@@ -48,14 +53,12 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
-  }
+  };
+
   useEffect(() => {
     fetchConversations();
   }, [newConversation]);
 
-  const [showBanner, setShowBanner] = useState(false);
-  const isOnline = useCheckOnlineStatus();
-  const wasOnlineRef = useRef(isOnline);
   useEffect(() => {
     if (wasOnlineRef.current !== isOnline) {
       if (!isOnline) {
@@ -89,31 +92,43 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${conversations.length === 0 ? "" : "flex-none"
-                }`}
+              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center shadow-sm border-r-2 bg-grey-lighter ${
+                conversations.length === 0 ? "" : "flex-none"
+              }`}
             >
               <div className="sticky top-0">
                 <SearchBar />
               </div>
               <ChatList conversations={conversations} />
             </aside>
-            <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
-              <div className="flex-none">
-                <MessageListHeader
-                  name={friend.name}
-                  isOnline={isOnline}
-                  avatar={friend.avatar}
+            {curentFriend === null ? (
+              <>
+                <EmptyFriendRequest
+                  message="No conversation selected"
+                  smallParagraph="Please choose a connvsersation in your left and click on it to start chating 😉"
                 />
-              </div>
+              </>
+            ) : (
+              <>
+                <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
+                  <div className="flex-none">
+                    <MessageListHeader
+                      name={friend.name}
+                      isOnline={isOnline}
+                      avatar={friend.avatar}
+                    />
+                  </div>
 
-              <div className="flex-grow overflow-y-auto scrollbar-none">
-                <MessageList messages={messages} />
-              </div>
+                  <div className="flex-grow overflow-y-auto scrollbar-none">
+                    <MessageList messages={messages} />
+                  </div>
 
-              <div className="flex-none">
-                <ChatInput onSendMessage={handleSendMessage} />
-              </div>
-            </main>
+                  <div className="flex-none">
+                    <ChatInput onSendMessage={handleSendMessage} />
+                  </div>
+                </main>
+              </>
+            )}
           </>
         )}
       </div>
@@ -121,4 +136,10 @@ const ChatPage = () => {
   );
 };
 
+type CurrentFriend = {
+  _id: string;
+  avatar: string;
+  username: string;
+  status: string;
+};
 export default ChatPage;

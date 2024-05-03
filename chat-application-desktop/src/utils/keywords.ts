@@ -8,9 +8,9 @@ export enum SocketKeywords {
   emit = "emit",
 }
 export enum NotificationTypes {
-	success = "success", 
-	error = "errro", 
-	warning = "warning"
+  success = "success",
+  error = "errro",
+  warning = "warning",
 }
 
 export enum FriendsRequestStatus {
@@ -20,4 +20,12 @@ export enum FriendsRequestStatus {
   deleted = "DELETED",
 }
 
-export const DEFAULT_COMMENT = "Hey there 😁 , \n I want to get in touch with you, let's chat. "
+export const DEFAULT_COMMENT =
+  "Hey there 😁 , \n I want to get in touch with you, let's chat. ";
+
+export const BEGINING_URL = "https://chat-communication/data/users"; 
+export const AVATAR_DEFAULT = "/default/profile/undefined"; 
+export const AVATAR_IDENTIFIER = {
+  man: 0, 
+  girl : 1
+}

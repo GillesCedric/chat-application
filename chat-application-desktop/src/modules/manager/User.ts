@@ -1,6 +1,8 @@
 import API from "../api/API";
 
 export default class User {
+
+
   public static async register(userData: {
     firstname: string;
     lastname: string;
@@ -55,6 +57,7 @@ export default class User {
     username: string;
     comment: string;
   }): Promise<any> {
+    console.log(data.comment);
     try {
       const response = await API.sendFriendRequest({
         username: data.username,
@@ -92,6 +95,24 @@ export default class User {
     }
   }
 
+  public static async updateFriendRequest(
+    id: string,
+    data: any
+  ): Promise<string> {
+    try {
+      const response = await API.updateFriendRequest(id, data);
+      if (response.message) {
+        console.log(response.message);
+        return Promise.resolve("Request successfully accepted");
+      } else {
+        throw new Error(response.error || "Failed to update friend request");
+      }
+    } catch (error) {
+      console.error("Failed to update friend request:", error);
+      return Promise.reject(error.message || "Error updating friend request");
+    }
+  }
+
   public static async getFriendsRequests(): Promise<any> {
     try {
       const response = await API.getFriendsRequests();
@@ -120,36 +141,7 @@ export default class User {
       return { error: error };
     }
   }
-
-  public static async updateFriendRequest(id: string, data: any): Promise<any> {
-    const response = await API.updateFriendRequest(id, data);
-    if (response.message) {
-      console.log(response.message);
-      return {
-        message: "Request successfully accpeted",
-      };
-    }
-    if (response.error) {
-      console.error("Failed to update friend request:", response.error);
-      return { error: response.error };
-    } else if (response.errors) {
-      const errors: any[] = response.errors;
-      const finalError: any[] = [];
-      errors.forEach((error) => {
-        finalError.push(error.msg + " for " + error.path, "error");
-      });
-      console.log(
-        finalError.reduce(
-          (accumulation: [], current: []) => accumulation + " " + current,
-          ""
-        )
-      );
-      return { error: "Failed to update friend reqesst" };
-    }
-  }
-
   public static async getConversations(): Promise<any> {
-
     const response = await API.getUserConversations();
     if (response.message) {
       return {

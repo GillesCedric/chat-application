@@ -24,12 +24,12 @@ export const AddFriend = ({ closeModal }: { closeModal: any }) => {
       notify("Username cannot be empty", "error");
       return;
     }
-    if (comment.trim() === "") {
-      setComment(DEFAULT_COMMENT);
-    }
+     if (comment.trim() === "") {
+       setComment(DEFAULT_COMMENT);
+     }
     User.sendFriendRequest({
       username: username,
-      comment: comment,
+      comment: comment.trim() === "" ? DEFAULT_COMMENT : comment.trim(),
     })
       .then((response: any) => {
         if (response.message) {

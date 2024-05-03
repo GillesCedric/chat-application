@@ -5,33 +5,29 @@ import User from "../modules/manager/User";
 import { useSocketListener } from "../hooks/useSocketListener"; // Make sure the path is correct
 import { SocketKeywords } from "../utils/keywords";
 import { EmptyFriendRequest } from "../components/EmptyFriendRequest";
-import Socket from "../modules/socket/Socket";
+import { notify } from "../components/toastify";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
-  const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
-  const [newShit, setNewShit] = useState(false);
-  const fetchFriendRequests = async () => {
+const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
+    const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
-      if (response && response.data) {
-        console.log(response.data)
+      if (response.message) {
+        console.log(response)
         setFriendRequests(response.data);
-        setNewShit(true);
-        console.log("Set new shit to true");
+      } else {
+        console.log(response.error)
+        notify(response.error, "error"); 
       }
     } catch (error) {
       console.error("Error fetching friend requests:", error);
+      notify(error, "error");
     }
   };
-
   useEffect(() => {
-    Socket.connect();
-    Socket.socket.on(SocketKeywords.newConversation, () => {
-      console.log("New conversation received on useEffect socket");
-    });
     fetchFriendRequests();
-  }, [newShit, hasNewFriendRequest]); // Re-fetch when new notifications arrive
+  }, [hasNewFriendRequest]); // Re-fetch when new notifications arrive
 
   return (
     <div className="h-screen flex flex-col">
@@ -53,13 +49,16 @@ export const FriendRequest = () => {
           friendRequests.map((request) => (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
               <FriendRequestComponent
-                key={request.id}
+                key={request._id}
                 friendRequest={request}
               />
             </div>
           ))
         ) : (
-          <EmptyFriendRequest />
+          <EmptyFriendRequest
+            message="There are no friend request in your center"
+            smallParagraph="Come back later 😉"
+          />
         )}
       </div>
     </div>
