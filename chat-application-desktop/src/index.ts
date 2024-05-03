@@ -15,9 +15,9 @@ const secureStore = new SecureStore("chat-application-desktop-encryption-generat
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
-
-/* secureStore.set("chat-application-access_token", "null")
-secureStore.set("chat-application-refresh_token", "null") */
+/* Acces token persitency here */
+secureStore.set("chat-application-access_token", "null")
+secureStore.set("chat-application-refresh_token", "null")
 
 // IPC listener
 ipcMain.on('electron-store-get', (event, val) => {

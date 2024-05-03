@@ -1,21 +1,26 @@
-import React, { useRef, useState } from "react";
+/* import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faBroom } from "@fortawesome/free-solid-svg-icons";
-import { Notification } from "./Notification";
+import { NotificationCenter } from "../models/NotifiactionCenter";
+import { Notification } from "../models/Notification";
+import { Notification as NotificationPanel } from "./Notification";
 
 export const NotificationDrawer = ({
   isOpen,
   onClose,
-  initialNotifications,
-  notificationCount,
 }: {
   isOpen: boolean;
-  onClose: any;
-  initialNotifications: any;
-  notificationCount: any;
+  onClose: () => void;
 }) => {
-  const drawerRef = useRef();
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const drawerRef = useRef(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const notificationCenter: NotificationCenter =
+    NotificationCenter.getInstance();
+
+  useEffect(() => {
+    const currentNotifications = notificationCenter.getNotifications();
+    setNotifications(currentNotifications);
+  }, [notificationCenter]);
 
   const handleClose = (e: any) => {
     if (drawerRef.current === e.target) {
@@ -24,15 +29,15 @@ export const NotificationDrawer = ({
   };
 
   const markAllAsRead = () => {
-    const updatedNotifications = notifications.map((notification: any) => ({
-      ...notification,
-      unread: false,
-    }));
-    setNotifications(updatedNotifications);
+    notificationCenter.markAllAsRead();
+    const currentNotifications = notificationCenter.getNotifications();
+    setNotifications(currentNotifications);
   };
 
   const clearAllNotifications = () => {
-    setNotifications([]);
+    notificationCenter.deleteAll();
+    const currentNotifications = notificationCenter.getNotifications();
+    setNotifications(currentNotifications);
   };
 
   return (
@@ -60,7 +65,7 @@ export const NotificationDrawer = ({
           <EmptySectionNotification />
         ) : (
           <div className="scrollbar-none pt-10 pb-20 overflow-y-auto">
-            <Notification
+            <NotificationPanel
               notifications={notifications}
               setNotifications={setNotifications}
             />
@@ -86,7 +91,7 @@ export const NotificationDrawer = ({
   );
 };
 
-export const EmptySectionNotification = () => {
+const EmptySectionNotification = () => {
   return (
     <>
       <div className="w-full flex items-center flex-wrap justify-center gap-10 h-screen">
@@ -111,3 +116,4 @@ export const EmptySectionNotification = () => {
     </>
   );
 };
+ */

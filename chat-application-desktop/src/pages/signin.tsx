@@ -96,16 +96,16 @@ export default function SignIn() {
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label
-                      htmlFor="remember"
+                    <Link
+                      to="/VerifyPage"
                       className="text-gray-500 dark:text-gray-300"
                     >
                       Remember me
-                    </label>
+                    </Link>
                   </div>
                 </div>
                 <Link
-                  to="/resetPassword"
+                  to="/forgotPassword"
                   className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
                 >
                   Forgot password?

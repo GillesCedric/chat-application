@@ -3,7 +3,7 @@ import { toast, ToastContainer, Zoom } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NotifyAsync } from "./NotifyAsync";
 
-const myAsyncFunction = () => {
+export const myAsyncFunction = () => {
   // Replace this with your actual asynchronous operation
   return new Promise((resolve, reject) => {
     setTimeout(() => {

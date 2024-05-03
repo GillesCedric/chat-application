@@ -9,21 +9,18 @@ import { SearchBar } from "../components/SearchBar";
 import Socket from "../modules/socket/Socket";
 import { friend } from "../components/FriendDataTest";
 import { conversation } from "../components/ConversationDataTest";
-import { useCheckOnlineStatus } from "../Hooks/useCheckOnlineStatus";
+import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
-import MyComponent from "../components/Test";
-import UserRepository from "../modules/repository/UserRepository";
+import { useSocketListener } from "../hooks/useSocketListener";
+import { SocketKeywords } from "../utils/keywords";
+import User from "../modules/manager/User";
 const ChatPage = () => {
-
-  //Socket connection to the server
-  Socket.connect()
-
-  const [chats, setChats] = useState(ChatDataTest);
+  const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState<any[]>([]);
 
   const handleSendMessage = (newMessage: string) => {
@@ -37,24 +34,25 @@ const ChatPage = () => {
     setMessages([...messages, newMsg]);
   };
 
-  /* useEffect(() => {
-    const data = {
-      username : "lilo"
-    };
-    UserRepository.getUsersFriends(data).
-      then((response) => {
-        if (response.message) {
-          setChats(response.message);
+  const newConversation = useSocketListener(SocketKeywords.newConversation); 
+  const fetchConversations = () => {
+    User.getConversations()
+      .then((response: any) => {
+        if (response) {
+          console.log(response);
+          setConversations(response.data);
+        } else {
+          notify(response.error, "error");
         }
-        else {
-          notify("Failed to load user's chat list " , "error");
-        }
-      }).
-      catch((error) => {
-        notify("Failed to load user's chat list" , "error");
-        console.log(error);
       })
-  },[chats]) */
+      .catch((error: any) => {
+        notify(error , "error");
+      });
+  }
+/*   useEffect(() => {
+    fetchConversations();
+  }, [newConversation]); */
+  
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();
   const wasOnlineRef = useRef(isOnline);
@@ -80,12 +78,11 @@ const ChatPage = () => {
     <div className="flex flex-col h-screen">
       {showBanner && <OfflineBanner isOnline={isOnline} />}
       <ToastContainer />
-      {/* <MyComponent /> */}
       <div className="sticky top-0 z-10">
         <ChatHeader />
       </div>
       <div className="flex flex-1 overflow-hidden">
-        {chats.length === 0 ? (
+        {conversations.length == 0 ? (
           <>
             <EmptySection />
           </>
@@ -93,13 +90,13 @@ const ChatPage = () => {
           <>
             <aside
               className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${
-                chats.length === 0 ? "" : "flex-none"
+                conversations.length === 0 ? "" : "flex-none"
               }`}
             >
               <div className="sticky top-0">
                 <SearchBar />
               </div>
-              <ChatList chats={chats} />
+              <ChatList conversations={conversations} />
             </aside>
             <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
               <div className="flex-none">
