@@ -62,17 +62,31 @@ export abstract class UserValidators extends Validators {
         query('access_token').escape().trim().stripLow().isJWT(),
     ]
 
+    public static readonly updateProfile = [
+        body('access_token').escape().trim().stripLow().isJWT(),
+        body('firstname').escape().trim().stripLow().isAlphanumeric().notEmpty().optional(),
+        body('lastname').escape().trim().stripLow().isAlphanumeric().notEmpty().optional(),
+        body('username', 'username must contains at least 6 characters, without specials characters').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }).optional(),
+        body('password', 'Password must contains al least 8 characters, 1 lowercase, 1 uppercase and 1 symbol').escape().trim().stripLow().isStrongPassword().optional(),
+        body('is2FAEnabled').escape().trim().stripLow().isBoolean().optional(),
+    ]
+
     public static readonly activateEmail = [
         query('token').escape().trim().stripLow().isJWT()
     ]
 
     public static readonly activateTel = [
         body('access_token').escape().trim().stripLow().isJWT(),
-        body('code').escape().trim().stripLow().isLength({ min: 6, max: 8 }).isAlphanumeric()
+        body('code').escape().trim().stripLow().isLength({ min: 6, max: 6 }).isNumeric()
     ]
 
     public static readonly verifyTel = [
         body('access_token').escape().trim().stripLow().isJWT(),
+    ]
+
+    public static readonly connect = [
+        body('userId').escape().trim().stripLow().isMongoId(),
+        body('code').escape().trim().stripLow().isLength({ min: 6, max: 6 }).isNumeric()
     ]
 
 }

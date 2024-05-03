@@ -15,8 +15,6 @@ interface IUser extends mongoose.Document {
   isEmailVerified: string;
   isTelVerified: string;
   is2FAEnabled: string;
-  twoFASecret: string;
-  twoFASecretExpiration: Date;
   picture: string;
   status: string
   friends: mongoose.Types.ObjectId[];
@@ -63,14 +61,6 @@ const userSchema = new mongoose.Schema({
   is2FAEnabled: {
     type: String,
     required: true,
-  },
-  twoFASecret: {
-    type: String,
-    required: false
-  },
-  twoFASecretExpiration: {
-    type: Date,
-    required: false
   },
   picture: {
     type: String,
