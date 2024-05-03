@@ -187,7 +187,8 @@ export default class ChatController {
         {
           $project: {
             _id: 1,
-            'memberDetails.username': 1,
+            'memberDetails.firstname': 1,
+            'memberDetails.lastname': 1,
             'memberDetails.picture': 1,
             'memberDetails.status': 1,
             'lastMessageDetails.message': 1,
@@ -213,7 +214,7 @@ export default class ChatController {
             message: conversation.lastMessageDetails && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
           },
           unreadCount: conversation.unreadCount,
-          username: Crypto.decrypt(conversation.memberDetails.username, "username"),
+          fullname: `${Crypto.decrypt(conversation.memberDetails.firstname, 'database')} ${Crypto.decrypt(conversation.memberDetails.lastname, 'database')}`,
           picture: Crypto.decrypt(conversation.memberDetails.picture, "database"),
           status: Crypto.decrypt(conversation.memberDetails.status, "status"),
         };

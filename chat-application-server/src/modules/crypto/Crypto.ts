@@ -174,6 +174,18 @@ export class Crypto {
 	}
 
 	/**
+	 * @function randomInt
+	 * @description this __OBJECT__ is used to generate a pseudo random int word
+	 * @param {number} length {10} the length of the word
+	 * @returns {string} s.e.
+	 */
+	public static readonly randomInt = (length: number = this.randomLength, min: number = 1, max: number = 9): string => {
+		let text = ''
+		for (let i = 0; i < length; i++) text += Math.floor(Math.random() * (max - min + 1)) + min
+		return text
+	}
+
+	/**
 	 * @function identifier
 	 * @description this __OBJECT__ is used to generate a random unique identifier
 	 * @param {string} suffix {''} s.e.

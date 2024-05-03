@@ -1,6 +1,6 @@
 Bonjour {{USERNAME}},
 
-Veuillez confirmer votre numéro de téléphone en saisissant le code de vérification suivant sur notre site : {{CODE}}.
+Pour vous connecter, veuillez saisir le code suivant : {{CODE}}.
 Attention ce code expirera exactement dans {{CODE_DELAY}} minutes.
 
 Merci,

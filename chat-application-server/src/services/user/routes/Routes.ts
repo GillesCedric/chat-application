@@ -9,7 +9,9 @@ export default class Routes {
     app.route("/").get(this.userController.getAll)
     app.route("/token").put(...UserValidators.updateTokens, UserValidators.errors, this.userController.updateTokens)
     app.route("/token").post(...UserValidators.isValidTokens, UserValidators.errors, this.userController.isValidTokens)
-    app.route("/me").get(...UserValidators.me, UserValidators.errors, this.userController.me)
+    app.route("/me")
+      .get(...UserValidators.me, UserValidators.errors, this.userController.me)
+      .patch(...UserValidators.updateProfile, UserValidators.errors, this.userController.updateProfile)
     app.route("/signin").post(...UserValidators.signIn, UserValidators.errors, this.userController.signIn)
     app.route("/signup").post(...UserValidators.signUp, UserValidators.errors, this.userController.signUp)
     app.route("/friends").get(this.userController.getUserFriends)
@@ -21,6 +23,6 @@ export default class Routes {
     app.route("/activate/email").get(...UserValidators.activateEmail, UserValidators.errors, this.userController.activateEmail)
     app.route("/activate/tel").post(...UserValidators.activateTel, UserValidators.errors, this.userController.activateTel)
     app.route("/verify/tel").post(...UserValidators.verifyTel, UserValidators.errors, this.userController.verifyTel)
-    //app.route("/connect").post(this.userController.connect)
+    app.route("/connect").post(...UserValidators.connect, UserValidators.errors, this.userController.connect)
   }
 }
