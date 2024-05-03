@@ -32,7 +32,7 @@ export default class Socket {
 		this.socket = socketServer
 
 		this.socket.on(SocketKeywords.connection, async (socket) => {
-
+			console.log("connection client")
 			try {
 
 				const userId = JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, Tokens.accessToken)

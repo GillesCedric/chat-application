@@ -6,26 +6,26 @@ type Conversation = {
   avatar: string;
   lastMessage: string;
   time: string;
-  unreadMessages:number
+  unreadMessages: number
 };
 
-const ChatListItem = ({ chat } : {chat : any}) => {
+const ChatListItem = ({ chat }: { chat: any }) => {
   return (
     <div className="flex items-center px-4 py-3 text-black hover:bg-grey-lighter cursor-pointer">
       <img
         className="h-12 w-12 rounded-full object-cover"
-        src={chat.avatar}
+        src={chat.picture}
         alt={`${chat.firstname}`}
       />
       <div className="ml-4">
         <p className=" font-semibold">{chat.username}</p>
-        <p className="text-grey-dark text-sm">{chat.lastMessage}</p>
+        <p className="text-grey-dark text-sm">{chat.lastMessage.message}</p>
       </div>
-      <span className="ml-auto text-grey-dark text-sm">{chat.time}</span>
-      {chat.unreadMessages > 0 && (
+      <span className="ml-auto text-grey-dark text-sm">{chat.lastMessage.date}</span>
+      {chat.unreadCount > 0 && (
         <>
           <span className="bg-red-500 text-white text-xs font-bold py-1 px-2 rounded-full ml-4">
-            {chat.unreadMessages}
+            {chat.unreadCount}
           </span>
         </>
       )}
@@ -33,13 +33,14 @@ const ChatListItem = ({ chat } : {chat : any}) => {
   );
 };
 
-const ChatList = (chats:any) => {
+const ChatList = ({ conversations }: { conversations: any }) => {
+  console.log(conversations.length)
   return (
     <div className="w-70 z-10 ">
       <div className="overflow-y-auto mt-3">
-        {chats.length > 0 ? (
+        {conversations.length > 0 ? (
           <>
-            {chats.map((chat: any) => (
+            {conversations.map((chat: any) => (
               <ChatListItem key={chat.id} chat={chat} />
             ))}
           </>

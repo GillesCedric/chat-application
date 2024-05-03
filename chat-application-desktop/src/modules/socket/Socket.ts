@@ -7,16 +7,14 @@ class Socket {
   public static socket: SocketClient;
 
   private static async getAccessToken() {
-    return  await window.electron.store.get(
+    return await window.electron.store.get(
       "chat-application-access_token"
     );
   }
   public static async connect() {
     const extraHeaders = {
-        Authorization:
-          "Basic " +
-          Crypto.encode(`${CONFIG.basic_username}:${CONFIG.basic_password}`),
-        Token: "Bearer " + this.getAccessToken(),
+      Authorization: "Basic " + Crypto.encode(`${CONFIG.basic_username}:${CONFIG.basic_password}`),
+      Token: "Bearer " + await this.getAccessToken(),
     }
     this.socket = io(`${CONFIG.socket_url}/`, {
       extraHeaders: extraHeaders,

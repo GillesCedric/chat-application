@@ -10,14 +10,14 @@ export function useSocketListener(eventName: string) {
       Socket.connect();
     }
 
-    const handleEvent = () => {
-      setEventTriggered(true);
-      console.log("Listeners received new : " + eventName);
-    };
-    Socket.socket.on(eventName, handleEvent);
-    return () => {
-      Socket.socket.off(eventName, handleEvent);
-    };
+    // const handleEvent = () => {
+    //   setEventTriggered(true);
+    //   console.log("Listeners received new : " + eventName);
+    // };
+    // Socket.socket.on(eventName, handleEvent);
+    // return () => {
+    //   Socket.socket.off(eventName, handleEvent);
+    // };
   }, [eventName]);
 
   return eventTriggered;

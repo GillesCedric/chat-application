@@ -9,7 +9,7 @@ import Socket from "../modules/socket/Socket";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
-   const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
+  const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
   const [newShit, setNewShit] = useState(false);
   const fetchFriendRequests = async () => {
     try {

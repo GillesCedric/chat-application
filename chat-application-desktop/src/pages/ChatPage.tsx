@@ -34,7 +34,7 @@ const ChatPage = () => {
     setMessages([...messages, newMsg]);
   };
 
-  const newConversation = useSocketListener(SocketKeywords.newConversation); 
+  const newConversation = useSocketListener(SocketKeywords.newConversation);
   const fetchConversations = () => {
     User.getConversations()
       .then((response: any) => {
@@ -46,13 +46,13 @@ const ChatPage = () => {
         }
       })
       .catch((error: any) => {
-        notify(error , "error");
+        notify(error, "error");
       });
   }
-/*   useEffect(() => {
+  useEffect(() => {
     fetchConversations();
-  }, [newConversation]); */
-  
+  }, [newConversation]);
+
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();
   const wasOnlineRef = useRef(isOnline);
@@ -89,9 +89,8 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${
-                conversations.length === 0 ? "" : "flex-none"
-              }`}
+              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${conversations.length === 0 ? "" : "flex-none"
+                }`}
             >
               <div className="sticky top-0">
                 <SearchBar />
