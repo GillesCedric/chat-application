@@ -636,7 +636,7 @@ export default class UserController {
       const friendRequests = await FriendsRequestModel.find({
         receiver: userId,
         status: Crypto.encrypt(FriendsRequestStatus.pending, "status")
-      }).select("_id sender comment createdAt").populate("sender", "username picture")
+      }).select("_id sender comment createdAt").populate("sender", "firstname lastname picture")
 
       if (!friendRequests) {
         return res.status(401).json({
@@ -652,7 +652,7 @@ export default class UserController {
             sender: {
               _id: friendRequest.sender._id,
               //@ts-ignore
-              username: Crypto.decrypt(friendRequest.sender.username, 'username'),
+              fullname: `${Crypto.decrypt(friendRequest.sender.firstname, 'database')} ${Crypto.decrypt(friendRequest.sender.lastname, 'database') }`,
               //@ts-ignore
               picture: Crypto.decrypt(friendRequest.sender.picture, 'database'),
             },
