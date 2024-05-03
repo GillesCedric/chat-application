@@ -210,7 +210,7 @@ export default class ChatController {
           _id: conversation._id,
           lastMessage: {
             date: conversation.lastMessageDate,
-            message: conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
+            message: conversation.lastMessageDetails && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
           },
           unreadCount: conversation.unreadCount,
           username: Crypto.decrypt(conversation.memberDetails.username, "username"),
