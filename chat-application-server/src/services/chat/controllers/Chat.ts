@@ -125,95 +125,74 @@ export default class ChatController {
       const userId = JWTUtils.getUserFromToken(req.query.access_token as string, Tokens.accessToken)
 
       let conversations = await ConversationModel.aggregate([
-        // Étape 1: Trouver toutes les conversations impliquant l'utilisateur
-        {
-          $match: {
-            members: new mongoose.Types.ObjectId(userId)
-          }
-        },
-        // Étape 2: Joindre avec la collection 'Chats'
-        {
-          $lookup: {
-            from: 'chats', // Le nom de la collection de chats dans MongoDB
-            localField: '_id',
-            foreignField: 'conversation',
-            as: 'chats'
-          }
-        },
-        // Étape 3: Ajouter des champs pour le dernier message et le nombre de messages non lus
-        {
-          $addFields: {
-            lastMessageDate: { $max: "$chats.createdAt" },
-            lastMessageDetails: {
-              $first: {
-                $arrayElemAt: [
-                  {
-                    $filter: {
-                      input: { $slice: [{ $sortArray: { input: "$chats", sortBy: { createdAt: -1 } } }, 1] },
-                      as: "chat",
-                      cond: {
-                        $and: [
-                          { $eq: ["$$chat.status", Crypto.encrypt(ChatStatus.received, "status")] },
-                          { $ne: ["$$chat.deleted", Crypto.encrypt("true", "boolean")] }
-                        ]
-                      }
-                    }
-                  },
-                  0
-                ]
-              }
-            },
-            unreadCount: {
-              $size: {
-                $filter: {
-                  input: "$chats",
-                  as: "chat",
-                  cond: {
-                    $and: [
-                      { $eq: ["$$chat.status", Crypto.encrypt(ChatStatus.received, "status")] }, // Filtrer pour le statut 'RECEIVED'
-                      { $ne: ["$$chat.deleted", Crypto.encrypt("true", "boolean")] }      // Assurer que le message n'est pas supprimé
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        // Étape 4: Joindre avec la collection 'Users' pour obtenir les détails des membres
+        { $match: { members: new mongoose.Types.ObjectId(userId) } },
         {
           $lookup: {
             from: 'users',
-            let: { memberList: "$members" },
+            localField: 'members',
+            foreignField: '_id',
+            as: 'memberDetails'
+          }
+        },
+        { $unwind: '$memberDetails' },
+        { $match: { 'memberDetails._id': { $ne: new mongoose.Types.ObjectId(userId) } } },
+        {
+          $lookup: {
+            from: 'chats',
+            let: { conversationId: '$_id' },
             pipeline: [
               {
                 $match: {
                   $expr: {
                     $and: [
-                      { $in: ["$_id", "$$memberList"] },
-                      { $ne: ["$_id", new mongoose.Types.ObjectId(userId)] } // Exclure l'utilisateur actuel
+                      { $eq: ['$conversation', '$$conversationId'] },
+                      { $ne: ['$deleted', Crypto.encrypt("true", "boolean")] }
                     ]
                   }
                 }
               },
+              { $sort: { createdAt: -1 } },
+              { $limit: 1 }
+            ],
+            as: 'lastMessage'
+          }
+        },
+        {
+          $lookup: {
+            from: 'chats',
+            let: { conversationId: '$_id' },
+            pipeline: [
               {
-                $project: {
-                  _id: 1,
-                  username: 1,
-                  picture: 1,
-                  status: 1
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$conversation', '$$conversationId'] },
+                      { $eq: ['$status', Crypto.encrypt(ChatStatus.received, "status")] }, // Assurez-vous que le statut est 'received'
+                      { $ne: ['$deleted', Crypto.encrypt("true", "boolean")] } // Assurez-vous que le message n'est pas supprimé
+                    ]
+                  }
                 }
               }
             ],
-            as: 'membersDetails'
+            as: 'unreadMessages'
           }
         },
-        // Étape 5: Projeter les champs nécessaires
+        {
+          $addFields: {
+            lastMessageDate: { $arrayElemAt: ['$lastMessage.createdAt', 0] },
+            lastMessageDetails: { $arrayElemAt: ['$lastMessage', 0] },
+            unreadCount: { $size: '$unreadMessages' } // Calcul du nombre de messages non lus
+          }
+        },
         {
           $project: {
-            lastMessageDate: 1,
-            lastMessageDetails: 1,
-            unreadCount: 1,
-            membersDetails: 1
+            _id: 1,
+            'memberDetails.username': 1,
+            'memberDetails.picture': 1,
+            'memberDetails.status': 1,
+            'lastMessageDetails.message': 1,
+            'lastMessageDate': 1,
+            unreadCount: 1
           }
         }
       ])
@@ -229,13 +208,14 @@ export default class ChatController {
         // Retourner la conversation mise à jour avec les membres déchiffrés
         return {
           _id: conversation._id,
-          lastMessageDate: conversation.lastMessageDate,
-          lastMessageDetails: conversation.lastMessageDetails && Crypto.decrypt(conversation.lastMessageDetails, "database"),
+          lastMessage: {
+            date: conversation.lastMessageDate,
+            message: conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
+          },
           unreadCount: conversation.unreadCount,
-          userId: conversation.membersDetails[0]._id,
-          username: Crypto.decrypt(conversation.membersDetails[0].username, "username"),
-          picture: Crypto.decrypt(conversation.membersDetails[0].picture, "database"),
-          status: Crypto.decrypt(conversation.membersDetails[0].status, "status"),
+          username: Crypto.decrypt(conversation.memberDetails.username, "username"),
+          picture: Crypto.decrypt(conversation.memberDetails.picture, "database"),
+          status: Crypto.decrypt(conversation.memberDetails.status, "status"),
         };
       });
 
