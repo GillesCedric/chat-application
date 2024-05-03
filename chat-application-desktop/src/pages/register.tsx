@@ -240,8 +240,6 @@ export default function Register() {
     if (emailRef.current && emailcheckRef.current) {
       const email = emailRef.current.value.trim();
       if (FormValidator.hasEmailFormat(email)) {
-        // Check if email is unique
-        // code ...
         emailcheckRef.current.className = "hidden";
         return true;
       } else {
