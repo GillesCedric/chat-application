@@ -89,6 +89,41 @@ export default class UserController {
       });
     }
   };
+
+  public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
+    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+    const { firstname, lastname, username, password, is2FAEnabled } = req.body
+    try {
+      const updates: {
+        firstname?: string
+        lastname?: string
+        username?: string
+        password?: string
+        is2FAEnabled?: string
+      } = {}
+      if (firstname) updates.firstname = Crypto.encrypt(firstname, "database");
+      if (lastname) updates.lastname = Crypto.encrypt(lastname, "database");
+      if (username) updates.username = Crypto.encrypt(username, "username");
+      if (password) updates.password = bcrypt.hashSync(
+        password,
+        Number.parseInt(process.env.SALT_ROUNDS)
+      )
+      if (is2FAEnabled) updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
+      // Mise à jour de l'utilisateur dans la base de données
+      const updatedUser = await UserModel.findByIdAndUpdate(userId, updates, { new: true }).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status");
+
+      return res.status(200).json({
+        message: 'Profile updated successfully',
+        data: updatedUser
+      })
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Erreur lors de la modifications des informations",
+      });
+    }
+  };
+
   public readonly signIn = async (
     req: Request,
     res: Response
@@ -123,7 +158,29 @@ export default class UserController {
       }
 
       if (Crypto.decrypt(user.is2FAEnabled, 'boolean') == "true") {
-        
+        const userCode = Crypto.randomInt(6)
+
+        const validity = new Date()
+
+        await TokenModel.insertMany({
+          user: user._id,
+          key: Crypto.encrypt(Keys.tel, 'status'),
+          token: bcrypt.hashSync(userCode, Number.parseInt(process.env.SALT_ROUNDS)),
+          validity: validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.TWOFA_TEL_CODE_DELAY)),
+          purpose: Crypto.encrypt(Purposes.connection, 'status')
+        })
+
+        await Mailer.sendSMS({
+          to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
+          messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
+          body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.TWOFA_TEL_CODE_DELAY),
+        })
+
+        return res.status(200).json({
+          message: "connection pending",
+          reason: "2FAEnabled",
+        });
+
       }
 
       user.status = Crypto.encrypt(UserStatus.online, "status")
@@ -273,7 +330,7 @@ export default class UserController {
 
       const user = await UserModel.findById(userId)
 
-      const userCode = Crypto.random(8).toUpperCase()
+      const userCode = Crypto.randomInt(6)
 
       const validity = new Date()
 
@@ -288,11 +345,63 @@ export default class UserController {
       await Mailer.sendSMS({
         to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
         messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
-        body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application'),
+        body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.VERIFY_TEL_CODE_DELAY),
       })
 
       return res.status(200).json({
         message: "Message envoyé avec succèss",
+      });
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Internal server Error",
+      });
+    }
+  };
+
+  public readonly connect = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+
+      const token = await TokenModel.findOne({
+        user: req.body.userId,
+        key: Crypto.encrypt(Keys.tel, 'status'),
+        purpose: Crypto.encrypt(Purposes.connection, 'status'),
+        validity: { $gt: new Date() }
+      }).sort({ createdAt: -1 })
+
+      if (!token) {
+        return res.status(403).json({
+          error: "Erreur lors de la vérification",
+        });
+      }
+
+      const tokenMatches = bcrypt.compareSync(
+        req.body.code,
+        token.token
+      );
+
+      if (!tokenMatches) {
+        return res.status(403).json({
+          error: "Le code saisie est invalide",
+        });
+      }
+
+      const user = await UserModel.findByIdAndUpdate(req.body.userId, {
+        status: Crypto.encrypt(UserStatus.online, "status")
+      })
+
+      return res.status(200).json({
+        message: "connection success",
+        access_token: JWTUtils.generateTokenForUser(
+          user.id,
+          Tokens.accessToken
+        ),
+        refresh_token: JWTUtils.generateTokenForUser(
+          user.id,
+          Tokens.refreshToken
+        ),
       });
 
     } catch (error) {
@@ -323,7 +432,7 @@ export default class UserController {
         isTelVerified: Crypto.encrypt("false", "boolean"),
         is2FAEnabled: Crypto.encrypt("false", "boolean"),
         picture: Crypto.encrypt(
-          "/default/profile/" + req.body.picture,
+          `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.apigw].domain}:${SERVICES[process.env.NODE_ENV][Services.apigw].port}/images/default/profile/${req.body.picture}`,
           "database"
         ),
         status: Crypto.encrypt(UserStatus.offline, "status"),
@@ -377,8 +486,8 @@ export default class UserController {
                 SERVICES[process.env.NODE_ENV][Services.apigw].domain
               }:${
                 SERVICES[process.env.NODE_ENV][Services.apigw].port
-              }/api/v1/users/activate?token=${token}`
-            ),
+              }/api/v1/users/activate/email?token=${token}`
+          ).replace('{{CODE_DELAY}}', (process.env.VERIFY_EMAIL_CODE_DELAY as unknown as number / 60) as unknown as string),
         });
 
         return res.status(200).json({
@@ -527,7 +636,7 @@ export default class UserController {
       const friendRequests = await FriendsRequestModel.find({
         receiver: userId,
         status: Crypto.encrypt(FriendsRequestStatus.pending, "status")
-      }).select("_id sender comment createdAt").populate("sender", "username picture")
+      }).select("_id sender comment createdAt").populate("sender", "firstname lastname picture")
 
       if (!friendRequests) {
         return res.status(401).json({
@@ -543,7 +652,7 @@ export default class UserController {
             sender: {
               _id: friendRequest.sender._id,
               //@ts-ignore
-              username: Crypto.decrypt(friendRequest.sender.username, 'username'),
+              fullname: `${Crypto.decrypt(friendRequest.sender.firstname, 'database')} ${Crypto.decrypt(friendRequest.sender.lastname, 'database') }`,
               //@ts-ignore
               picture: Crypto.decrypt(friendRequest.sender.picture, 'database'),
             },
