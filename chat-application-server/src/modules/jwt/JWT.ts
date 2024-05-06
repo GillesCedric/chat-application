@@ -1,4 +1,5 @@
 import * as jwt from "jsonwebtoken";
+import { userLogger } from "modules/logger/Logger";
 
 export type TokenType = "access_token" | "refresh_token"
 
@@ -13,8 +14,8 @@ export type TokenType = "access_token" | "refresh_token"
  */
 export default abstract class JWTUtils {
 
-  public static readonly generateTokenForUser: (id: string | number, tokenType: TokenType) => string = (id: string, tokenType: TokenType): string => {
-    return jwt.sign({ userId: id }, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY, { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY })
+  public static readonly generateTokenForUser: (id: string | number, userAgent: string, tokenType: TokenType) => string = (id: string, userAgent: string, tokenType: TokenType): string => {
+    return jwt.sign({ userId: id, userAgent: userAgent }, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY, { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY })
   }
 
   public static readonly generateTokenWithData: (data: any) => string = (data: any): string => {
@@ -44,8 +45,9 @@ export default abstract class JWTUtils {
    * @private
    * @returns {number}
    */
-  public static readonly getUserFromToken: (token: string, tokenType: TokenType) => string | undefined = (
+  public static readonly getUserFromToken: (token: string, userAgent: string, tokenType: TokenType) => string | undefined = (
     token: string,
+    userAgent: string,
     tokenType: TokenType
   ): string | undefined => {
     token = this.parseToken(token)
@@ -53,7 +55,8 @@ export default abstract class JWTUtils {
     try {
       const jwtToken = jwt.verify(token, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY);
 
-      if (jwtToken) {
+      //@ts-ignore
+      if (jwtToken && jwtToken.userAgent as unknown as string == userAgent) {
         //@ts-ignore
         userId = jwtToken.userId as unknown as number;
       }

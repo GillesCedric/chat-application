@@ -6,24 +6,37 @@ import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/AuthContext";
+import { error } from "console";
 export default function SignIn() {
 
   const { authUser, setAuthUser } = useAuthContext()
+  const [csrfToken, setCsrfToken] = useState('');
 
+  const csrfTokenRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    API.getCSRFToken().then((data) => {
+      setCsrfToken(data.token)
+    })
+  }, [])
 
   const signIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     console.log(passwordRef.current?.value);
     event.preventDefault();
     API.login({
+      _csrf: csrfTokenRef.current?.value,
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
-    })
+    }, { "csrf-token": csrfToken})
       .then((data: any) => {
-        if (data.message) {
-          window.electron.store.set('chat-application-access_token', data.access_token)
-          window.electron.store.set('chat-application-refresh_token', data.refresh_token)
+        if (data.reason && data.reason == "2FAEnabled") {
+          // TODO redirect to code verification page
+          console.log("Redirection")
+        } else if (data.message) {
+          //window.electron.store.set('chat-application-access_token', data.access_token)
+          //window.electron.store.set('chat-application-refresh_token', data.refresh_token)
           setAuthUser(data.access_token)
         } else if (data.error) {
           if (data.error === "already authenticated") {
@@ -52,6 +65,7 @@ export default function SignIn() {
             </h1>
             <form className="space-y-4 md:space-y-6" action="#">
               <div>
+                <input ref={csrfTokenRef} type="hidden" name="_csrf" value={csrfToken} />
                 <label
                   htmlFor="email"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

@@ -186,6 +186,16 @@ export class Crypto {
 	}
 
 	/**
+	 * @function randomBytes
+	 * @description this __OBJECT__ is used to generate a pseudo random int word
+	 * @param {number} length {10} the length of the word
+	 * @returns {string} s.e.
+	 */
+	public static readonly randomBytes = (length: number = this.randomLength, encoding: BufferEncoding = 'hex'): string => {
+		return crypto.randomBytes(length).toString(encoding)
+	}
+
+	/**
 	 * @function identifier
 	 * @description this __OBJECT__ is used to generate a random unique identifier
 	 * @param {string} suffix {''} s.e.

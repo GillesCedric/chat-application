@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from "body-parser"
+import cookieParser from 'cookie-parser'
 import cors from "cors"
 import dotenv from 'dotenv'
 import helmet from "helmet"
@@ -17,8 +18,12 @@ import BasicAuthentication from '../../middlewares/BasicAuthentication'
 import { apiGWLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
-import { Services } from '../../utils/Keywords'
+import { Services, Tokens } from '../../utils/Keywords'
 import Mailer from '../../modules/mailer/Mailer'
+import { SendFileOptions } from 'express-serve-static-core'
+import sanitize from 'sanitize-filename'
+import JWTUtils from '../../modules/jwt/JWT'
+import CSRF from '../../middlewares/CSRF'
 
 
 export default class App {
@@ -97,39 +102,10 @@ export default class App {
 
         //body parser configuration
         this.app.use(bodyParser.json())
-        this.app.use(bodyParser.urlencoded({ extended: true }))
+        this.app.use(bodyParser.urlencoded({ extended: false }))
 
         // serving static files 
-        this.app.use("/images", express.static('data/users'))
-
-        try {
-            const store = MongoStore.create({
-                mongoUrl: process.env.DATABASE_URL,
-            })
-
-            // this.app.use(session({
-            //     name: 'chat-application',
-            //     secret: process.env.SESSION_SECRET,
-            //     resave: false,
-            //     saveUninitialized: true,
-            //     store: store,
-            //     cookie: {
-            //         secure: process.env.NODE_ENV == 'production',
-            //         httpOnly: true,
-            //         maxAge: 30 * 24 * 1 * 60 * 60 * 1000, //30j, //should be the same as TOKEN_DELAY
-            //         path: "/",
-            //         sameSite: process.env.NODE_ENV == 'production',
-            //         domain: `localhost`,
-            //         //sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',//TODO test in production for potential bug
-            //         signed: true
-            //     }
-            // }))
-        } catch (error) {
-            Logger.error(error.message)
-            process.exit(1)
-        }
-
-
+        //this.app.use("/images", express.static('data/users'))
 
         // this.app.use(rateLimit({
         //     windowMs: 10 * 60 * 1000, // 10 minutes
@@ -139,6 +115,21 @@ export default class App {
         // }))
 
         this.app.use(BasicAuthentication.authenticate)
+
+        this.app.get('/images/profile/:filename', (req, res) => {
+            const filename = sanitize(req.params.filename)
+            const filePath = path.join(process.cwd(), 'data/users/profile', filename)
+
+            if (filename == "man.png" || filename == "girl.jpg") {
+                res.sendFile(filePath)
+            } else if (req.body.access_token && JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken) != undefined) {
+                res.sendFile(filePath)
+            } else {
+                res.status(403).send("Vous n'avez pas accèss à cette ressource")
+            }
+        })
+
+        this.app.use(CSRF.authenticate)
 
         this.app.use(Session.authenticate)
 
