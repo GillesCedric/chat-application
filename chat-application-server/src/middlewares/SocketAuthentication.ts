@@ -15,7 +15,7 @@ export default class SocketAuthentication {
             const authorization = Crypto.atob(socket.handshake.headers.authorization.split(' ')[1]).split(':')
             if (authorization[0] == process.env.BASIC_APP_USERNAME && authorization[1] == process.env.BASIC_APP_PASSWORD) {
                 if (socket.handshake.headers.token) {
-                    const userId = JWTUtils.getUserFromToken(socket.handshake.headers.token as string, Tokens.accessToken)
+                    const userId = JWTUtils.getUserFromToken(socket.handshake.headers.token as string, socket.handshake.headers['user-agent'] as string,  Tokens.accessToken)
                     if (userId) {
                         socket.data.userId = userId
                         next()
