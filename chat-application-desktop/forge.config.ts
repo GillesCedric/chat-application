@@ -48,8 +48,8 @@ const config: ForgeConfig = {
           },
         ],
       },
-      //port: 3001, //Custom Electron port
-      //loggerPort: 9001 //Custom Electron Logger port
+      port: 3001, //Custom Electron port
+      loggerPort: 9001 //Custom Electron Logger port
     }),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
