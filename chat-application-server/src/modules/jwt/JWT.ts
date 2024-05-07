@@ -1,5 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { userLogger } from "modules/logger/Logger";
+import { BlacklistedTokenModel } from "../../models/BlacklistedToken";
 
 export type TokenType = "access_token" | "refresh_token"
 
@@ -45,18 +45,22 @@ export default abstract class JWTUtils {
    * @private
    * @returns {number}
    */
-  public static readonly getUserFromToken: (token: string, userAgent: string, tokenType: TokenType) => string | undefined = (
+  public static readonly getUserFromToken: (token: string, userAgent: string, tokenType: TokenType) => Promise<string | undefined> = async (
     token: string,
     userAgent: string,
     tokenType: TokenType
-  ): string | undefined => {
+  ): Promise<string | undefined> => {
     token = this.parseToken(token)
     let userId = undefined;
     try {
       const jwtToken = jwt.verify(token, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY);
 
+      const blacklistedToken = await BlacklistedTokenModel.findOne({
+        token: token
+      })
+
       //@ts-ignore
-      if (jwtToken && jwtToken.userAgent as unknown as string == userAgent) {
+      if (jwtToken && jwtToken.userAgent as unknown as string == userAgent && !blacklistedToken) {
         //@ts-ignore
         userId = jwtToken.userId as unknown as number;
       }

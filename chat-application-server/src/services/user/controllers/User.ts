@@ -14,6 +14,7 @@ import { Keys, Purposes, TokenModel } from "../../../models/Token";
 import Mailer from "../../../modules/mailer/Mailer";
 import fs from "fs";
 import path from "path";
+import { BlacklistedTokenModel } from "../../../models/BlacklistedToken";
 
 export default class UserController {
   public readonly getAll = (req: Request, res: Response): Response => {
@@ -56,7 +57,7 @@ export default class UserController {
   };
 
   public readonly me = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
     try {
       const user = await UserModel.findById(userId).select(
         "lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status"
@@ -91,7 +92,7 @@ export default class UserController {
   };
 
   public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
     const { firstname, lastname, username, password, is2FAEnabled } = req.body
     try {
       const updates: {
@@ -277,7 +278,7 @@ export default class UserController {
   public readonly activateTel = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
       const user = await UserModel.findById(userId)
 
@@ -330,7 +331,7 @@ export default class UserController {
   public readonly verifyTel = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
       const user = await UserModel.findById(userId)
 
@@ -514,10 +515,10 @@ export default class UserController {
     }
   };
 
-  public readonly updateTokens = (req: Request, res: Response): Response => {
+  public readonly updateTokens = async (req: Request, res: Response): Promise<Response> => {
     const refreshToken = req.body.refresh_token;
 
-    const userId = JWTUtils.getUserFromToken(refreshToken, req.headers['user-agent'], Tokens.refreshToken);
+    const userId = await JWTUtils.getUserFromToken(refreshToken, req.headers['user-agent'], Tokens.refreshToken);
 
     // Vérifier si le refreshToken est stocké et valide
     if (userId == undefined)
@@ -541,16 +542,16 @@ export default class UserController {
     });
   };
 
-  public readonly isValidTokens = (req: Request, res: Response): Response => {
+  public readonly isValidTokens = async (req: Request, res: Response): Promise<Response> => {
     const accessToken = req.body.access_token;
     const refreshToken = req.body.refresh_token;
 
-    const accessTokenUserId = JWTUtils.getUserFromToken(
+    const accessTokenUserId = await JWTUtils.getUserFromToken(
       accessToken,
       req.headers['user-agent'],
       Tokens.accessToken
     );
-    const refreshTokenUserId = JWTUtils.getUserFromToken(
+    const refreshTokenUserId = await JWTUtils.getUserFromToken(
       refreshToken,
       req.headers['user-agent'],
       Tokens.refreshToken
@@ -570,7 +571,7 @@ export default class UserController {
     req: Request,
     res: Response
   ): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(
+    const userId = await JWTUtils.getUserFromToken(
       req.body.access_token,
       req.headers['user-agent'],
       "access_token"
@@ -640,7 +641,7 @@ export default class UserController {
 
   public readonly getUserFriendRequests = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
 
     try {
       const friendRequests = await FriendsRequestModel.find({
@@ -689,7 +690,7 @@ export default class UserController {
 
     //check if the username exits
     try {
-      const userId = JWTUtils.getUserFromToken(
+      const userId = await JWTUtils.getUserFromToken(
         req.body.access_token,
         req.headers['user-agent'],
         "access_token"
@@ -826,4 +827,39 @@ export default class UserController {
       });
     }
   };
+
+  public readonly signOut = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const userId = await JWTUtils.getUserFromToken(
+        req.body.access_token,
+        req.headers['user-agent'],
+        "access_token"
+      );
+
+      const user = await UserModel.findById(userId);
+
+      user.status = Crypto.encrypt(UserStatus.offline, "status")
+
+      await Promise.all([
+        BlacklistedTokenModel.create({ token: req.body.access_token }),
+        user.save()
+      ])
+
+      //TODO send a socket to update the user status on all his friends
+
+      return res.status(200).json({
+        message: "disconnection success",
+      });
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Cet utilisateur n'existe pas",
+      });
+    }
+  };
+
 }

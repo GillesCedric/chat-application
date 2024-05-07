@@ -116,13 +116,13 @@ export default class App {
 
         this.app.use(BasicAuthentication.authenticate)
 
-        this.app.get('/images/profile/:filename', (req, res) => {
+        this.app.get('/images/profile/:filename', async (req, res) => {
             const filename = sanitize(req.params.filename)
             const filePath = path.join(process.cwd(), 'data/users/profile', filename)
 
             if (filename == "man.png" || filename == "girl.jpg") {
                 res.sendFile(filePath)
-            } else if (req.body.access_token && JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken) != undefined) {
+            } else if (req.body.access_token && await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken) != undefined) {
                 res.sendFile(filePath)
             } else {
                 res.status(403).send("Vous n'avez pas accèss à cette ressource")

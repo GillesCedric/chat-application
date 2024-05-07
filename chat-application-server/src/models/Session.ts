@@ -24,7 +24,7 @@ const sessionSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    index: {expires: '48h'}
+    index: { expires: '48h' }
   },
   updatedAt: {
     type: Date,

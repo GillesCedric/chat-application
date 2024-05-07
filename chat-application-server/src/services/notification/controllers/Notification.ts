@@ -10,7 +10,7 @@ import SERVICES from '../../../config/services.json'
 export default class NotificationController {
   public readonly getUserNotifications = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
       const notifications = await NotificationModel.find({ receiver: userId })
 
@@ -34,7 +34,7 @@ export default class NotificationController {
 
   public readonly sendNotification = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
     try {
 
@@ -71,7 +71,7 @@ export default class NotificationController {
   };
 
   public readonly updateNotification = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
     //check if the username exits
     try {

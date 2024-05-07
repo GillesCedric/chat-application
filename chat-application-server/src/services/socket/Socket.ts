@@ -35,7 +35,7 @@ export default class Socket {
 			console.log("connection client")
 			try {
 
-				const userId = JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, socket.handshake.headers["user-agent"] as string, Tokens.accessToken)
+				const userId = await JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, socket.handshake.headers["user-agent"] as string, Tokens.accessToken)
 
 				// Enregistrer une nouvelle association socketId
 				//await new UserSocketModel({ user: socket.data.userId, socket: socket.id }).save()
