@@ -14,6 +14,7 @@ import { Keys, Purposes, TokenModel } from "../../../models/Token";
 import Mailer from "../../../modules/mailer/Mailer";
 import fs from "fs";
 import path from "path";
+import { BlacklistedTokenModel } from "../../../models/BlacklistedToken";
 
 export default class UserController {
   public readonly getAll = (req: Request, res: Response): Response => {
@@ -56,7 +57,7 @@ export default class UserController {
   };
 
   public readonly me = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
     try {
       const user = await UserModel.findById(userId).select(
         "lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status"
@@ -91,7 +92,7 @@ export default class UserController {
   };
 
   public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
     const { firstname, lastname, username, password, is2FAEnabled } = req.body
     try {
       const updates: {
@@ -161,24 +162,26 @@ export default class UserController {
         const userCode = Crypto.randomInt(6)
 
         const validity = new Date()
+        validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.TWOFA_TEL_CODE_DELAY))
 
         await TokenModel.insertMany({
           user: user._id,
           key: Crypto.encrypt(Keys.tel, 'status'),
           token: bcrypt.hashSync(userCode, Number.parseInt(process.env.SALT_ROUNDS)),
-          validity: validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.TWOFA_TEL_CODE_DELAY)),
+          validity: validity,
           purpose: Crypto.encrypt(Purposes.connection, 'status')
         })
 
         await Mailer.sendSMS({
           to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
           messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
-          body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.TWOFA_TEL_CODE_DELAY),
+          body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', '2FATelAuthentication.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.TWOFA_TEL_CODE_DELAY),
         })
 
         return res.status(200).json({
           message: "connection pending",
           reason: "2FAEnabled",
+          userId: Crypto.encrypt(user.id, 'data')
         });
 
       }
@@ -190,10 +193,12 @@ export default class UserController {
         message: "connection success",
         access_token: JWTUtils.generateTokenForUser(
           user.id,
+          req.headers['user-agent'],
           Tokens.accessToken
         ),
         refresh_token: JWTUtils.generateTokenForUser(
           user.id,
+          req.headers['user-agent'],
           Tokens.refreshToken
         ),
       });
@@ -273,7 +278,7 @@ export default class UserController {
   public readonly activateTel = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
       const user = await UserModel.findById(userId)
 
@@ -292,7 +297,7 @@ export default class UserController {
 
       if (!token) {
         return res.status(403).json({
-          error: "Erreur lors de la vérification",
+          error: "Le code saisie est invalide",
         });
       }
 
@@ -326,19 +331,20 @@ export default class UserController {
   public readonly verifyTel = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, "access_token")
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
 
       const user = await UserModel.findById(userId)
 
       const userCode = Crypto.randomInt(6)
 
       const validity = new Date()
+      validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.VERIFY_TEL_CODE_DELAY))
 
       await TokenModel.insertMany({
         user: user._id,
         key: Crypto.encrypt(Keys.tel, 'status'),
         token: bcrypt.hashSync(userCode, Number.parseInt(process.env.SALT_ROUNDS)),
-        validity: validity.setMinutes(validity.getMinutes() + Number.parseInt(process.env.VERIFY_TEL_CODE_DELAY)),
+        validity: validity,
         purpose: Crypto.encrypt(Purposes.verification, 'status')
       })
 
@@ -365,7 +371,7 @@ export default class UserController {
     try {
 
       const token = await TokenModel.findOne({
-        user: req.body.userId,
+        user: Crypto.decrypt(req.body.userId, 'data'),
         key: Crypto.encrypt(Keys.tel, 'status'),
         purpose: Crypto.encrypt(Purposes.connection, 'status'),
         validity: { $gt: new Date() }
@@ -373,7 +379,7 @@ export default class UserController {
 
       if (!token) {
         return res.status(403).json({
-          error: "Erreur lors de la vérification",
+          error: "Le code saisie est invalide",
         });
       }
 
@@ -396,10 +402,12 @@ export default class UserController {
         message: "connection success",
         access_token: JWTUtils.generateTokenForUser(
           user.id,
+          req.headers['user-agent'],
           Tokens.accessToken
         ),
         refresh_token: JWTUtils.generateTokenForUser(
           user.id,
+          req.headers['user-agent'],
           Tokens.refreshToken
         ),
       });
@@ -449,7 +457,11 @@ export default class UserController {
           purpose: Crypto.encrypt(Purposes.verification, "data"),
         });
 
-        const validity = new Date();
+        const validity = new Date()
+        validity.setMinutes(
+          validity.getMinutes() +
+          Number.parseInt(process.env.VERIFY_EMAIL_CODE_DELAY)
+        )
 
         await TokenModel.insertMany({
           user: user[0]._id,
@@ -458,10 +470,7 @@ export default class UserController {
             userCode,
             Number.parseInt(process.env.SALT_ROUNDS)
           ),
-          validity: validity.setMinutes(
-            validity.getMinutes() +
-              Number.parseInt(process.env.VERIFY_EMAIL_CODE_DELAY)
-          ),
+          validity: validity,
           purpose: Crypto.encrypt(Purposes.verification, "status"),
         });
 
@@ -482,12 +491,10 @@ export default class UserController {
             .replace("{{USERNAME}}", req.body.username)
             .replace(
               "{{VERIFICATION_URL}}",
-              `${protocol()}://${
-                SERVICES[process.env.NODE_ENV][Services.apigw].domain
-              }:${
-                SERVICES[process.env.NODE_ENV][Services.apigw].port
+              `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.apigw].domain
+              }:${SERVICES[process.env.NODE_ENV][Services.apigw].port
               }/api/v1/users/activate/email?token=${token}`
-          ).replace('{{CODE_DELAY}}', (process.env.VERIFY_EMAIL_CODE_DELAY as unknown as number / 60) as unknown as string),
+            ).replace('{{CODE_DELAY}}', (process.env.VERIFY_EMAIL_CODE_DELAY as unknown as number / 60) as unknown as string),
         });
 
         return res.status(200).json({
@@ -508,10 +515,10 @@ export default class UserController {
     }
   };
 
-  public readonly updateTokens = (req: Request, res: Response): Response => {
+  public readonly updateTokens = async (req: Request, res: Response): Promise<Response> => {
     const refreshToken = req.body.refresh_token;
 
-    const userId = JWTUtils.getUserFromToken(refreshToken, Tokens.refreshToken);
+    const userId = await JWTUtils.getUserFromToken(refreshToken, req.headers['user-agent'], Tokens.refreshToken);
 
     // Vérifier si le refreshToken est stocké et valide
     if (userId == undefined)
@@ -519,10 +526,12 @@ export default class UserController {
 
     const newAccessToken = JWTUtils.generateTokenForUser(
       userId,
+      req.headers['user-agent'],
       Tokens.accessToken
     );
     const newRefreshToken = JWTUtils.generateTokenForUser(
       userId,
+      req.headers['user-agent'],
       Tokens.accessToken
     );
 
@@ -533,16 +542,18 @@ export default class UserController {
     });
   };
 
-  public readonly isValidTokens = (req: Request, res: Response): Response => {
+  public readonly isValidTokens = async (req: Request, res: Response): Promise<Response> => {
     const accessToken = req.body.access_token;
     const refreshToken = req.body.refresh_token;
 
-    const accessTokenUserId = JWTUtils.getUserFromToken(
+    const accessTokenUserId = await JWTUtils.getUserFromToken(
       accessToken,
+      req.headers['user-agent'],
       Tokens.accessToken
     );
-    const refreshTokenUserId = JWTUtils.getUserFromToken(
+    const refreshTokenUserId = await JWTUtils.getUserFromToken(
       refreshToken,
+      req.headers['user-agent'],
       Tokens.refreshToken
     );
 
@@ -560,8 +571,9 @@ export default class UserController {
     req: Request,
     res: Response
   ): Promise<Response> => {
-    const userId = JWTUtils.getUserFromToken(
+    const userId = await JWTUtils.getUserFromToken(
       req.body.access_token,
+      req.headers['user-agent'],
       "access_token"
     );
 
@@ -599,8 +611,7 @@ export default class UserController {
           status: Crypto.encrypt(FriendsRequestStatus.pending, "status"),
         }),
         fetch(
-          `${protocol()}://${
-            SERVICES[process.env.NODE_ENV][Services.notification].domain
+          `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain
           }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
           {
             method: "POST",
@@ -630,7 +641,7 @@ export default class UserController {
 
   public readonly getUserFriendRequests = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, "access_token")
+    const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
 
     try {
       const friendRequests = await FriendsRequestModel.find({
@@ -652,7 +663,7 @@ export default class UserController {
             sender: {
               _id: friendRequest.sender._id,
               //@ts-ignore
-              fullname: `${Crypto.decrypt(friendRequest.sender.firstname, 'database')} ${Crypto.decrypt(friendRequest.sender.lastname, 'database') }`,
+              fullname: `${Crypto.decrypt(friendRequest.sender.firstname, 'database')} ${Crypto.decrypt(friendRequest.sender.lastname, 'database')}`,
               //@ts-ignore
               picture: Crypto.decrypt(friendRequest.sender.picture, 'database'),
             },
@@ -679,8 +690,9 @@ export default class UserController {
 
     //check if the username exits
     try {
-      const userId = JWTUtils.getUserFromToken(
+      const userId = await JWTUtils.getUserFromToken(
         req.body.access_token,
+        req.headers['user-agent'],
         "access_token"
       );
 
@@ -721,8 +733,7 @@ export default class UserController {
           ),
           friendRequest.save(),
           fetch(
-            `${protocol()}://${
-              SERVICES[process.env.NODE_ENV][Services.notification].domain
+            `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain
             }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
             {
               method: "POST",
@@ -738,10 +749,8 @@ export default class UserController {
             }
           ),
           fetch(
-            `${protocol()}://${
-              SERVICES[process.env.NODE_ENV][Services.chat].domain
-            }:${
-              SERVICES[process.env.NODE_ENV][Services.chat].port
+            `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.chat].domain
+            }:${SERVICES[process.env.NODE_ENV][Services.chat].port
             }/conversations`,
             {
               method: Method.post,
@@ -818,4 +827,39 @@ export default class UserController {
       });
     }
   };
+
+  public readonly signOut = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    try {
+      const userId = await JWTUtils.getUserFromToken(
+        req.body.access_token,
+        req.headers['user-agent'],
+        "access_token"
+      );
+
+      const user = await UserModel.findById(userId);
+
+      user.status = Crypto.encrypt(UserStatus.offline, "status")
+
+      await Promise.all([
+        BlacklistedTokenModel.create({ token: req.body.access_token }),
+        user.save()
+      ])
+
+      //TODO send a socket to update the user status on all his friends
+
+      return res.status(200).json({
+        message: "disconnection success",
+      });
+
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        error: "Cet utilisateur n'existe pas",
+      });
+    }
+  };
+
 }

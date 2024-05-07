@@ -34,7 +34,7 @@ export default class ChatController {
 
     try {
 
-      const userId = JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken)
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
       if (await this.checkIfConversationExists(req.body.members)) {
         return res.status(401).json({
@@ -83,7 +83,7 @@ export default class ChatController {
 
   public readonly getUserConversationChats = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.query.access_token as string, Tokens.accessToken)
+    const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], Tokens.accessToken)
 
     try {
 
@@ -122,7 +122,7 @@ export default class ChatController {
 
     try {
 
-      const userId = JWTUtils.getUserFromToken(req.query.access_token as string, Tokens.accessToken)
+      const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], Tokens.accessToken)
 
       let conversations = await ConversationModel.aggregate([
         { $match: { members: new mongoose.Types.ObjectId(userId) } },
@@ -237,7 +237,7 @@ export default class ChatController {
 
   public readonly addChats = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken)
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
     try {
       // Créer un nouvel objet chat
@@ -305,7 +305,7 @@ export default class ChatController {
 
   public readonly updateChat = async (req: Request, res: Response): Promise<Response> => {
 
-    const userId = JWTUtils.getUserFromToken(req.body.access_token, Tokens.accessToken)
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
     try {
       // Créer un nouvel objet chat

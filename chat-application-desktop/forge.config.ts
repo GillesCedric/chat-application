@@ -7,16 +7,29 @@ import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-nati
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
-
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    icon: "./src/assets/chat-application"
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [new MakerSquirrel({
+    iconUrl: "https://chat-application/images/application/chat-application.ico",
+    setupIcon: "./src/assets/chat-application.ico",
+  }), new MakerZIP({
+
+  }, ['darwin']), new MakerRpm({
+    options: {
+      icon: "./src/assets/chat-application.png"
+    }
+  }), new MakerDeb({
+    options: {
+      icon: "./src/assets/chat-application.png"
+    }
+  })],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
@@ -35,6 +48,8 @@ const config: ForgeConfig = {
           },
         ],
       },
+      //port: 3001, //Custom Electron port
+      //loggerPort: 9001 //Custom Electron Logger port
     }),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
