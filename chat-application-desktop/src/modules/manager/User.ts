@@ -1,23 +1,20 @@
 import API from "../api/API";
 
 export default class User {
-public static async register(userData: {
+  public static async register(userData: {
     firstname: string;
     lastname: string;
     username: string;
     email: string;
     password: string;
     tel: string;
+    _csrf: string;
   }): Promise<any> {
     try {
-      const response = await API.register({
-        firstname: userData.firstname,
-        lastname: userData.lastname,
-        username: userData.username,
-        email: userData.email,
-        password: userData.password,
-        tel: userData.tel,
-      });
+      const response = await API.register(
+        userData, 
+        {"csrf-token": userData._csrf}
+      );
       if (response.message) {
         console.log("Registration successful");
         return { message: userData.username + " registration successful" };
@@ -53,12 +50,13 @@ public static async register(userData: {
   public static async sendFriendRequest(data: {
     username: string;
     comment: string;
+    _csrf: string;
   }): Promise<any> {
     try {
-      const response = await API.sendFriendRequest({
-        username: data.username,
-        comment: data.comment,
-      });
+      const response = await API.sendFriendRequest(
+        data,
+        { "csrf-token": data._csrf }
+      );
       if (response.message) {
         console.log(response.message);
         return {
@@ -72,8 +70,8 @@ public static async register(userData: {
         );
         return { error: response.error };
       } else if (response.errors) {
-         console.log(response.errros);
-         return { error: "Failed to send friend request " };
+        console.log(response.errros);
+        return { error: "Failed to send friend request " };
       }
     } catch (error) {
       console.error("Error while adding friend", error);

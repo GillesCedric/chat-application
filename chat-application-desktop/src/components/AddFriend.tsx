@@ -1,11 +1,12 @@
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import User from "../modules/manager/User";
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { DEFAULT_COMMENT } from "../utils/keywords";
+import API from "../modules/api/API";
 
 export const AddFriend = () => {
   // Close modal if clicked outside of it
@@ -29,40 +30,47 @@ export const AddFriend = () => {
 };
 
 const FriendRequestModal = ({ closeModal }: { closeModal: any }) => {
-   const modalRef = useRef();
-   const [comment, setComment] = useState("");
+  const modalRef = useRef();
+  const [comment, setComment] = useState("");
   const [username, setUsername] = useState("");
-  
+  const [csrfToken, setCsrfToken] = useState("");
+  const csrfTokenRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   const handleClose = (e: React.FormEvent) => {
-     if (modalRef.current === e.target) {
-       closeModal();
-     }
-   };
- 
-    const handleSendFriendRequest = (e: React.FormEvent): void => {
-      e.preventDefault();
-      if (username.trim() === "") {
-        notify("Username cannot be empty", "error");
-        return;
-      }
-      if (comment.trim() === "") {
-        setComment(DEFAULT_COMMENT);
-      }
-      User.sendFriendRequest({
-        username: username,
-        comment: comment.trim() === "" ? DEFAULT_COMMENT : comment.trim(),
+    if (modalRef.current === e.target) {
+      closeModal();
+    }
+  };
+
+  const handleSendFriendRequest = (e: React.FormEvent): void => {
+    e.preventDefault();
+    if (username.trim() === "") {
+      notify("Username cannot be empty", "error");
+      return;
+    }
+    if (comment.trim() === "") {
+      setComment(DEFAULT_COMMENT);
+    }
+    User.sendFriendRequest({
+      username: username,
+      comment: comment.trim() === "" ? DEFAULT_COMMENT : comment.trim(),
+      _csrf: csrfTokenRef.current?.value,
+    })
+      .then((response: any) => {
+        if (response.message) {
+          notify(response.message, "success", closeModal);
+        } else {
+          notify(response.error, "error");
+        }
       })
-        .then((response: any) => {
-          if (response.message) {
-            notify(response.message, "success", closeModal);
-          } else {
-            notify(response.error, "error");
-          }
-        })
-        .catch((error: any) => {
-          notify(error, "error");
-        });
-    };
+      .catch((error: any) => {
+        notify(error, "error");
+      });
+  };
   return (
     <>
       <div
@@ -86,6 +94,12 @@ const FriendRequestModal = ({ closeModal }: { closeModal: any }) => {
           <form className="p-4 md:p-5">
             <div className="grid gap-4 mb-4 grid-cols-2">
               <div className="col-span-2">
+                <input
+                  ref={csrfTokenRef}
+                  type="hidden"
+                  name="_csrf"
+                  value={csrfToken}
+                />
                 <label
                   htmlFor="name"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

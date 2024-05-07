@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faFaceSmile, faFile } from "@fortawesome/free-regular-svg-icons";
+import API from "../modules/api/API";
 
 function resetTextAreaToDefault(event: React.FormEvent): void {
   const textarea = event.currentTarget.querySelector("textarea");
@@ -32,14 +33,20 @@ const textAreaAdjust = (element: HTMLTextAreaElement) => {
 const ChatInput = ({
   onSendMessage,
 }: {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string , csrfToken : string) => void;
 }) => {
   const [message, setMessage] = useState("");
-
+const [csrfToken, setCsrfToken] = useState("");
+const csrfTokenRef = useRef<HTMLInputElement | null>(null);
+useEffect(() => {
+  API.getCSRFToken().then((data: any) => {
+    setCsrfToken(data.token);
+  });
+}, []);
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
-      onSendMessage(message);
+      onSendMessage(message, csrfToken);
       setMessage("");
     }
     resetTextAreaToDefault(event);
@@ -47,6 +54,7 @@ const ChatInput = ({
 
   return (
     <form onSubmit={handleSend} className="rounded-b-lg">
+      <input ref={csrfTokenRef} type="hidden" name="_csrf" value={csrfToken} />
       <label htmlFor="chat" className="sr-only">
         Your message
       </label>
@@ -70,8 +78,7 @@ const ChatInput = ({
           placeholder="Your message..."
           value={message}
           onChange={(e) => {
-            setMessage(e.target.value),
-            textAreaAdjust(e.target)              
+            setMessage(e.target.value), textAreaAdjust(e.target);
           }}
           style={{ resize: "none" }} // Disable resizing
         ></textarea>

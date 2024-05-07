@@ -60,25 +60,27 @@ export default class ConversationRepository {
       return { error: "Failed to load conversations:" };
     }
   }
-  public static async addMessage( id:string , data: {
-    message: string;
-  }): Promise<any> {
+  public static async addMessage(
+    id: string,
+    data: {
+      message: string;
+      _csrf: string;
+    }
+  ): Promise<any> {
     try {
-      const response = await API.sendMessage(id , data);
+      const response = await API.sendMessage(id, data, {
+        "csrf-token": data._csrf,
+      });
       if (response.message) {
         console.log(response.message);
         return {
           message: response.message,
         };
-      }
-      else if (response.error) {
-        console.error(
-          "Failed to add message :",
-          response.error
-        );
+      } else if (response.error) {
+        console.error("Failed to add message :", response.error);
         return { error: response.error };
       } else if (response.errors) {
-        console.log("Errors : " +response.errros)
+        console.log("Errors : " + response.errros);
         return { error: "Failed to send message" };
       }
     } catch (error) {

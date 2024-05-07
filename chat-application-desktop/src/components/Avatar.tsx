@@ -26,7 +26,8 @@ export const Avatar = ({
       ) : (
         <img
           className="h-12 w-12 rounded-full object-cover"
-          src={BEGINING_URL + avatar}
+            /* src={BEGINING_URL + avatar} */
+            src={avatar}
           alt={fullname}
         />
       )}

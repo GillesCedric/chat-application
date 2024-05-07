@@ -19,7 +19,9 @@ import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
 import User from "../modules/manager/User";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
-import ConversationRepository, { MessageModel } from "../modules/manager/ConversationRepository";
+import ConversationRepository, {
+  MessageModel,
+} from "../modules/manager/ConversationRepository";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToYesterday } from "../utils/utilsFunctions";
 const ChatPage = () => {
@@ -30,21 +32,24 @@ const ChatPage = () => {
   const wasOnlineRef = useRef(isOnline);
   const [messsages, setMessages] = useState<MessageModel[]>([]);
   const [conversation, setConversation] = useState<ConversationModel>(null);
-  const handleSendMessage = (newMessage: string) => {
+  const handleSendMessage = (newMessage: string, csrfToken: string) => {
     if (conversation === null) {
       notify("Error sending message, cannot get conversation", "error");
       return;
     }
     // Add new message to the messages state
-    ConversationRepository.addMessage(conversation._id, { message: newMessage })
+    ConversationRepository.addMessage(conversation._id, {
+      message: newMessage,
+      _csrf: csrfToken,
+    });
     const savedMessage: MessageModel = {
       _id: "",
       sender: "",
-      message: newMessage, 
-      status : "",
-      createdAt: convertToYesterday( new Date().toISOString()).toISOString(),
-      isOwnedByUser : true,
-    }
+      message: newMessage,
+      status: "",
+      createdAt: convertToYesterday(new Date().toISOString()).toISOString(),
+      isOwnedByUser: true,
+    };
     setMessages([...messsages, savedMessage]);
   };
 
@@ -54,7 +59,11 @@ const ChatPage = () => {
       .then((response: any) => {
         if (!response.error) {
           console.log("Messages : " + response.data.length);
-          console.log(response.data.map((data:any)=> {console.log(data)}) );
+          console.log(
+            response.data.map((data: any) => {
+              console.log(data);
+            })
+          );
           setMessages(response.data);
         } else {
           notify(response.error, "error");

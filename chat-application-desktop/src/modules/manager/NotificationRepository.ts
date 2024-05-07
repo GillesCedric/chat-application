@@ -1,7 +1,7 @@
 import API from "../api/API";
 
 export default class NotificationRepository {
-  public static async getNotifications(data: any): Promise<any> {
+  /* public static async getNotifications(data: any): Promise<any> {
     try {
       const response = await API.getNotifications({
         userId: data.userId,
@@ -36,5 +36,5 @@ export default class NotificationRepository {
       );
       return { error: error };
     }
-  }
+  } */
 }
