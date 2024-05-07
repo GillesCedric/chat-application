@@ -24,5 +24,6 @@ export default class Routes {
     app.route("/activate/tel").post(...UserValidators.activateTel, UserValidators.errors, this.userController.activateTel)
     app.route("/verify/tel").post(...UserValidators.verifyTel, UserValidators.errors, this.userController.verifyTel)
     app.route("/connect").post(...UserValidators.connect, UserValidators.errors, this.userController.connect)
+    app.route("/signout").post(...UserValidators.signIn, UserValidators.errors, this.userController.signOut)
   }
 }

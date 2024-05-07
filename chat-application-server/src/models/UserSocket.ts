@@ -19,7 +19,8 @@ const userSocketSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index: { expires: '7d' }
   },
   updatedAt: {
     type: Date,

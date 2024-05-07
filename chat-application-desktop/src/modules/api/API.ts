@@ -95,14 +95,15 @@ export default class API {
     return false;
   };
 
-  public static readonly refreshTokens: (data: any) => Promise<any> = async (
-    data: any
+  public static readonly refreshTokens = async (
+    data: any,
+    headers: HeadersInit = {}
   ): Promise<any> => {
     let responseData = null;
     try {
       const response = await fetch(this.apiUrl + "/users/token", {
         method: "PUT",
-        headers: this.headers,
+        headers: { ...this.headers, ...headers },
         body: JSON.stringify(data),
       });
       responseData = await response.json();
@@ -112,13 +113,13 @@ export default class API {
     return responseData;
   };
 
-  public static readonly checkAuthentication: (data: any) => Promise<any> =
-    async (data: any): Promise<any> => {
+  public static readonly checkAuthentication =
+    async (data: any, headers: HeadersInit = {}): Promise<any> => {
       let responseData = null;
       try {
         const response = await fetch(this.apiUrl + "/users/token", {
           method: "POST",
-          headers: this.headers,
+          headers: { ...this.headers },
           body: JSON.stringify(data),
         });
         responseData = await response.json();
@@ -128,14 +129,15 @@ export default class API {
       return responseData;
     };
 
-  public static readonly checkIfExist: (data: any) => Promise<any> = async (
-    data: any
+  public static readonly checkIfExist = async (
+    data: any,
+    headers: HeadersInit = this.headers
   ): Promise<any> => {
     let responseData = null;
     try {
       const response = await fetch(this.apiUrl + "/users/checkUnique", {
         method: "POST",
-        headers: this.headers,
+        headers: { ...this.headers, ...headers },
         body: JSON.stringify(data),
       });
       responseData = await response.json();
@@ -146,10 +148,30 @@ export default class API {
   };
 
   public static readonly getAllUsers: () => Promise<any> =
-    async (): Promise<any> => {};
+    async (): Promise<any> => { };
+  
+  public static readonly getCSRFToken = async (): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/form", {
+        method: "GET",
+        headers: {
+          ...this.headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getCSRFToken();
+    return responseData;
+  };
 
-  public static readonly login: (data: any) => Promise<any> = async (
-    data: any
+  public static readonly login = async (
+    data: any,
+    headers: HeadersInit = {}
   ): Promise<any> => {
     let responseData = null;
     let handleRequest = false;
@@ -158,6 +180,7 @@ export default class API {
         method: "POST",
         headers: {
           ...this.headers,
+          ...headers
         },
         body: await this.generateBody(data),
       });
@@ -170,14 +193,15 @@ export default class API {
     return responseData;
   };
 
-  public static readonly register: (data: any) => Promise<any> = async (
-    data: any
+  public static readonly register = async (
+    data: any,
+    headers: HeadersInit = {}
   ): Promise<any> => {
     let responseData = null;
     try {
       const response = await fetch(this.apiUrl + "/users/signup", {
         method: "POST",
-        headers: this.headers,
+        headers: { ...this.headers, ...headers },
         body: JSON.stringify(data),
       });
       responseData = await response.json();
@@ -187,8 +211,8 @@ export default class API {
     return responseData;
   };
 
-  public static readonly sendFriendRequest: (data: any) => Promise<any> =
-    async (data: any): Promise<any> => {
+  public static readonly sendFriendRequest =
+    async (data: any, headers: HeadersInit = {}): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -196,6 +220,7 @@ export default class API {
           method: "POST",
           headers: {
             ...this.headers,
+            ...headers
           },
           body: await this.generateBody(data),
         });
@@ -207,8 +232,7 @@ export default class API {
       if (handleRequest) return this.sendFriendRequest(data);
       return responseData;
     };
-  public static readonly getFriendsRequests: () => Promise<any> =
-    async (): Promise<any> => {
+  public static readonly getFriendsRequests = async (headers: HeadersInit = {}): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -219,6 +243,7 @@ export default class API {
           method: "GET",
           headers: {
             ...this.headers,
+            ...headers
           },
         });
         responseData = await response.json();
@@ -230,10 +255,8 @@ export default class API {
       return responseData;
     };
 
-  public static readonly updateFriendRequest: (
-    id: string,
-    data: any
-  ) => Promise<any> = async (id: string, data: any): Promise<any> => {
+  public static readonly updateFriendRequest = async (id: string, data: any, headers: HeadersInit = {}): Promise<any> => {
+    console.log(id);
     let responseData = null;
     let handleRequest = false;
     const url = this.apiUrl + "/users/friends/request/" + id;
@@ -242,6 +265,7 @@ export default class API {
         method: "PUT",
         headers: {
           ...this.headers,
+          ...headers
         },
         body: await this.generateBody(data),
       });
@@ -253,8 +277,8 @@ export default class API {
     if (handleRequest) return this.updateFriendRequest(id, data);
     return responseData;
   };
-  public static readonly getUserConversation: (id: string) => Promise<any> =
-    async (id: string): Promise<any> => {
+
+  public static readonly getUserConversations = async (headers: HeadersInit = {}): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -265,6 +289,7 @@ export default class API {
           method: "GET",
           headers: {
             ...this.headers,
+            ...headers
           },
         });
         responseData = await response.json();
@@ -276,8 +301,7 @@ export default class API {
       return responseData;
     };
 
-  public static readonly getUserConversations: () => Promise<any> =
-    async (): Promise<any> => {
+  public static readonly getUserConversations = async (headers: HeadersInit = {}): Promise<any> => {
       let responseData = null;
       let handleRequest = false;
       try {
@@ -288,6 +312,7 @@ export default class API {
           method: "GET",
           headers: {
             ...this.headers,
+            ...headers
           },
         });
         responseData = await response.json();
@@ -298,30 +323,7 @@ export default class API {
       if (handleRequest) return this.getUserConversations();
       return responseData;
     };
-  public static readonly sendMessage: (id: string, data: any) => Promise<any> =
-    async (id: string, data: any): Promise<any> => {
-      let responseData = null;
-      let handleRequest = false;
-      try {
-        const response = await fetch(
-          this.apiUrl + "/chats/conversations/" + id,
-          {
-            method: "POST",
-            headers: {
-              ...this.headers,
-            },
-            body: await this.generateBody(data),
-          }
-        );
-        responseData = await response.json();
-      } catch (error) {
-        console.log("error " + error);
-      }
-      handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.sendMessage(id, data);
-      return responseData;
-    };
-  public static readonly getNotifications: (data: any) => Promise<any> = async (
+  public static readonly getNotifications = async (
     data: any
-  ): Promise<any> => {};
+  ): Promise<any> => { };
 }
