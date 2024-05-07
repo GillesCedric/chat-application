@@ -234,7 +234,6 @@ export default class API {
     id: string,
     data: any
   ) => Promise<any> = async (id: string, data: any): Promise<any> => {
-    console.log(id);
     let responseData = null;
     let handleRequest = false;
     const url = this.apiUrl + "/users/friends/request/" + id;
@@ -254,6 +253,28 @@ export default class API {
     if (handleRequest) return this.updateFriendRequest(id, data);
     return responseData;
   };
+  public static readonly getUserConversation: (id: string) => Promise<any> =
+    async (id: string): Promise<any> => {
+      let responseData = null;
+      let handleRequest = false;
+      try {
+        const url = await this.generateURL(
+          this.apiUrl + "/chats/conversations/" + id
+        );
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            ...this.headers,
+          },
+        });
+        responseData = await response.json();
+      } catch (error) {
+        console.log("error " + error);
+      }
+      handleRequest = await this.handleRequest(responseData);
+      if (handleRequest) return this.getUserConversation(id);
+      return responseData;
+    };
 
   public static readonly getUserConversations: () => Promise<any> =
     async (): Promise<any> => {
@@ -275,6 +296,29 @@ export default class API {
       }
       handleRequest = await this.handleRequest(responseData);
       if (handleRequest) return this.getUserConversations();
+      return responseData;
+    };
+  public static readonly sendMessage: (id: string, data: any) => Promise<any> =
+    async (id: string, data: any): Promise<any> => {
+      let responseData = null;
+      let handleRequest = false;
+      try {
+        const response = await fetch(
+          this.apiUrl + "/chats/conversations/" + id,
+          {
+            method: "POST",
+            headers: {
+              ...this.headers,
+            },
+            body: await this.generateBody(data),
+          }
+        );
+        responseData = await response.json();
+      } catch (error) {
+        console.log("error " + error);
+      }
+      handleRequest = await this.handleRequest(responseData);
+      if (handleRequest) return this.sendMessage(id, data);
       return responseData;
     };
   public static readonly getNotifications: (data: any) => Promise<any> = async (

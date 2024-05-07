@@ -111,7 +111,7 @@ export const FriendRequestComponent = ({
           alt="Friend's avatar"
         />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {friendRequest.sender.username}
+          {friendRequest.sender.fullname}
         </h5>
         <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
           {friendRequest.comment}

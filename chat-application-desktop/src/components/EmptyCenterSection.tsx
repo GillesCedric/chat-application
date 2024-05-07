@@ -1,4 +1,10 @@
-export const EmptyFriendRequest = ({message , smallParagraph} : {message : string, smallParagraph : string}) => {
+export const EmptyCenterSection = ({
+  message,
+  smallParagraph,
+}: {
+  message: string;
+  smallParagraph: string;
+}) => {
   return (
     <div
       className="w-full h-full flex items-center flex-wrap justify-center gap-10 

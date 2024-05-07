@@ -4,12 +4,13 @@ import ChatHeader from "../components/ChatHeader";
 import User from "../modules/manager/User";
 import { useSocketListener } from "../hooks/useSocketListener"; // Make sure the path is correct
 import { SocketKeywords } from "../utils/keywords";
-import { EmptyFriendRequest } from "../components/EmptyFriendRequest";
+import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import { notify } from "../components/toastify";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
 const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
+const hasNewNotification = useSocketListener(SocketKeywords.newNotification); 
     const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
@@ -27,7 +28,7 @@ const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
   };
   useEffect(() => {
     fetchFriendRequests();
-  }, [hasNewFriendRequest]); // Re-fetch when new notifications arrive
+  }, [hasNewFriendRequest ,hasNewNotification]); // Re-fetch when new notifications arrive
 
   return (
     <div className="h-screen flex flex-col">
@@ -55,7 +56,7 @@ const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation);
             </div>
           ))
         ) : (
-          <EmptyFriendRequest
+          <EmptyCenterSection
             message="There are no friend request in your center"
             smallParagraph="Come back later 😉"
           />

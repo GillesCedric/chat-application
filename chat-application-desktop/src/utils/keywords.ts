@@ -21,7 +21,7 @@ export enum FriendsRequestStatus {
 }
 
 export const DEFAULT_COMMENT =
-  "Hey there 😁 , \n I want to get in touch with you, let's chat. ";
+  "Hey there 👋🏾. \n I want to get in touch with you, let's chat. ";
 
 export const BEGINING_URL = "https://chat-communication/data/users"; 
 export const AVATAR_DEFAULT = "/default/profile/undefined"; 

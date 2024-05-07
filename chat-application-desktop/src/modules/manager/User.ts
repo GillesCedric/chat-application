@@ -1,9 +1,7 @@
 import API from "../api/API";
 
 export default class User {
-
-
-  public static async register(userData: {
+public static async register(userData: {
     firstname: string;
     lastname: string;
     username: string;
@@ -52,12 +50,10 @@ export default class User {
     const response = await API.checkIfExist(data);
     console.log(response);
   }
-
   public static async sendFriendRequest(data: {
     username: string;
     comment: string;
   }): Promise<any> {
-    console.log(data.comment);
     try {
       const response = await API.sendFriendRequest({
         username: data.username,
@@ -76,25 +72,14 @@ export default class User {
         );
         return { error: response.error };
       } else if (response.errors) {
-        const errors: any[] = response.errors;
-        const finalError: any[] = [];
-        errors.forEach((error) => {
-          finalError.push(error.msg + " for " + error.path, "error");
-        });
-        console.log(
-          finalError.reduce(
-            (accumulation: [], current: []) => accumulation + " " + current,
-            ""
-          )
-        );
-        return { error: "Username does not exist" };
+         console.log(response.errros);
+         return { error: "Failed to send friend request " };
       }
     } catch (error) {
       console.error("Error while adding friend", error);
       return { error: error };
     }
   }
-
   public static async updateFriendRequest(
     id: string,
     data: any
@@ -112,7 +97,6 @@ export default class User {
       return Promise.reject(error.message || "Error updating friend request");
     }
   }
-
   public static async getFriendsRequests(): Promise<any> {
     try {
       const response = await API.getFriendsRequests();
@@ -139,31 +123,6 @@ export default class User {
     } catch (error) {
       console.error("Failed to load Friends requests :", error);
       return { error: error };
-    }
-  }
-  public static async getConversations(): Promise<any> {
-    const response = await API.getUserConversations();
-    if (response.message) {
-      return {
-        data: response.data,
-      };
-    }
-    if (response.error) {
-      console.error("Failed to load conversations:", response.error);
-      return { error: response.error };
-    } else if (response.errors) {
-      const errors: any[] = response.errors;
-      const finalError: any[] = [];
-      errors.forEach((error) => {
-        finalError.push(error.msg + " for " + error.path, "error");
-      });
-      console.log(
-        finalError.reduce(
-          (accumulation: [], current: []) => accumulation + " " + current,
-          ""
-        )
-      );
-      return { error: "Failed to load conversations:" };
     }
   }
   public static async getUsersFriends(data: {

@@ -140,7 +140,7 @@ export const EmptySection = () => {
               Send invitation
             </button>
           </div>
-          {isModalOpen && <AddFriend closeModal={toggleModal} />}
+          {isModalOpen && <AddFriend/>}
         </div>
       </div>
     </div>

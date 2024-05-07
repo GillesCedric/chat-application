@@ -12,14 +12,22 @@ function resetTextAreaToDefault(event: React.FormEvent): void {
 
 // Function to adjust the textarea height while typing
 const textAreaAdjust = (element: HTMLTextAreaElement) => {
-  element.style.height = "1px";
+  // First, reset the height to 'auto' to shrink as content is deleted
+  element.style.height = "auto";
+  // Then set it to the actual scroll height
   element.style.height = `${element.scrollHeight}px`;
-  // If you want to limit the growth to the height equivalent to 3 rows
-  if (element.scrollHeight > element.clientHeight && element.rows < 4) {
-    element.rows += 1;
+
+  // Calculate maximum height for 3 rows
+  const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+  const maxRowsHeight = lineHeight * 4;
+
+  if (element.scrollHeight > maxRowsHeight) {
+    element.style.height = `${maxRowsHeight}px`;
+    element.style.overflowY = "auto"; // Enable scrolling
+  } else {
+    element.style.overflowY = "hidden"; // Hide scrollbar when not needed
   }
 };
-
 
 const ChatInput = ({
   onSendMessage,
@@ -57,11 +65,14 @@ const ChatInput = ({
         </button>
         <textarea
           id="chat"
-          rows={4} // Change the initial rows to your desired height
-          className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          rows={1} // Change the initial rows to your desired height
+          className=" focus:outline-none block scrollbar-none mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Your message..."
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value),
+            textAreaAdjust(e.target)              
+          }}
           style={{ resize: "none" }} // Disable resizing
         ></textarea>
         <button
