@@ -12,17 +12,20 @@ export default class CSRF {
             const token = Crypto.randomBytes(24)
             const session = await SessionModel.findOne({
                 userAgent: request.headers['user-agent'],
-                validity: {$gt: new Date()}
+                validity: {$gt: new Date()} 
             }).sort({ createdAt: -1 })
             
             const validity = new Date()
             validity.setMinutes(validity.getMinutes() + 30)
 
             if (session) {
+                console.log("test 1")
+                session.userAgent = request.headers['user-agent']
                 session.token = token
                 session.validity = validity
                 await session.save()
             } else {
+                console.log("test 2")
                 await SessionModel.insertMany({
                     userAgent: request.headers['user-agent'],
                     token: token,
@@ -42,9 +45,9 @@ export default class CSRF {
             const tokenFromHeader = request.headers['csrf-token']
             const tokenFromSession = await SessionModel.findOne({
                 userAgent: request.headers['user-agent'],
-                token: tokenFromBodyOrQuery,
+                token: tokenFromHeader,
                 validity: { $gt: new Date() }
-            })
+            }).sort({ createdAt: -1 })
 
             if (tokenFromBodyOrQuery &&
                 tokenFromHeader &&

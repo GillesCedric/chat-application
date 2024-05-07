@@ -23,6 +23,7 @@ export default function SignIn() {
   }, [])
 
   const signIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    console.log(csrfToken)
     console.log(passwordRef.current?.value);
     event.preventDefault();
     API.login({
