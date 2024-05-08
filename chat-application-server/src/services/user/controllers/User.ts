@@ -115,7 +115,18 @@ export default class UserController {
 
       return res.status(200).json({
         message: 'Profile updated successfully',
-        data: updatedUser
+        data: {
+          _id: updatedUser._id,
+          lastname: Crypto.decrypt(updatedUser.lastname, 'database'),
+          firstname: Crypto.decrypt(updatedUser.firstname, 'database'),
+          username: Crypto.decrypt(updatedUser.username, 'username'),
+          tel: Crypto.decrypt(updatedUser.tel, 'tel'),
+          email: Crypto.decrypt(updatedUser.email, 'email'),
+          isTelVerified: Crypto.decrypt(updatedUser.isTelVerified, 'boolean'),
+          is2FAEnabled: Crypto.decrypt(updatedUser.is2FAEnabled, 'boolean'),
+          picture: Crypto.decrypt(updatedUser.picture, 'database'),
+          status: Crypto.decrypt(updatedUser.status, 'status')
+        }
       })
     } catch (error) {
       console.log(error);
@@ -370,8 +381,10 @@ export default class UserController {
 
     try {
 
+      const userId = Crypto.decrypt(req.body.userId, 'data')
+
       const token = await TokenModel.findOne({
-        user: Crypto.decrypt(req.body.userId, 'data'),
+        user: userId,
         key: Crypto.encrypt(Keys.tel, 'status'),
         purpose: Crypto.encrypt(Purposes.connection, 'status'),
         validity: { $gt: new Date() }
@@ -394,7 +407,7 @@ export default class UserController {
         });
       }
 
-      const user = await UserModel.findByIdAndUpdate(req.body.userId, {
+      const user = await UserModel.findByIdAndUpdate(userId, {
         status: Crypto.encrypt(UserStatus.online, "status")
       })
 

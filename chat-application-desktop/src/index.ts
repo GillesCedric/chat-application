@@ -96,12 +96,14 @@ const createWindow = async (): Promise<void> => {
 
   //mainWindow.setMenu(null)
 
-  mainWindow.loadURL(`file://${path.join(process.cwd(), 'src', 'loading.html')}`);
+  // mainWindow.loadURL(`file://${path.join(process.cwd(), 'src', 'loading.html')}`);
 
-  const fingerprint = await getSystemFingerprint()
+  // const fingerprint = await getSystemFingerprint()
 
-  if (fingerprint)
-    mainWindow.webContents.setUserAgent(`${mainWindow.webContents.userAgent} Fingerprint/${fingerprint}`)
+  // if (fingerprint)
+  //   mainWindow.webContents.setUserAgent(`${mainWindow.webContents.userAgent} Fingerprint/${fingerprint}`)
+
+  mainWindow.webContents.setUserAgent(`${mainWindow.webContents.userAgent} Fingerprint/${crypto.randomInt(500)}`)
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);

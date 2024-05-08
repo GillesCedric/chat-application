@@ -259,6 +259,24 @@ export default class ChatController {
         { new: true, upsert: true }
       )
 
+      const request = await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
+        method: Method.post,
+        headers: headers(),
+        body: JSON.stringify({
+          access_token: req.body.access_token,
+          receivers: [conversaton.members[0]],
+          data: {
+            _id: savedChat._id,
+            message: req.body.message,
+            status: ChatStatus.received,
+            isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
+          },
+          event: SocketKeywords.newMessage
+        })
+      })
+
+      console.log(  await request.json())
+
       await Promise.all([
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: Method.post,
