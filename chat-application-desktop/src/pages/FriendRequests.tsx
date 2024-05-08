@@ -27,9 +27,27 @@ export const FriendRequest = () => {
       notify(error, "error");
     }
   };
+
   useEffect(() => {
-    fetchFriendRequests();
-  }, [hasNewNotification]); // Re-fetch when new notifications arrive
+    const initSocket = async () => {
+      await Socket.connect();
+      Socket.socket.on(SocketKeywords.newNotification, (data) => {
+        console.log(data);
+        fetchFriendRequests();
+      });
+
+      Socket.socket.on(SocketKeywords.newConversation, (data) => {
+        console.log(data);
+        fetchFriendRequests();
+      });
+    };
+
+    initSocket();
+
+    return () => {
+      Socket.disconnect();
+    };
+  }, []);
 
   return (
     <div className="h-screen flex flex-col">

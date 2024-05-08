@@ -2,6 +2,7 @@ import { Crypto } from "../crypto/Crypto";
 import CONFIG from "../../config/config.json";
 import { Tokens } from "../..//utils/Tokens";
 import { redirect } from "react-router-dom";
+import Socket from "../socket/Socket";
 
 export type Method = "GET" | "HEAD" | "POST" | "OPTIONS";
 
@@ -87,10 +88,11 @@ export default class API {
           "chat-application-refresh_token",
           response.refresh_token
         );
-      } else {
-        redirect("/signin");
+        return true;
       }
-      return true;
+      //TODO redirect to the login page
+      redirect("/signin");
+      return false
     }
     return false;
   };
@@ -162,8 +164,8 @@ export default class API {
     } catch (error) {
       console.log("error " + error);
     }
-    handleRequest = await this.handleRequest(responseData);
-    if (handleRequest) return this.getCSRFToken();
+    //handleRequest = await this.handleRequest(responseData);
+    //if (handleRequest) return this.getCSRFToken();
     return responseData;
   };
 

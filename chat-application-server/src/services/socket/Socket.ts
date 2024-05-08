@@ -37,9 +37,18 @@ export default class Socket {
 
 				const userId = await JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, socket.handshake.headers["user-agent"] as string, Tokens.accessToken)
 
-				// Enregistrer une nouvelle association socketId
-				//await new UserSocketModel({ user: socket.data.userId, socket: socket.id }).save()
-				await new UserSocketModel({ user: userId, socket: socket.id }).save()
+				const userSocket = await UserSocketModel.findOne({
+					user: userId,
+				}).sort({ createdAt: -1 })
+
+				if (userSocket) {
+					userSocket.socket = socket.id
+					await userSocket.save()
+				} else {
+					// Enregistrer une nouvelle association socketId
+					//await new UserSocketModel({ user: socket.data.userId, socket: socket.id }).save()
+					await new UserSocketModel({ user: userId, socket: socket.id }).save()
+				}
 
 			} catch (err) {
 				console.error('Error saving user socket:', err)

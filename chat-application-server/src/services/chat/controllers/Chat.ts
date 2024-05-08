@@ -50,7 +50,7 @@ export default class ChatController {
 
       await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
         method: Method.post,
-        headers: headers(),
+        headers: headers(req.headers["user-agent"]),
         body: JSON.stringify({
           access_token: req.body.access_token,
           receivers: req.body.members,
@@ -262,7 +262,7 @@ export default class ChatController {
 
       const request = await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
         method: Method.post,
-        headers: headers(),
+        headers: headers(req.headers["user-agent"]),
         body: JSON.stringify({
           access_token: req.body.access_token,
           receivers: [conversaton.members[0]],
@@ -281,7 +281,7 @@ export default class ChatController {
       await Promise.all([
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: Method.post,
-          headers: headers(),
+          headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
             receivers: [conversaton.members[0]],
@@ -296,7 +296,7 @@ export default class ChatController {
         }),
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: Method.post,
-          headers: headers(),
+          headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
             receivers: [conversaton.members[1]],
@@ -348,7 +348,7 @@ export default class ChatController {
 
       await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
         method: Method.post,
-        headers: headers(),
+        headers: headers(req.headers["user-agent"]),
         body: JSON.stringify({
           access_token: req.body.access_token,
           receivers: conversaton.members,

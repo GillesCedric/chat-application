@@ -81,7 +81,7 @@ export default class App {
 
         this.app.use(BasicAuthentication.authenticate)
 
-        this.app.use(Session.authenticate)
+        //this.app.use(Session.authenticate)
 
         try {
             if (process.env.NODE_ENV == "development")

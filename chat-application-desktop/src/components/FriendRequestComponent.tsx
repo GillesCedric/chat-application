@@ -20,7 +20,7 @@ export const FriendRequestComponent = ({
   const friendRequestId: string = friendRequest._id;
   const handleAccept = () => {
     const data = {
-      status: FriendsRequestStatus.deleted,
+      status: FriendsRequestStatus.accepted,
       _csrf: csrfToken,
     };
     User.updateFriendRequest(friendRequestId ,data )

@@ -33,6 +33,32 @@ const ChatPage = () => {
   const wasOnlineRef = useRef(isOnline);
   const [messsages, setMessages] = useState<MessageModel[]>([]);
   const [conversation, setConversation] = useState<ConversationModel>(null);
+
+  useEffect(() => {
+    fetchConversations()
+    
+    const initSocket = async () => {
+      await Socket.connect();
+      Socket.socket.on(SocketKeywords.newMessage, (data) => {
+        console.log(data);
+        addMessage()
+      });
+
+      Socket.socket.on(SocketKeywords.newConversation, (data) => {
+        console.log(data);
+        fetchConversations()
+      });
+      
+    };
+
+    initSocket();
+
+    return () => {
+      Socket.disconnect();
+    };
+  }, []);
+
+
   const handleSendMessage = (newMessage: string, csrfToken: string) => {
     if (conversation === null) {
       notify("Error sending message, cannot get conversation", "error");
@@ -93,13 +119,6 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
-    addMessage();
-  }, [newConversation]);
-  useEffect(() => {
-    fetchConversations();
-  }, [newConversation]);
-
-  useEffect(() => {
     if (wasOnlineRef.current !== isOnline) {
       if (!isOnline) {
         // If we've just gone offline
@@ -132,9 +151,8 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
-                conversations.length === 0 ? "" : "flex-none"
-              }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${conversations.length === 0 ? "" : "flex-none"
+                }`}
             >
               <div className="sticky top-0 z-50">
                 <SearchBar />

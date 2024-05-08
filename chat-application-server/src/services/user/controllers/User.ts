@@ -616,7 +616,7 @@ export default class UserController {
           }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
           {
             method: "POST",
-            headers: headers(),
+            headers: headers(req.headers["user-agent"]),
             body: JSON.stringify({
               access_token: req.body.access_token,
               receiver: friend.id,
@@ -696,6 +696,8 @@ export default class UserController {
         "access_token"
       );
 
+      console.log(userId)
+
       const user = await UserModel.findById(userId)
 
       const friendRequest = await FriendsRequestModel.findById(req.params.id)
@@ -734,7 +736,7 @@ export default class UserController {
             }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
             {
               method: "POST",
-              headers: headers(),
+              headers: headers(req.headers["user-agent"]),
               body: JSON.stringify({
                 access_token: req.body.access_token,
                 receiver: friendRequest.sender,
@@ -751,7 +753,7 @@ export default class UserController {
             }/conversations`,
             {
               method: Method.post,
-              headers: headers(),
+              headers: headers(req.headers["user-agent"]),
               body: JSON.stringify({
                 access_token: req.body.access_token,
                 members: [friendRequest.sender, friendRequest.receiver],

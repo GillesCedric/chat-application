@@ -47,7 +47,7 @@ export default class NotificationController {
         }),
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: 'POST',
-          headers: headers(),
+          headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
             receivers: [req.body.receiver],
