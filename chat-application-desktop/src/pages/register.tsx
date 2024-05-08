@@ -17,6 +17,7 @@ export default function Register() {
   const telRef = useRef<HTMLInputElement | null>(null);
   const passwordRef = useRef<HTMLInputElement | null>(null);
   const confirmpasswordRef = useRef<HTMLInputElement | null>(null);
+  const avatarSectionRef = useRef<HTMLDivElement | null>(null);
 
   const emailSectionRef = useRef<HTMLDivElement | null>(null);
   const nameSectionRef = useRef<HTMLDivElement | null>(null);
@@ -47,7 +48,7 @@ export default function Register() {
       backButtonVisible(false);
       nextButtonVisible(true);
       signupButtonVisible(false);
-    } else if (5 === etape) {
+    } else if (6 === etape) {
       backButtonVisible(true);
       nextButtonVisible(false);
       signupButtonVisible(true);
@@ -92,12 +93,13 @@ export default function Register() {
   };
   const moveOn = () => {
     if (
-      emailSectionRef.current &&
-      nameSectionRef.current &&
-      usernameSectionRef.current &&
-      telSectionRef.current &&
-      passwordSectionRef.current &&
-      nextButtonRef.current
+      (emailSectionRef.current &&
+        nameSectionRef.current &&
+        usernameSectionRef.current &&
+        telSectionRef.current &&
+        passwordSectionRef.current &&
+        avatarSectionRef.current,
+      nextButtonRef.current)
     ) {
       nextButtonRef.current.blur();
       switch (etape) {
@@ -107,6 +109,7 @@ export default function Register() {
             telSectionRef.current.className = "hidden";
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
+            avatarSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "flex flex-col mb-5";
             setEtape(2);
           }
@@ -117,6 +120,8 @@ export default function Register() {
             passwordSectionRef.current.className = "hidden";
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
+            avatarSectionRef.current.className = "hidden";
+
             emailSectionRef.current.className = "flex flex-col mb-5";
             setEtape(3);
           }
@@ -127,6 +132,8 @@ export default function Register() {
             nameSectionRef.current.className = "hidden";
             usernameSectionRef.current.className = "hidden";
             emailSectionRef.current.className = "hidden";
+            avatarSectionRef.current.className = "hidden";
+
             telSectionRef.current.className = "flex flex-col mb-5";
             setEtape(4);
           }
@@ -137,8 +144,20 @@ export default function Register() {
             usernameSectionRef.current.className = "hidden";
             telSectionRef.current.className = "hidden";
             emailSectionRef.current.className = "hidden";
-            passwordSectionRef.current.className = "flex flex-col mb-5";
+            passwordSectionRef.current.className = "hidden";
+            avatarSectionRef.current.className = "flex flex-col mb-5";
             setEtape(5);
+          }
+          break;
+        case 5:
+          if (checkAvatar) {
+            nameSectionRef.current.className = "hidden";
+            usernameSectionRef.current.className = "hidden";
+            telSectionRef.current.className = "hidden";
+            avatarSectionRef.current.className = "hidden";
+            emailSectionRef.current.className = "hidden";
+            passwordSectionRef.current.className = "flex flex-col mb-5";
+            setEtape(6);
           }
           break;
         default:
@@ -148,19 +167,21 @@ export default function Register() {
   };
   const moveBack = () => {
     if (
-      emailSectionRef.current &&
-      nameSectionRef.current &&
-      usernameSectionRef.current &&
-      telSectionRef.current &&
-      passwordSectionRef.current &&
-      nameSectionRef.current &&
-      backButtonRef.current
+      (emailSectionRef.current &&
+        nameSectionRef.current &&
+        usernameSectionRef.current &&
+        telSectionRef.current &&
+        passwordSectionRef.current &&
+        nameSectionRef.current &&
+        avatarSectionRef.current,
+      backButtonRef.current)
     ) {
       backButtonRef.current.blur();
 
       switch (etape) {
         case 2:
           nameSectionRef.current.className = "flex flex-col mb-5";
+          avatarSectionRef.current.className = "hidden";
           emailSectionRef.current.className = "hidden";
           telSectionRef.current.className = "hidden";
           passwordSectionRef.current.className = "hidden";
@@ -169,6 +190,7 @@ export default function Register() {
           break;
         case 3:
           telSectionRef.current.className = "hidden";
+          avatarSectionRef.current.className = "hidden";
           usernameSectionRef.current.className = "flex flex-col mb-5";
           emailSectionRef.current.className = "hidden";
           passwordSectionRef.current.className = "hidden";
@@ -177,6 +199,7 @@ export default function Register() {
           break;
         case 4:
           telSectionRef.current.className = "hidden";
+          avatarSectionRef.current.className = "hidden";
           emailSectionRef.current.className = "flex flex-col mb-5";
           usernameSectionRef.current.className = "hidden";
           passwordSectionRef.current.className = "hidden";
@@ -187,10 +210,20 @@ export default function Register() {
         case 5:
           telSectionRef.current.className = "flex flex-col mb-5";
           nameSectionRef.current.className = "hidden";
+          avatarSectionRef.current.className = "hidden";
           emailSectionRef.current.className = "hidden";
           usernameSectionRef.current.className = "hidden";
           passwordSectionRef.current.className = "hidden";
           setEtape(4);
+          break;
+        case 6:
+          avatarSectionRef.current.className = "flex flex-col mb-5";
+          nameSectionRef.current.className = "hidden";
+          telSectionRef.current.className = "hidden";
+          emailSectionRef.current.className = "hidden";
+          usernameSectionRef.current.className = "hidden";
+          passwordSectionRef.current.className = "hidden";
+          setEtape(5);
           break;
         default:
           break;
@@ -331,29 +364,29 @@ export default function Register() {
     // Default return false if refs are not set properly
     return false;
   };
- const [picture, setPicture] = useState<AVATAR_IDENTIFIER | null>(null);
- const [useInitials, setUseInitials] = useState(false);
+  const [picture, setPicture] = useState<AVATAR_IDENTIFIER | null>(null);
+  const [useInitials, setUseInitials] = useState(false);
 
- const handleAvatarClick = (avatar: AVATAR_IDENTIFIER) => {
-   if (picture === avatar) {
-     setPicture(null);
-   } else {
-     setPicture(avatar);
-   }
-   setUseInitials(false);
- };
+  const handleAvatarClick = (avatar: AVATAR_IDENTIFIER) => {
+    if (picture === avatar) {
+      setPicture(null);
+    } else {
+      setPicture(avatar);
+    }
+    setUseInitials(false);
+  };
 
- const handleCheckboxChange = () => {
-   setUseInitials(!useInitials);
-   setPicture(null);
- };
+  const handleCheckboxChange = () => {
+    setUseInitials(!useInitials);
+    setPicture(null);
+  };
 
-  const checkAvatar = () : boolean => {
-    if (!useInitials && (picture === null)){
+  const checkAvatar = (): boolean => {
+    if (!useInitials && picture === null) {
       return false;
     }
     return true;
-  }
+  };
   const signUp = () => {
     if (checkPassword()) {
       const userdata = {
@@ -363,10 +396,12 @@ export default function Register() {
         email: emailRef.current?.value,
         password: passwordRef.current?.value,
         tel: telRef.current?.value.replace(/-/g, ""),
+        picture: useInitials ? AVATAR_IDENTIFIER.none : picture,
         _csrf: csrfTokenRef.current?.value,
       };
       console.log(userdata);
       console.log(csrfToken);
+      console.log(picture + "initials : " + useInitials);
       User.register(userdata)
         .then((response: any) => {
           if (!response.message) {
@@ -391,7 +426,7 @@ export default function Register() {
               Create your account
             </h1>
             <form className="space-y-4 md:space-y-6">
-              <div className="hidden" ref={nameSectionRef}>
+              <div className="" ref={nameSectionRef}>
                 <div>
                   <label
                     htmlFor="firstname"
@@ -546,7 +581,7 @@ export default function Register() {
                   </p>
                 </div>
               </div>
-              <div className="">
+              <div className="hidden" ref={avatarSectionRef}>
                 <h3 className="mb-5 text-lg font-medium text-gray-900 dark:text-white">
                   Select an avatar{" "}
                   <span className="font-bold text-red-600">*</span>

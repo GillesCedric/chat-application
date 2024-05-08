@@ -27,6 +27,7 @@ import { convertToYesterday } from "../utils/utilsFunctions";
 const ChatPage = () => {
   const [conversations, setConversations] = useState<ConversationModel[]>([]);
   const newConversation = useSocketListener(SocketKeywords.newConversation);
+  const newMessage = useSocketListener(SocketKeywords.newMessage);
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();
   const wasOnlineRef = useRef(isOnline);
@@ -87,7 +88,13 @@ const ChatPage = () => {
         notify(error, "error");
       });
   };
+  const addMessage = () => {
+    notify("New message received", "info");
+  };
 
+  useEffect(() => {
+    addMessage();
+  }, [newConversation]);
   useEffect(() => {
     fetchConversations();
   }, [newConversation]);

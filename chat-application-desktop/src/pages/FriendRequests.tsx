@@ -6,11 +6,12 @@ import { useSocketListener } from "../hooks/useSocketListener"; // Make sure the
 import { SocketKeywords } from "../utils/keywords";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import { notify } from "../components/toastify";
+import Socket from "../modules/socket/Socket";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
-const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
-const hasNewNotification = useSocketListener(SocketKeywords.newNotification); 
+/* const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
+ */const hasNewNotification = useSocketListener(SocketKeywords.newNotification); 
     const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
@@ -28,7 +29,7 @@ const hasNewNotification = useSocketListener(SocketKeywords.newNotification);
   };
   useEffect(() => {
     fetchFriendRequests();
-  }, [hasNewFriendRequest ,hasNewNotification]); // Re-fetch when new notifications arrive
+  }, [hasNewNotification]); // Re-fetch when new notifications arrive
 
   return (
     <div className="h-screen flex flex-col">

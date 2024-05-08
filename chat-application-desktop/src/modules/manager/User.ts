@@ -8,13 +8,13 @@ export default class User {
     email: string;
     password: string;
     tel: string;
+    picture: string;
     _csrf: string;
   }): Promise<any> {
     try {
-      const response = await API.register(
-        userData, 
-        {"csrf-token": userData._csrf}
-      );
+      const response = await API.register(userData, {
+        "csrf-token": userData._csrf,
+      });
       if (response.message) {
         console.log("Registration successful");
         return { message: userData.username + " registration successful" };
@@ -53,25 +53,25 @@ export default class User {
     _csrf: string;
   }): Promise<any> {
     try {
-      const response = await API.sendFriendRequest(
-        data,
-        { "csrf-token": data._csrf }
-      );
+      const response = await API.sendFriendRequest(data, {
+        "csrf-token": data._csrf,
+      });
       if (response.message) {
         console.log(response.message);
         return {
           message: "Friend requests successfully sent to " + data.username,
         };
-      }
-      if (response.error) {
+      } else if (response.error) {
         console.error(
           "Failed to add friend with error message:",
           response.error
         );
         return { error: response.error };
       } else if (response.errors) {
-        console.log(response.errros);
-        return { error: "Failed to send friend request " };
+        console.log(response);
+        return {
+          error: "Failed to send friend request " + response.errors[0].msg,
+        };
       }
     } catch (error) {
       console.error("Error while adding friend", error);
@@ -80,15 +80,26 @@ export default class User {
   }
   public static async updateFriendRequest(
     id: string,
-    data: any
-  ): Promise<string> {
+    data: { status: string; _csrf: string }
+  ): Promise<any> {
     try {
-      const response = await API.updateFriendRequest(id, data);
+      const response = await API.updateFriendRequest(id, data, {
+        "csrf-token": data._csrf,
+      });
       if (response.message) {
         console.log(response.message);
-        return Promise.resolve("Request successfully accepted");
-      } else {
-        throw new Error(response.error || "Failed to update friend request");
+        return { message: "Request successfully accepted" };
+      } else if (response.error) {
+        console.error(
+          "Failed to udate frined request with error message:",
+          response.error
+        );
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response.errors.msg);
+        return {
+          error: "Failed to update friend request " + response.errors.msg,
+        };
       }
     } catch (error) {
       console.error("Failed to update friend request:", error);

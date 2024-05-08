@@ -3,17 +3,26 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
 import { notify } from "./toastify";
+import { useEffect, useState } from "react";
+import API from "../modules/api/API";
 
 export const FriendRequestComponent = ({
   friendRequest,
 }: {
   friendRequest: any;
-}) => {
+  }) => {
+  const [csrfToken, setCsrfToken] = useState("");
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   const friendRequestId: string = friendRequest._id;
   const handleAccept = () => {
     const data = {
-      status: FriendsRequestStatus.accepted,
-    }
+      status: FriendsRequestStatus.deleted,
+      _csrf: csrfToken,
+    };
     User.updateFriendRequest(friendRequestId ,data )
       .then((response: any) => {
         if (response.message) {
@@ -31,6 +40,7 @@ export const FriendRequestComponent = ({
   const handleDelete = () => {
     User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.deleted,
+      _csrf : csrfToken
     })
       .then((response: any) => {
         if (response.message) {
@@ -46,7 +56,8 @@ export const FriendRequestComponent = ({
 
   const handleReject = () => {
     User.updateFriendRequest(friendRequestId, {
-      status: FriendsRequestStatus.rejected,
+      status: FriendsRequestStatus.deleted,
+      _csrf: csrfToken,
     })
       .then((response: any) => {
         if (response.message) {
