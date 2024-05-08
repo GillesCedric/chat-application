@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faFaceSmile, faFile } from "@fortawesome/free-regular-svg-icons";
+import API from "../modules/api/API";
 
 function resetTextAreaToDefault(event: React.FormEvent): void {
   const textarea = event.currentTarget.querySelector("textarea");
@@ -12,26 +13,40 @@ function resetTextAreaToDefault(event: React.FormEvent): void {
 
 // Function to adjust the textarea height while typing
 const textAreaAdjust = (element: HTMLTextAreaElement) => {
-  element.style.height = "1px";
+  // First, reset the height to 'auto' to shrink as content is deleted
+  element.style.height = "auto";
+  // Then set it to the actual scroll height
   element.style.height = `${element.scrollHeight}px`;
-  // If you want to limit the growth to the height equivalent to 3 rows
-  if (element.scrollHeight > element.clientHeight && element.rows < 4) {
-    element.rows += 1;
+
+  // Calculate maximum height for 3 rows
+  const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
+  const maxRowsHeight = lineHeight * 4;
+
+  if (element.scrollHeight > maxRowsHeight) {
+    element.style.height = `${maxRowsHeight}px`;
+    element.style.overflowY = "auto"; // Enable scrolling
+  } else {
+    element.style.overflowY = "hidden"; // Hide scrollbar when not needed
   }
 };
-
 
 const ChatInput = ({
   onSendMessage,
 }: {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string , csrfToken : string) => void;
 }) => {
   const [message, setMessage] = useState("");
-
+const [csrfToken, setCsrfToken] = useState("");
+const csrfTokenRef = useRef<HTMLInputElement | null>(null);
+useEffect(() => {
+  API.getCSRFToken().then((data: any) => {
+    setCsrfToken(data.token);
+  });
+}, []);
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
-      onSendMessage(message);
+      onSendMessage(message, csrfToken);
       setMessage("");
     }
     resetTextAreaToDefault(event);
@@ -39,6 +54,7 @@ const ChatInput = ({
 
   return (
     <form onSubmit={handleSend} className="rounded-b-lg">
+      <input ref={csrfTokenRef} type="hidden" name="_csrf" value={csrfToken} />
       <label htmlFor="chat" className="sr-only">
         Your message
       </label>
@@ -57,11 +73,13 @@ const ChatInput = ({
         </button>
         <textarea
           id="chat"
-          rows={4} // Change the initial rows to your desired height
-          className="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          rows={1} // Change the initial rows to your desired height
+          className=" focus:outline-none block scrollbar-none mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Your message..."
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value), textAreaAdjust(e.target);
+          }}
           style={{ resize: "none" }} // Disable resizing
         ></textarea>
         <button

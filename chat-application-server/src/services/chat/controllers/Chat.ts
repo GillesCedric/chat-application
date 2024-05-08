@@ -50,7 +50,7 @@ export default class ChatController {
 
       await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
         method: Method.post,
-        headers: headers(),
+        headers: headers(req.headers["user-agent"]),
         body: JSON.stringify({
           access_token: req.body.access_token,
           receivers: req.body.members,
@@ -207,11 +207,12 @@ export default class ChatController {
       conversations = conversations.map(conversation => {
         // Déchiffrer les détails de chaque membre
         // Retourner la conversation mise à jour avec les membres déchiffrés
+        console.log(conversation);
         return {
           _id: conversation._id,
           lastMessage: {
             date: conversation.lastMessageDate,
-            message: conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
+            message: conversation.lastMessageDetails && conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
           },
           unreadCount: conversation.unreadCount,
           fullname: `${Crypto.decrypt(conversation.memberDetails.firstname, 'database')} ${Crypto.decrypt(conversation.memberDetails.lastname, 'database')}`,
@@ -259,10 +260,28 @@ export default class ChatController {
         { new: true, upsert: true }
       )
 
+      const request = await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
+        method: Method.post,
+        headers: headers(req.headers["user-agent"]),
+        body: JSON.stringify({
+          access_token: req.body.access_token,
+          receivers: [conversaton.members[0]],
+          data: {
+            _id: savedChat._id,
+            message: req.body.message,
+            status: ChatStatus.received,
+            isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
+          },
+          event: SocketKeywords.newMessage
+        })
+      })
+
+      console.log(  await request.json())
+
       await Promise.all([
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: Method.post,
-          headers: headers(),
+          headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
             receivers: [conversaton.members[0]],
@@ -277,7 +296,7 @@ export default class ChatController {
         }),
         fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
           method: Method.post,
-          headers: headers(),
+          headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
             receivers: [conversaton.members[1]],
@@ -329,7 +348,7 @@ export default class ChatController {
 
       await fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
         method: Method.post,
-        headers: headers(),
+        headers: headers(req.headers["user-agent"]),
         body: JSON.stringify({
           access_token: req.body.access_token,
           receivers: conversaton.members,

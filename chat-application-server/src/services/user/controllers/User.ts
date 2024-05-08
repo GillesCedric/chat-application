@@ -1,15 +1,12 @@
 import { UserModel, UserStatus } from "../../../models/User";
-import {
-  FriendsRequestModel,
-  FriendsRequestStatus,
-} from "../../../models/FriendsRequest";
+import { FriendsRequestModel, FriendsRequestStatus } from "../../../models/FriendsRequest";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import JWTUtils from "../../../modules/jwt/JWT";
 import { Crypto } from "../../../modules/crypto/Crypto";
 import { Code, Method, headers, protocol } from "../../../utils/HTTP";
 import { Services, SocketKeywords, Tokens } from "../../../utils/Keywords";
-import SERVICES from "../../../config/services.json";
+import SERVICES from '../../../config/services.json'
 import { Keys, Purposes, TokenModel } from "../../../models/Token";
 import Mailer from "../../../modules/mailer/Mailer";
 import fs from "fs";
@@ -50,7 +47,7 @@ export default class UserController {
           });
         });
       })
-      .catch((error: any) => {
+      .catch((error) => {
         console.error(error);
         return res.status(500).json({ error: "Internal Server Error" });
       });
@@ -59,9 +56,7 @@ export default class UserController {
   public readonly me = async (req: Request, res: Response): Promise<Response> => {
     const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
     try {
-      const user = await UserModel.findById(userId).select(
-        "lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status"
-      );
+      const user = await UserModel.findById(userId).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status")
 
       if (!user) {
         return res.status(500).json({
@@ -69,16 +64,16 @@ export default class UserController {
         });
       }
 
-      user.lastname = Crypto.decrypt(user.lastname, "database");
-      user.firstname = Crypto.decrypt(user.firstname, "database");
-      user.username = Crypto.decrypt(user.username, "username");
-      user.tel = Crypto.decrypt(user.tel, "tel");
-      user.email = Crypto.decrypt(user.email, "email");
-      user.isEmailVerified = Crypto.decrypt(user.isEmailVerified, "database");
-      user.isTelVerified = Crypto.decrypt(user.isTelVerified, "database");
-      user.is2FAEnabled = Crypto.decrypt(user.is2FAEnabled, "database");
-      user.picture = Crypto.decrypt(user.picture, "database");
-      user.status = Crypto.decrypt(user.status, "database");
+      user.lastname = Crypto.decrypt(user.lastname, "database")
+      user.firstname = Crypto.decrypt(user.firstname, "database")
+      user.username = Crypto.decrypt(user.username, "username")
+      user.tel = Crypto.decrypt(user.tel, "tel")
+      user.email = Crypto.decrypt(user.email, "email")
+      user.isEmailVerified = Crypto.decrypt(user.isEmailVerified, "database")
+      user.isTelVerified = Crypto.decrypt(user.isTelVerified, "database")
+      user.is2FAEnabled = Crypto.decrypt(user.is2FAEnabled, "database")
+      user.picture = Crypto.decrypt(user.picture, "database")
+      user.status = Crypto.decrypt(user.status, "database")
 
       return res.status(200).json({
         user,
@@ -115,7 +110,18 @@ export default class UserController {
 
       return res.status(200).json({
         message: 'Profile updated successfully',
-        data: updatedUser
+        data: {
+          _id: updatedUser._id,
+          lastname: Crypto.decrypt(updatedUser.lastname, 'database'),
+          firstname: Crypto.decrypt(updatedUser.firstname, 'database'),
+          username: Crypto.decrypt(updatedUser.username, 'username'),
+          tel: Crypto.decrypt(updatedUser.tel, 'tel'),
+          email: Crypto.decrypt(updatedUser.email, 'email'),
+          isTelVerified: Crypto.decrypt(updatedUser.isTelVerified, 'boolean'),
+          is2FAEnabled: Crypto.decrypt(updatedUser.is2FAEnabled, 'boolean'),
+          picture: Crypto.decrypt(updatedUser.picture, 'database'),
+          status: Crypto.decrypt(updatedUser.status, 'status')
+        }
       })
     } catch (error) {
       console.log(error);
@@ -131,8 +137,8 @@ export default class UserController {
   ): Promise<Response> => {
     try {
       const user = await UserModel.findOne({
-        email: Crypto.encrypt(req.body.email, "email"),
-      });
+        email: Crypto.encrypt(req.body.email, "email")
+      })
 
       if (!user) {
         return res.status(401).json({
@@ -151,10 +157,9 @@ export default class UserController {
         });
       }
 
-      if (Crypto.decrypt(user.isEmailVerified, "boolean") == "false") {
+      if (Crypto.decrypt(user.isEmailVerified, 'boolean') == "false") {
         return res.status(403).json({
-          error:
-            "Votre compte n'est pas encore activé! Vous ne pouvez pas encore vous connecter",
+          error: "Votre compte n'est pas encore activé! Vous ne pouvez pas encore vous connecter",
         });
       }
 
@@ -201,7 +206,8 @@ export default class UserController {
           req.headers['user-agent'],
           Tokens.refreshToken
         ),
-      });
+      })
+
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -213,60 +219,54 @@ export default class UserController {
   public readonly activateEmail = async (req: Request, res: Response): Promise<Response> => {
 
     try {
-      const userToken = JWTUtils.getDataFromToken(req.query.token as string);
+      const userToken = JWTUtils.getDataFromToken(req.query.token as string)
 
       if (userToken == undefined) {
-        res.sendFile(
-          path.join(process.cwd(), "public", "VerificationEmailError.html")
-        );
-        return;
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
       }
 
-      userToken.userId = Crypto.decrypt(userToken.userId, "data");
-      userToken.key = Crypto.decrypt(userToken.key, "data");
-      userToken.purpose = Crypto.decrypt(userToken.purpose, "data");
-      userToken.code = Crypto.decrypt(userToken.code, "data");
+      userToken.userId = Crypto.decrypt(userToken.userId, 'data')
+      userToken.key = Crypto.decrypt(userToken.key, 'data')
+      userToken.purpose = Crypto.decrypt(userToken.purpose, 'data')
+      userToken.code = Crypto.decrypt(userToken.code, 'data')
 
-      const user = await UserModel.findById(userToken.userId);
+      const user = await UserModel.findById(userToken.userId)
 
-      if (Crypto.decrypt(user.isEmailVerified, "boolean") == "true") {
-        res.sendFile(
-          path.join(process.cwd(), "public", "EmailAlreadyVerified.html")
-        );
-        return;
+      if (Crypto.decrypt(user.isEmailVerified, 'boolean') == "true") {
+        res.sendFile(path.join(process.cwd(), 'public', 'EmailAlreadyVerified.html'))
+        return
       }
 
       const token = await TokenModel.findOne({
         user: userToken.userId,
-        key: Crypto.encrypt(userToken.key, "status"),
-        purpose: Crypto.encrypt(userToken.purpose, "status"),
-        validity: { $gt: new Date() },
-      }).sort({ createdAt: -1 });
+        key: Crypto.encrypt(userToken.key, 'status'),
+        purpose: Crypto.encrypt(userToken.purpose, 'status'),
+        validity: { $gt: new Date() }
+      }).sort({ createdAt: -1 })
 
       if (!token) {
-        res.sendFile(
-          path.join(process.cwd(), "public", "VerificationEmailError.html")
-        );
-        return;
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
       }
 
-      const tokenMatches = bcrypt.compareSync(userToken.code, token.token);
+      const tokenMatches = bcrypt.compareSync(
+        userToken.code,
+        token.token
+      );
 
       if (!tokenMatches) {
-        res.sendFile(
-          path.join(process.cwd(), "public", "VerificationEmailError.html")
-        );
-        return;
+        res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailError.html'))
+        return
       }
 
       await UserModel.findByIdAndUpdate(userToken.userId, {
-        isEmailVerified: Crypto.encrypt("true", "boolean"),
-      });
+        isEmailVerified: Crypto.encrypt("true", "boolean")
+      })
 
-      res.sendFile(
-        path.join(process.cwd(), "public", "VerificationEmailSuccess.html")
-      );
-      return;
+      res.sendFile(path.join(process.cwd(), 'public', 'VerificationEmailSuccess.html'))
+      return
+
     } catch (error) {
       console.log(error);
       return res.status(500).json({
@@ -370,8 +370,10 @@ export default class UserController {
 
     try {
 
+      const userId = Crypto.decrypt(req.body.userId, 'data')
+
       const token = await TokenModel.findOne({
-        user: Crypto.decrypt(req.body.userId, 'data'),
+        user: userId,
         key: Crypto.encrypt(Keys.tel, 'status'),
         purpose: Crypto.encrypt(Purposes.connection, 'status'),
         validity: { $gt: new Date() }
@@ -394,7 +396,7 @@ export default class UserController {
         });
       }
 
-      const user = await UserModel.findByIdAndUpdate(req.body.userId, {
+      const user = await UserModel.findByIdAndUpdate(userId, {
         status: Crypto.encrypt(UserStatus.online, "status")
       })
 
@@ -445,17 +447,18 @@ export default class UserController {
         ),
         status: Crypto.encrypt(UserStatus.offline, "status"),
         friends: [],
-      });
+
+      })
 
       if (user) {
-        const userCode = Crypto.random().toUpperCase();
+        const userCode = Crypto.random().toUpperCase()
 
         const token = JWTUtils.generateTokenWithData({
           userId: Crypto.encrypt(user[0].id, "data"),
-          code: Crypto.encrypt(userCode, "data"),
-          key: Crypto.encrypt(Keys.email, "data"),
-          purpose: Crypto.encrypt(Purposes.verification, "data"),
-        });
+          code: Crypto.encrypt(userCode, 'data'),
+          key: Crypto.encrypt(Keys.email, 'data'),
+          purpose: Crypto.encrypt(Purposes.verification, 'data')
+        })
 
         const validity = new Date()
         validity.setMinutes(
@@ -506,9 +509,10 @@ export default class UserController {
       return res.status(401).json({
         error: "Cet utilisateur existe déjà",
       });
+
     } catch (error) {
       //TODO log the error
-      console.log(error);
+      console.log(error)
       return res.status(401).json({
         error: "Impossible d'enregistrer l'utilisateur",
       });
@@ -579,28 +583,25 @@ export default class UserController {
 
     //check if the username exits
     try {
-      const user = await UserModel.findById(userId);
-      const friend = await UserModel.findOne({
-        username: Crypto.encrypt(req.body.username, "username"),
-      });
+      const user = await UserModel.findById(userId)
+      const friend = await UserModel.findOne({ username: Crypto.encrypt(req.body.username, "username") })
 
       if (!friend) {
         return res.status(401).json({
           error: "Cet utilisateur n'existe pas",
-        });
+        })
       }
 
       if (friend.id == user.id) {
         return res.status(401).json({
-          error:
-            "Vous ne pouvez pas vous envoyer une demande d'amitié à vous même",
-        });
+          error: "Vous ne pouvez pas vous envoyer une demande d'amitié à vous même",
+        })
+        
       }
-
-      if (user.friends.includes(friend.id)) {
-        return res.status(403).json({
+        if (user.friends.includes(friend.id)) {
+          return res.status(403).json({
           error: "Vous êtes déjà amis avec cet Utilisateur",
-        });
+        })
       }
 
       await Promise.all([
@@ -608,14 +609,14 @@ export default class UserController {
           sender: user.id,
           receiver: friend.id,
           comment: Crypto.encrypt(req.body.comment, "database"),
-          status: Crypto.encrypt(FriendsRequestStatus.pending, "status"),
+          status: Crypto.encrypt(FriendsRequestStatus.pending, "status")
         }),
         fetch(
           `${protocol()}://${SERVICES[process.env.NODE_ENV][Services.notification].domain
           }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
           {
             method: "POST",
-            headers: headers(),
+            headers: headers(req.headers["user-agent"]),
             body: JSON.stringify({
               access_token: req.body.access_token,
               receiver: friend.id,
@@ -630,15 +631,15 @@ export default class UserController {
 
       return res.status(200).json({
         message: "Demande d'amis envoyée avec succèss",
-      });
+      })
+
     } catch (error) {
-      console.log(error);
+      console.log(error)
       return res.status(401).json({
         error: "Impossible d'envoyer la demande d'amis",
       });
     }
   };
-
   public readonly getUserFriendRequests = async (req: Request, res: Response): Promise<Response> => {
 
     const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], "access_token")
@@ -652,7 +653,7 @@ export default class UserController {
       if (!friendRequests) {
         return res.status(401).json({
           error: "Impossible de récupérer vos demandes d'amis",
-        });
+        })
       }
 
       return res.status(200).json({
@@ -675,18 +676,17 @@ export default class UserController {
       })
 
     } catch (error) {
-      console.log(error);
+      console.log(error)
       return res.status(401).json({
         error: "Internal server error",
       });
     }
+
   };
 
-  public readonly updateUserFriendRequest = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
+  public readonly updateUserFriendRequest = async (req: Request, res: Response): Promise<Response> => {
     //salt should always be in number for because bcrypt generate salt only for salt in number not string
+
 
     //check if the username exits
     try {
@@ -696,20 +696,19 @@ export default class UserController {
         "access_token"
       );
 
-      const user = await UserModel.findById(userId);
+      console.log(userId)
 
-      const friendRequest = await FriendsRequestModel.findById(req.params.id);
+      const user = await UserModel.findById(userId)
+
+      const friendRequest = await FriendsRequestModel.findById(req.params.id)
 
       if (!friendRequest) {
         return res.status(401).json({
           error: "Cette demande d'amis n'existe pas",
-        });
+        })
       }
 
-      if (
-        Crypto.decrypt(friendRequest.status, "database") !=
-        FriendsRequestStatus.pending
-      ) {
+      if (Crypto.decrypt(friendRequest.status, 'database') != FriendsRequestStatus.pending) {
         return res.status(403).json({
           error: "Cette demande d'amis a déjà été mise à jour",
         })
@@ -723,12 +722,12 @@ export default class UserController {
         await Promise.all([
           UserModel.findByIdAndUpdate(
             friendRequest.receiver,
-            { $addToSet: { friends: friendRequest.sender } }, // Utilise $addToSet pour éviter les doublons
+            { $addToSet: { friends: friendRequest.sender } },  // Utilise $addToSet pour éviter les doublons
             { new: true, upsert: false }
           ),
           UserModel.findByIdAndUpdate(
             friendRequest.sender,
-            { $addToSet: { friends: friendRequest.receiver } }, // Utilise $addToSet pour éviter les doublons
+            { $addToSet: { friends: friendRequest.receiver } },  // Utilise $addToSet pour éviter les doublons
             { new: true, upsert: false }
           ),
           friendRequest.save(),
@@ -737,7 +736,7 @@ export default class UserController {
             }:${SERVICES[process.env.NODE_ENV][Services.notification].port}/`,
             {
               method: "POST",
-              headers: headers(),
+              headers: headers(req.headers["user-agent"]),
               body: JSON.stringify({
                 access_token: req.body.access_token,
                 receiver: friendRequest.sender,
@@ -754,7 +753,7 @@ export default class UserController {
             }/conversations`,
             {
               method: Method.post,
-              headers: headers(),
+              headers: headers(req.headers["user-agent"]),
               body: JSON.stringify({
                 access_token: req.body.access_token,
                 members: [friendRequest.sender, friendRequest.receiver],
@@ -765,18 +764,21 @@ export default class UserController {
 
         return res.status(200).json({
           message: "Demande d'amis mise à jour avec succèss",
-        });
+        })
+
       } else {
         return res.status(403).json({
           error: "Vous n'avez pas le droit d'accéder à cette ressource",
-        });
+        })
       }
+
     } catch (error) {
-      console.log(error);
+      console.log(error)
       return res.status(401).json({
         error: "Impossible de mettre à jour la demande d'amis",
       });
     }
+
   };
 
   public readonly deleteFriend = (req: Request, res: Response): Response => {

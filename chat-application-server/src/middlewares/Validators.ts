@@ -85,7 +85,7 @@ export abstract class UserValidators extends Validators {
     ]
 
     public static readonly connect = [
-        body('userId').escape().trim().stripLow().isMongoId(),
+        body('userId').trim().stripLow().notEmpty(),
         body('code').escape().trim().stripLow().isLength({ min: 6, max: 6 }).isNumeric()
     ]
 
