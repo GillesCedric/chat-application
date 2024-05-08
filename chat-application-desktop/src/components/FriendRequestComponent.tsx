@@ -3,17 +3,26 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
 import { notify } from "./toastify";
+import { useEffect, useState } from "react";
+import API from "../modules/api/API";
 
 export const FriendRequestComponent = ({
   friendRequest,
 }: {
   friendRequest: any;
-}) => {
+  }) => {
+  const [csrfToken, setCsrfToken] = useState("");
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   const friendRequestId: string = friendRequest._id;
   const handleAccept = () => {
     const data = {
-      status: FriendsRequestStatus.accepted,
-    }
+      status: FriendsRequestStatus.deleted,
+      _csrf: csrfToken,
+    };
     User.updateFriendRequest(friendRequestId ,data )
       .then((response: any) => {
         if (response.message) {
@@ -31,6 +40,7 @@ export const FriendRequestComponent = ({
   const handleDelete = () => {
     User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.deleted,
+      _csrf : csrfToken
     })
       .then((response: any) => {
         if (response.message) {
@@ -46,7 +56,8 @@ export const FriendRequestComponent = ({
 
   const handleReject = () => {
     User.updateFriendRequest(friendRequestId, {
-      status: FriendsRequestStatus.rejected,
+      status: FriendsRequestStatus.deleted,
+      _csrf: csrfToken,
     })
       .then((response: any) => {
         if (response.message) {
@@ -111,12 +122,12 @@ export const FriendRequestComponent = ({
           alt="Friend's avatar"
         />
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {friendRequest.sender.username}
+          {friendRequest.sender.fullname}
         </h5>
         <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
           {friendRequest.comment}
         </span>
-        <div className="flex mt-4">
+        <div className="flex mt-4 justify-between">
           <button
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             onClick={handleAccept}

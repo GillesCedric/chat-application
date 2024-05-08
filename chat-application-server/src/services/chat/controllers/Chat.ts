@@ -207,11 +207,12 @@ export default class ChatController {
       conversations = conversations.map(conversation => {
         // Déchiffrer les détails de chaque membre
         // Retourner la conversation mise à jour avec les membres déchiffrés
+        console.log(conversation);
         return {
           _id: conversation._id,
           lastMessage: {
             date: conversation.lastMessageDate,
-            message: conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
+            message: conversation.lastMessageDetails && conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
           },
           unreadCount: conversation.unreadCount,
           fullname: `${Crypto.decrypt(conversation.memberDetails.firstname, 'database')} ${Crypto.decrypt(conversation.memberDetails.lastname, 'database')}`,

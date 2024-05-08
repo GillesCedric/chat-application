@@ -39,8 +39,8 @@ export const NotificationDrawer = ({
     <div
       ref={drawerRef}
       onClick={handleClose}
-      className={`fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${
+        isOpen ? " opacity-100  " : "opacity-0 pointer-events-none"
       }`}
     >
       <div

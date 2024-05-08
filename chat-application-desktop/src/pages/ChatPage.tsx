@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import ChatList from "../components/ChatList";
-import MessageList from "../components/MessageList";
+import Conversations from "../components/Conversations";
+import { Conversation } from "../components/Conversation";
 import ChatInput from "../components/ChatInput";
 import { ChatDataTest } from "../components/ChatDataTest";
-import MessageListHeader from "../components/MessageListHeader";
+import ConversationHeader from "../components/ConversationHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
 import Socket from "../modules/socket/Socket";
 import { friend } from "../components/FriendDataTest";
-import { conversation } from "../components/ConversationDataTest";
 import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
@@ -19,27 +18,67 @@ import { AddFriend } from "../components/AddFriend";
 import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
 import User from "../modules/manager/User";
+import { EmptyCenterSection } from "../components/EmptyCenterSection";
+import ConversationRepository, {
+  MessageModel,
+} from "../modules/manager/ConversationRepository";
+import { ConversationModel } from "../modules/manager/ConversationRepository";
+import { convertToYesterday } from "../utils/utilsFunctions";
 const ChatPage = () => {
-  const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState<any[]>([]);
-
-  const handleSendMessage = (newMessage: string) => {
+  const [conversations, setConversations] = useState<ConversationModel[]>([]);
+  const newConversation = useSocketListener(SocketKeywords.newConversation);
+  const newMessage = useSocketListener(SocketKeywords.newMessage);
+  const [showBanner, setShowBanner] = useState(false);
+  const isOnline = useCheckOnlineStatus();
+  const wasOnlineRef = useRef(isOnline);
+  const [messsages, setMessages] = useState<MessageModel[]>([]);
+  const [conversation, setConversation] = useState<ConversationModel>(null);
+  const handleSendMessage = (newMessage: string, csrfToken: string) => {
+    if (conversation === null) {
+      notify("Error sending message, cannot get conversation", "error");
+      return;
+    }
     // Add new message to the messages state
-    const newMsg = {
-      id: messages.length + 1,
-      content: newMessage,
-      time: new Date().toLocaleTimeString(),
-      isOwn: true,
+    ConversationRepository.addMessage(conversation._id, {
+      message: newMessage,
+      _csrf: csrfToken,
+    });
+    const savedMessage: MessageModel = {
+      _id: "",
+      sender: "",
+      message: newMessage,
+      status: "",
+      createdAt: convertToYesterday(new Date().toISOString()).toISOString(),
+      isOwnedByUser: true,
     };
-    setMessages([...messages, newMsg]);
+    setMessages([...messsages, savedMessage]);
   };
 
-  const newConversation = useSocketListener(SocketKeywords.newConversation);
-  const fetchConversations = () => {
-    User.getConversations()
+  const handleSelectConversation = (conversation: ConversationModel): void => {
+    setConversation(conversation);
+    ConversationRepository.getUserConversation(conversation._id)
       .then((response: any) => {
-        if (response) {
-          console.log(response);
+        if (!response.error) {
+          console.log("Messages : " + response.data.length);
+          console.log(
+            response.data.map((data: any) => {
+              console.log(data);
+            })
+          );
+          setMessages(response.data);
+        } else {
+          notify(response.error, "error");
+        }
+      })
+      .catch((error: any) => {
+        notify(error, "error");
+      });
+  };
+  const fetchConversations = () => {
+    ConversationRepository.getConversations()
+      .then((response: any) => {
+        console.log(response);
+        if (!response.error) {
           setConversations(response.data);
         } else {
           notify(response.error, "error");
@@ -48,14 +87,18 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
-  }
+  };
+  const addMessage = () => {
+    notify("New message received", "info");
+  };
+
+  useEffect(() => {
+    addMessage();
+  }, [newConversation]);
   useEffect(() => {
     fetchConversations();
   }, [newConversation]);
 
-  const [showBanner, setShowBanner] = useState(false);
-  const isOnline = useCheckOnlineStatus();
-  const wasOnlineRef = useRef(isOnline);
   useEffect(() => {
     if (wasOnlineRef.current !== isOnline) {
       if (!isOnline) {
@@ -89,31 +132,50 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`w-1/4 p-2 overflow-y-auto scrollbar justify-center items-center  ${conversations.length === 0 ? "" : "flex-none"
-                }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
+                conversations.length === 0 ? "" : "flex-none"
+              }`}
             >
-              <div className="sticky top-0">
+              <div className="sticky top-0 z-50">
                 <SearchBar />
               </div>
-              <ChatList conversations={conversations} />
+              <Conversations
+                conversations={conversations}
+                changeConversation={handleSelectConversation}
+                selectedConversation={conversation}
+              />
+              <div className="absolute bottom-0 left-0 p-4">
+                <AddFriend />
+              </div>
             </aside>
-            <main className="flex flex-col w-3/4 flex-1 p-2 overflow-hidden">
-              <div className="flex-none">
-                <MessageListHeader
-                  name={friend.name}
-                  isOnline={isOnline}
-                  avatar={friend.avatar}
+            {conversation === null ? (
+              <>
+                <EmptyCenterSection
+                  message="No conversation selected"
+                  smallParagraph="Please choose a connvsersation in your left and click on it to start chating 😉"
                 />
-              </div>
+              </>
+            ) : (
+              <>
+                <main className="flex flex-col w-3/4 flex-1 overflow-hidden bg-white">
+                  <div className="flex-none">
+                    <ConversationHeader
+                      name={conversation.fullname}
+                      status={true}
+                      avatar={conversation.picture}
+                    />
+                  </div>
 
-              <div className="flex-grow overflow-y-auto scrollbar-none">
-                <MessageList messages={messages} />
-              </div>
+                  <div className="flex-grow overflow-y-auto scrollbar-none">
+                    <Conversation messages={messsages} />
+                  </div>
 
-              <div className="flex-none">
-                <ChatInput onSendMessage={handleSendMessage} />
-              </div>
-            </main>
+                  <div className="flex-none bg-white">
+                    <ChatInput onSendMessage={handleSendMessage} />
+                  </div>
+                </main>
+              </>
+            )}
           </>
         )}
       </div>

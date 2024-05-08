@@ -113,21 +113,23 @@ export default class API {
     return responseData;
   };
 
-  public static readonly checkAuthentication =
-    async (data: any, headers: HeadersInit = {}): Promise<any> => {
-      let responseData = null;
-      try {
-        const response = await fetch(this.apiUrl + "/users/token", {
-          method: "POST",
-          headers: { ...this.headers },
-          body: JSON.stringify(data),
-        });
-        responseData = await response.json();
-      } catch (error) {
-        console.log("error " + error);
-      }
-      return responseData;
-    };
+  public static readonly checkAuthentication = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    try {
+      const response = await fetch(this.apiUrl + "/users/token", {
+        method: "POST",
+        headers: { ...this.headers },
+        body: JSON.stringify(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    return responseData;
+  };
 
   public static readonly checkIfExist = async (
     data: any,
@@ -146,10 +148,6 @@ export default class API {
     }
     return responseData;
   };
-
-  public static readonly getAllUsers: () => Promise<any> =
-    async (): Promise<any> => { };
-  
   public static readonly getCSRFToken = async (): Promise<any> => {
     let responseData = null;
     let handleRequest = false;
@@ -169,6 +167,78 @@ export default class API {
     return responseData;
   };
 
+  public static readonly getUserConversation = async (
+    id: string,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = await this.generateURL(
+        this.apiUrl + "/chats/conversations/" + id
+      );
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getUserConversation(id);
+    return responseData;
+  };
+
+  public static readonly getUserConversations = async (
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = await this.generateURL(this.apiUrl + "/chats/conversations/");
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getUserConversations();
+    return responseData;
+  };
+  public static readonly sendMessage = async (
+    id: string,
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/chats/conversations/" + id, {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: await this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.sendMessage(id, data);
+    return responseData;
+  };
   public static readonly login = async (
     data: any,
     headers: HeadersInit = {}
@@ -180,7 +250,7 @@ export default class API {
         method: "POST",
         headers: {
           ...this.headers,
-          ...headers
+          ...headers,
         },
         body: await this.generateBody(data),
       });
@@ -211,51 +281,59 @@ export default class API {
     return responseData;
   };
 
-  public static readonly sendFriendRequest =
-    async (data: any, headers: HeadersInit = {}): Promise<any> => {
-      let responseData = null;
-      let handleRequest = false;
-      try {
-        const response = await fetch(this.apiUrl + "/users/friends/request", {
-          method: "POST",
-          headers: {
-            ...this.headers,
-            ...headers
-          },
-          body: await this.generateBody(data),
-        });
-        responseData = await response.json();
-      } catch (error) {
-        console.log("error " + error);
-      }
-      handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.sendFriendRequest(data);
-      return responseData;
-    };
-  public static readonly getFriendsRequests = async (headers: HeadersInit = {}): Promise<any> => {
-      let responseData = null;
-      let handleRequest = false;
-      try {
-        const url = await this.generateURL(
-          this.apiUrl + "/users/friends/request"
-        );
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            ...this.headers,
-            ...headers
-          },
-        });
-        responseData = await response.json();
-      } catch (error) {
-        console.log("error " + error);
-      }
-      handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.getFriendsRequests();
-      return responseData;
-    };
+  public static readonly sendFriendRequest = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/friends/request", {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: await this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.sendFriendRequest(data);
+    return responseData;
+  };
+  public static readonly getFriendsRequests = async (
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = await this.generateURL(
+        this.apiUrl + "/users/friends/request"
+      );
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getFriendsRequests();
+    return responseData;
+  };
 
-  public static readonly updateFriendRequest = async (id: string, data: any, headers: HeadersInit = {}): Promise<any> => {
+  public static readonly updateFriendRequest = async (
+    id: string,
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
     console.log(id);
     let responseData = null;
     let handleRequest = false;
@@ -265,7 +343,7 @@ export default class API {
         method: "PUT",
         headers: {
           ...this.headers,
-          ...headers
+          ...headers,
         },
         body: await this.generateBody(data),
       });
@@ -277,30 +355,4 @@ export default class API {
     if (handleRequest) return this.updateFriendRequest(id, data);
     return responseData;
   };
-
-  public static readonly getUserConversations = async (headers: HeadersInit = {}): Promise<any> => {
-      let responseData = null;
-      let handleRequest = false;
-      try {
-        const url = await this.generateURL(
-          this.apiUrl + "/chats/conversations/"
-        );
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            ...this.headers,
-            ...headers
-          },
-        });
-        responseData = await response.json();
-      } catch (error) {
-        console.log("error " + error);
-      }
-      handleRequest = await this.handleRequest(responseData);
-      if (handleRequest) return this.getUserConversations();
-      return responseData;
-    };
-  public static readonly getNotifications = async (
-    data: any
-  ): Promise<any> => { };
 }

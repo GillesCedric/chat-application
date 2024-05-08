@@ -6,8 +6,8 @@ import User from "../modules/manager/User";
 import { Link } from "react-router-dom";
 
 const VerifyPage = ({ isTelVerification }: { isTelVerification: boolean }) => {
-  const [inputs, setInputs] = useState<string[]>(new Array(4).fill(""));
-  const inputRefs = Array(4)
+  const [inputs, setInputs] = useState<string[]>(new Array(6).fill(""));
+  const inputRefs = Array(6)
     .fill(0)
     .map(() => useRef<HTMLInputElement>(null));
 
@@ -16,8 +16,7 @@ const VerifyPage = ({ isTelVerification }: { isTelVerification: boolean }) => {
     newInputs[index] = value;
     setInputs(newInputs);
 
-    // Move focus forward
-    if (index < 3 && value) {
+    if (index < 5 && value) {
       inputRefs[index + 1].current?.focus();
     }
   };
@@ -41,10 +40,10 @@ const VerifyPage = ({ isTelVerification }: { isTelVerification: boolean }) => {
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const pasteData = event.clipboardData.getData("text").slice(0, 4);
+    const pasteData = event.clipboardData.getData("text").slice(0, 6);
     if (/^\d+$/.test(pasteData)) {
       setInputs(
-        pasteData.split("").concat(new Array(4 - pasteData.length).fill(""))
+        pasteData.split("").concat(new Array(6 - pasteData.length).fill(""))
       );
       inputRefs[pasteData.length - 1].current?.focus();
     }
@@ -53,17 +52,15 @@ const VerifyPage = ({ isTelVerification }: { isTelVerification: boolean }) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Verifying:", inputs.join(""));
-    notify("Verifiying", "success");
   };
+
   const label: string = isTelVerification ? "phone number" : "email";
   return (
     <body className=" flex flex-col  justify-center h-screen bg-grey-lighter">
       <div className="max-w-md mx-auto text-center bg-white px-4 sm:px-8 py-10 rounded-xl shadow">
         <header className="mb-8">
           <h1 className="text-2xl font-bold mb-1">
-            Mobile{" "}
-            {isTelVerification ? "Phone" : "Email"}{" "}
-            Verification 
+            Mobile {isTelVerification ? "Phone" : "Email"} Verification
           </h1>
           <p className="text-[17px] text-slate-500">
             Enter the 4-digit verification code that was sent to your{" "}

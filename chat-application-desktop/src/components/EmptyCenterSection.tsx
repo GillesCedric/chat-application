@@ -1,4 +1,10 @@
-export const EmptyFriendRequest = () => {
+export const EmptyCenterSection = ({
+  message,
+  smallParagraph,
+}: {
+  message: string;
+  smallParagraph: string;
+}) => {
   return (
     <div
       className="w-full h-full flex items-center flex-wrap justify-center gap-10 
@@ -13,10 +19,10 @@ export const EmptyFriendRequest = () => {
         />
         <div>
           <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
-            There are no friend request in your center
+            {message}
           </h2>
           <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
-            Come back later 😉
+            {smallParagraph}
             <br />
           </p>
         </div>
