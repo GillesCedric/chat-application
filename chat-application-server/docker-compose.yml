@@ -37,6 +37,63 @@ services:
       - user-logs:/app/logs
     depends_on:
       - mongodb
+      
+  chat:
+    build:
+      context: .
+      dockerfile: src/services/chat/Dockerfile
+    ports:
+      - "3000"
+    image: gillescedric/chat:latest
+    networks:
+      - chat-application-network
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /etc/chat-application/certs/chat:/app/certs/chat:ro
+      - /etc/chat-application/certs/ca:/app/certs/ca:ro
+      - chat-logs:/app/logs
+    depends_on:
+      - mongodb
+
+  notification:
+    build:
+      context: .
+      dockerfile: src/services/notification/Dockerfile
+    ports:
+      - "3000"
+    image: gillescedric/notification:latest
+    networks:
+      - chat-application-network
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /etc/chat-application/certs/notification:/app/certs/notification:ro
+      - /etc/chat-application/certs/ca:/app/certs/ca:ro
+      - notification-logs:/app/logs
+    depends_on:
+      - mongodb
+
+  socket:
+    build:
+      context: .
+      dockerfile: src/services/socket/Dockerfile
+    ports:
+      - "3000"
+    image: gillescedric/socket:latest
+    networks:
+      - chat-application-network
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /etc/chat-application/certs/socket:/app/certs/socket:ro
+      - /etc/chat-application/certs/ca:/app/certs/ca:ro
+      - socket-logs:/app/logs
+    depends_on:
+      - mongodb
 
   mongodb:
     image: mongo:latest
@@ -70,5 +127,8 @@ volumes:
   mongodb_data:
   api-gateway-logs:
   user-logs:
+  chat-logs:
+  notification-logs:
+  socket-logs:
 
 
