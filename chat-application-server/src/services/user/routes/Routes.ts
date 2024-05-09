@@ -1,6 +1,7 @@
 import { Application } from "express";
 import UserController from "../controllers/User";
 import { UserValidators } from "../../../middlewares/Validators";
+import rateLimit from "express-rate-limit";
 
 export default class Routes {
   private static readonly userController: UserController = new UserController();
@@ -12,7 +13,13 @@ export default class Routes {
     app.route("/me")
       .get(...UserValidators.me, UserValidators.errors, this.userController.me)
       .patch(...UserValidators.updateProfile, UserValidators.errors, this.userController.updateProfile)
-    app.route("/signin").post(...UserValidators.signIn, UserValidators.errors, this.userController.signIn)
+    app.route("/signin").post(rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 5, // Limite chaque IP à 5 tentatives de connexion par fenêtre de 15 minutes
+      message: 'Trop de tentatives de connexion, veuillez réessayer après 15 minutes',
+      standardHeaders: 'draft-7',
+      legacyHeaders: false,
+    }),...UserValidators.signIn, UserValidators.errors, this.userController.signIn)
     app.route("/signup").post(...UserValidators.signUp, UserValidators.errors, this.userController.signUp)
     app.route("/friends").get(this.userController.getUserFriends)
     app.route("/friends/request")

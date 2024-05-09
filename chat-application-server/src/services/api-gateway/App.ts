@@ -1,6 +1,5 @@
 import express from 'express'
 import bodyParser from "body-parser"
-import cookieParser from 'cookie-parser'
 import cors from "cors"
 import dotenv from 'dotenv'
 import helmet from "helmet"
@@ -106,15 +105,12 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
-        // serving static files
-        //this.app.use("/images", express.static('data/users'))
-
-        // this.app.use(rateLimit({
-        //     windowMs: 10 * 60 * 1000, // 10 minutes
-        //     limit: 100, // 100 calls,
-        //     standardHeaders: 'draft-7',
-        //     legacyHeaders: false,
-        // }))
+        this.app.use(rateLimit({
+            windowMs: 10 * 60 * 1000, // 10 minutes
+            limit: 500, // 500 calls,
+            standardHeaders: 'draft-7',
+            legacyHeaders: false,
+        }))
 
         this.app.get('/images/profile/:filename', async (req, res) => {
             const filename = sanitize(req.params.filename)

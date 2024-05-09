@@ -1,5 +1,5 @@
 import { ConversationModel } from "../../../models/Conversation";
-import { ChatModel, ChatStatus } from "../../../models/Chat";
+import { ChatModel } from "../../../models/Chat";
 import { Request, Response } from "express";
 import JWTUtils from "../../../modules/jwt/JWT";
 import { protocol, headers, Method } from "../../../utils/HTTP";
@@ -125,7 +125,7 @@ export default class ChatController {
           _id: chat._id,
           sender: chat.sender,
           message: Crypto.decrypt(chat.message, "database"),
-          status: Crypto.decrypt(chat.status, "status"),
+          readBy: chat.readBy,
           createdAt: chat.createdAt,
           isOwnedByUser: chat.sender.toString() === userId
         }))
@@ -189,8 +189,7 @@ export default class ChatController {
                   $expr: {
                     $and: [
                       { $eq: ['$conversation', '$$conversationId'] },
-                      { $eq: ['$status', Crypto.encrypt(ChatStatus.received, "status")] }, // Assurez-vous que le statut est 'received'
-                      { $ne: ['$deleted', Crypto.encrypt("true", "boolean")] } // Assurez-vous que le message n'est pas supprimé
+                      { $not: [{ $in: [new mongoose.Types.ObjectId(userId), '$readBy'] }] },
                     ]
                   }
                 }
@@ -268,8 +267,7 @@ export default class ChatController {
         conversation: new mongoose.Types.ObjectId(req.params.id),
         sender: new mongoose.Types.ObjectId(userId),
         message: Crypto.encrypt(req.body.message, "database"),
-        status: Crypto.encrypt(ChatStatus.received, "status"),
-        deleted: Crypto.encrypt("false", "boolean")
+        readBy: [new mongoose.Types.ObjectId(userId)],
       })
 
       // Enregistrer le chat dans la base de données
@@ -292,7 +290,7 @@ export default class ChatController {
             data: {
               _id: savedChat._id,
               message: req.body.message,
-              status: ChatStatus.received,
+              readBy: savedChat.readBy,
               isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
             },
             event: SocketKeywords.newMessage
@@ -307,7 +305,7 @@ export default class ChatController {
             data: {
               _id: savedChat._id,
               message: req.body.message,
-              status: ChatStatus.received,
+              readBy: savedChat.readBy,
               isOwnedByUser: savedChat.sender.equals(conversaton.members[1])
             },
             event: SocketKeywords.newMessage
@@ -321,12 +319,35 @@ export default class ChatController {
 
     } catch (error) {
       console.error('Failed to add chat or update conversation:', error);
-      throw error;
+      return res.status(401).json({
+        error: "Failed to add chat or update conversation",
+      });
     }
 
   };
 
   public readonly updateChat = async (req: Request, res: Response): Promise<Response> => {
+
+    try {
+      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
+
+      const chats = await ChatModel.updateMany(
+        { conversation: req.params.id, readBy: { $ne: userId } },
+        { $push: { readBy: userId } }
+      )
+
+      return res.status(200).json({
+        message: "Message modifié avec succèss",
+      })
+
+    } catch (error) {
+      console.log(error)
+      return res.status(401).json({
+        error: "Impossible de mettre à jour les messages",
+      });
+    }
+
+
 
     return null
 

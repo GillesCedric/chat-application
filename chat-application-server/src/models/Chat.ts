@@ -1,17 +1,10 @@
 import mongoose from "mongoose";
 
-export enum ChatStatus {
-  pending = 'PENDING',
-  received = 'RECEIVED',
-  viewed = 'VIEWED'
-}
-
 interface IChat extends mongoose.Document {
   conversation: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
   message: string;
-  status: string
-  deleted: string
+  readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }]
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,14 +22,12 @@ const chatSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  status: {
-    type: String,
-    required: true,
-  },
-  deleted: {
-    type: String,
-    default: false,
-  },
+  readBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
   createdAt: {
     type: Date,
     default: Date.now

@@ -109,7 +109,7 @@ export abstract class ChatValidators extends Validators {
     public static readonly addChats = [
         body('access_token').escape().trim().stripLow().isJWT(),
         param('id').escape().trim().stripLow().isMongoId(),
-        body('message').trim().stripLow().isLength({ min: 0, max: 250 }),
+        body('message').trim().stripLow().isLength({ min: 0, max: 500 }),
     ]
 
     public static readonly updateChat = [
