@@ -104,7 +104,7 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: false }))
 
-        // serving static files 
+        // serving static files
         //this.app.use("/images", express.static('data/users'))
 
         // this.app.use(rateLimit({
@@ -113,8 +113,6 @@ export default class App {
         //     standardHeaders: 'draft-7',
         //     legacyHeaders: false,
         // }))
-
-        this.app.use(BasicAuthentication.authenticate)
 
         this.app.get('/images/profile/:filename', async (req, res) => {
             const filename = sanitize(req.params.filename)
@@ -128,6 +126,8 @@ export default class App {
                 res.status(403).send("Vous n'avez pas accèss à cette ressource")
             }
         })
+
+        this.app.use(BasicAuthentication.authenticate)
 
         this.app.use(CSRF.authenticate)
 
