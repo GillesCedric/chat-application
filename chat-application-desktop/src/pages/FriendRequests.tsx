@@ -2,26 +2,22 @@ import React, { useEffect, useState } from "react";
 import { FriendRequestComponent } from "../components/FriendRequestComponent";
 import ChatHeader from "../components/ChatHeader";
 import User from "../modules/manager/User";
-import { useSocketListener } from "../hooks/useSocketListener"; // Make sure the path is correct
 import { SocketKeywords } from "../utils/keywords";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import { notify } from "../components/toastify";
-import Socket from "../modules/socket/Socket";
 import { useSocketContext } from "../context/SocketContext";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
-/* const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
- */const hasNewNotification = useSocketListener(SocketKeywords.newNotification);
-  const { subscribe, unsubscribe } = useSocketContext();
+  const { isConnected, subscribe, unsubscribe } = useSocketContext();
   const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
       if (response.message) {
-        console.log(response)
+        console.log(response);
         setFriendRequests(response.data);
       } else {
-        console.log(response.error)
+        console.log(response.error);
         notify(response.error, "error");
       }
     } catch (error) {
@@ -31,23 +27,28 @@ export const FriendRequest = () => {
   };
 
   useEffect(() => {
-    fetchFriendRequests()
-      const handleNewNotification = (data: any) => {
-        console.log(data);
-        fetchFriendRequests();
-      };
+    fetchFriendRequests();
+    const handleNewNotification = (data: any) => {
+      console.log(data);
+      fetchFriendRequests();
+    };
 
-      const handleNewConversation = (data: any) => {
-        console.log(data);
-        fetchFriendRequests();
-      };
+    const handleNewConversation = (data: any) => {
+      console.log(data);
+      fetchFriendRequests();
+    };
+    if (isConnected) {
+      // S'abonner aux événements
+      subscribe(SocketKeywords.newNotification, handleNewNotification);
+      subscribe(SocketKeywords.newConversation, handleNewConversation);
 
+      // Fonction de nettoyage pour se désabonner
       return () => {
-        unsubscribe(SocketKeywords.newNotification, handleNewNotification);
+        unsubscribe(SocketKeywords.newMessage, handleNewNotification);
         unsubscribe(SocketKeywords.newConversation, handleNewConversation);
       };
-
-  }, [subscribe, unsubscribe]);
+    }
+  }, [subscribe, unsubscribe , isConnected]);
 
   return (
     <div className="h-screen flex flex-col">
