@@ -98,7 +98,9 @@ export default class App {
         }))
 
         //security configuration with helmet
-        this.app.use(helmet())
+        this.app.use(helmet({
+            crossOriginResourcePolicy: { policy: "cross-origin" } // Nécessaire pour autoriser le chargement des ressources cross-origin
+        }))
 
         //body parser configuration
         this.app.use(bodyParser.json())

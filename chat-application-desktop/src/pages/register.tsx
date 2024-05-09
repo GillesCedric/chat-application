@@ -9,6 +9,8 @@ import API from "../modules/api/API";
 import { Avatar } from "../components/Avatar";
 import { AVATAR_DEFAULT } from "../utils/keywords";
 import { AVATAR_IDENTIFIER } from "../utils/keywords";
+import CONFIG from "../config/config.json";
+
 export default function Register() {
   const emailRef = useRef<HTMLInputElement | null>(null);
   const firstnameRef = useRef<HTMLInputElement | null>(null);
@@ -99,7 +101,7 @@ export default function Register() {
         telSectionRef.current &&
         passwordSectionRef.current &&
         avatarSectionRef.current,
-      nextButtonRef.current)
+        nextButtonRef.current)
     ) {
       nextButtonRef.current.blur();
       switch (etape) {
@@ -174,7 +176,7 @@ export default function Register() {
         passwordSectionRef.current &&
         nameSectionRef.current &&
         avatarSectionRef.current,
-      backButtonRef.current)
+        backButtonRef.current)
     ) {
       backButtonRef.current.blur();
 
@@ -317,7 +319,7 @@ export default function Register() {
       } else if (!FormValidator.isFrNumber(tel.replace(/-/g, ""))) {
         setErrorMessage(
           "The phone number must be 10 digit long and start with " +
-            FormValidator.FR_NUMBER_STARTER.join(" or ")
+          FormValidator.FR_NUMBER_STARTER.join(" or ")
         );
         telCheckRef.current.className =
           "block text-sm text-red-600 dark:text-red-500";
@@ -588,21 +590,19 @@ export default function Register() {
                 </h3>
                 <div className="flex justify-between">
                   <img
-                    className={`w-32 h-32 p-1 rounded-full ring-2 ${
-                      picture === AVATAR_IDENTIFIER.man
-                        ? "ring-blue-500"
-                        : "ring-gray-300 dark:ring-gray-500"
-                    }`}
-                    src="https://png.pngtree.com/png-clipart/20231019/original/pngtree-user-profile-avatar-png-image_13369989.png"
+                    className={`w-32 h-32 p-1 rounded-full ring-2 ${picture === AVATAR_IDENTIFIER.man
+                      ? "ring-blue-500"
+                      : "ring-gray-300 dark:ring-gray-500"
+                      }`}
+                    src={`${CONFIG.api_url}/images/profile/man.png`}
                     alt="Bordered avatar"
                     onClick={() => handleAvatarClick(AVATAR_IDENTIFIER.man)}
                   />
                   <img
-                    className={`w-32 h-32  p-1 rounded-full ring-2 ${
-                      picture === AVATAR_IDENTIFIER.girl
-                        ? "ring-blue-500"
-                        : "ring-gray-300 dark:ring-gray-500"
-                    }`}
+                    className={`w-32 h-32  p-1 rounded-full ring-2 ${picture === AVATAR_IDENTIFIER.girl
+                      ? "ring-blue-500"
+                      : "ring-gray-300 dark:ring-gray-500"
+                      }`}
                     src="https://d1wnwqwep8qkqc.cloudfront.net/uploads/stage/stage_image/67515/optimized_product_thumb_stage.jpg"
                     alt="Bordered avatar"
                     onClick={() => handleAvatarClick(AVATAR_IDENTIFIER.girl)}
