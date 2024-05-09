@@ -5,10 +5,8 @@ import {
   ReactNode,
   Dispatch,
   SetStateAction,
-  useEffect,
 } from "react";
 import API from "../modules/api/API";
-import { Navigate } from "react-router-dom";
 
 // Définir le type pour le contexte d'authentification
 type AuthUser =

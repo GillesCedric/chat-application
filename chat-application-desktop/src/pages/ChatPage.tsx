@@ -24,6 +24,7 @@ import ConversationRepository, {
 } from "../modules/manager/ConversationRepository";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToYesterday } from "../utils/utilsFunctions";
+import { useSocketContext } from "../context/SocketContext";
 const ChatPage = () => {
   const [conversations, setConversations] = useState<ConversationModel[]>([]);
   const newConversation = useSocketListener(SocketKeywords.newConversation);
@@ -33,30 +34,35 @@ const ChatPage = () => {
   const wasOnlineRef = useRef(isOnline);
   const [messsages, setMessages] = useState<MessageModel[]>([]);
   const [conversation, setConversation] = useState<ConversationModel>(null);
+  const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   useEffect(() => {
-    fetchConversations()
-    
-    const initSocket = async () => {
-      await Socket.connect();
-      Socket.socket.on(SocketKeywords.newMessage, (data) => {
-        console.log(data);
-        addMessage()
-      });
+    fetchConversations();  
 
-      Socket.socket.on(SocketKeywords.newConversation, (data) => {
-        console.log(data);
-        fetchConversations()
-      });
-      
+    const handleNewMessage = (data: any) => {
+      console.log(data);
+      addMessage(); 
+      setMessages(prevMessages => [...prevMessages, data]);
     };
 
-    initSocket();
-
-    return () => {
-      Socket.disconnect();
+    const handleNewConversation = (data: any) => {
+      console.log(data);
+      fetchConversations();
     };
-  }, []);
+
+    if (isConnected) {
+      // S'abonner aux événements
+      subscribe(SocketKeywords.newMessage, handleNewMessage);
+      subscribe(SocketKeywords.newConversation, handleNewConversation);
+
+      // Fonction de nettoyage pour se désabonner
+      return () => {
+        unsubscribe(SocketKeywords.newMessage, handleNewMessage);
+        unsubscribe(SocketKeywords.newConversation, handleNewConversation);
+      };
+    }
+
+  }, [isConnected, subscribe, unsubscribe]);  // Réexécute l'effet seulement quand Socket.socket change
 
 
   const handleSendMessage = (newMessage: string, csrfToken: string) => {
@@ -77,7 +83,7 @@ const ChatPage = () => {
       createdAt: convertToYesterday(new Date().toISOString()).toISOString(),
       isOwnedByUser: true,
     };
-    setMessages([...messsages, savedMessage]);
+    //setMessages([...messsages, savedMessage]);
   };
 
   const handleSelectConversation = (conversation: ConversationModel): void => {

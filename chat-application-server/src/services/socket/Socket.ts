@@ -18,6 +18,7 @@ export default class Socket {
 		try {
 			const userSockets = await UserSocketModel.find({ user: userId })
 			userSockets.forEach((userSocket) => {
+				console.log("Emit socket event")
 				this.socket.to(userSocket.socket).emit(event, data)
 			});
 		} catch (err) {
