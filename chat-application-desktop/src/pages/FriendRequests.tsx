@@ -7,12 +7,14 @@ import { SocketKeywords } from "../utils/keywords";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import { notify } from "../components/toastify";
 import Socket from "../modules/socket/Socket";
+import { useSocketContext } from "../context/SocketContext";
 
 export const FriendRequest = () => {
   const [friendRequests, setFriendRequests] = useState([]);
 /* const hasNewFriendRequest = useSocketListener(SocketKeywords.newConversation); 
- */const hasNewNotification = useSocketListener(SocketKeywords.newNotification); 
-    const fetchFriendRequests = async () => {
+ */const hasNewNotification = useSocketListener(SocketKeywords.newNotification);
+  const { subscribe, unsubscribe } = useSocketContext();
+  const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
       if (response.message) {
@@ -20,7 +22,7 @@ export const FriendRequest = () => {
         setFriendRequests(response.data);
       } else {
         console.log(response.error)
-        notify(response.error, "error"); 
+        notify(response.error, "error");
       }
     } catch (error) {
       console.error("Error fetching friend requests:", error);
@@ -29,25 +31,23 @@ export const FriendRequest = () => {
   };
 
   useEffect(() => {
-    const initSocket = async () => {
-      await Socket.connect();
-      Socket.socket.on(SocketKeywords.newNotification, (data) => {
+    fetchFriendRequests()
+      const handleNewNotification = (data: any) => {
         console.log(data);
         fetchFriendRequests();
-      });
+      };
 
-      Socket.socket.on(SocketKeywords.newConversation, (data) => {
+      const handleNewConversation = (data: any) => {
         console.log(data);
         fetchFriendRequests();
-      });
-    };
+      };
 
-    initSocket();
+      return () => {
+        unsubscribe(SocketKeywords.newNotification, handleNewNotification);
+        unsubscribe(SocketKeywords.newConversation, handleNewConversation);
+      };
 
-    return () => {
-      Socket.disconnect();
-    };
-  }, []);
+  }, [subscribe, unsubscribe]);
 
   return (
     <div className="h-screen flex flex-col">

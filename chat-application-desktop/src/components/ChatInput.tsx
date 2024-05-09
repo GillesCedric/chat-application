@@ -33,16 +33,16 @@ const textAreaAdjust = (element: HTMLTextAreaElement) => {
 const ChatInput = ({
   onSendMessage,
 }: {
-  onSendMessage: (message: string , csrfToken : string) => void;
+  onSendMessage: (message: string, csrfToken: string) => void;
 }) => {
   const [message, setMessage] = useState("");
-const [csrfToken, setCsrfToken] = useState("");
-const csrfTokenRef = useRef<HTMLInputElement | null>(null);
-useEffect(() => {
-  API.getCSRFToken().then((data: any) => {
-    setCsrfToken(data.token);
-  });
-}, []);
+  const [csrfToken, setCsrfToken] = useState("");
+  const csrfTokenRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
@@ -51,6 +51,13 @@ useEffect(() => {
     }
     resetTextAreaToDefault(event);
   };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      handleSend(event)
+    }
+  };
+
 
   return (
     <form onSubmit={handleSend} className="rounded-b-lg">
@@ -78,8 +85,10 @@ useEffect(() => {
           placeholder="Your message..."
           value={message}
           onChange={(e) => {
-            setMessage(e.target.value), textAreaAdjust(e.target);
+            setMessage(e.target.value),
+              textAreaAdjust(e.target);
           }}
+          onKeyDown={handleKeyDown}
           style={{ resize: "none" }} // Disable resizing
         ></textarea>
         <button

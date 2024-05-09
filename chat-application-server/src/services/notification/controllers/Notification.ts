@@ -50,7 +50,7 @@ export default class NotificationController {
           headers: headers(req.headers["user-agent"]),
           body: JSON.stringify({
             access_token: req.body.access_token,
-            receivers: [req.body.receiver],
+            receiver: req.body.receiver,
             data: req.body.content,
             event: SocketKeywords.newNotification
           })
