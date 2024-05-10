@@ -1,0 +1,10 @@
+{
+	"out": "./docs",
+	"name": "Chat-Application-Desktop",
+	"theme": "default",
+	"entryPoints": [
+		"./src"
+	],
+	"entryPointStrategy": "expand",
+	"tsconfig": "./tsconfig.json"
+}

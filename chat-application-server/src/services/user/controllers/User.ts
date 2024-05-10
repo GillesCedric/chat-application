@@ -789,29 +789,19 @@ export default class UserController {
     req: Request,
     res: Response
   ): Promise<Response> => {
-    const { username, tel, email } = req.query;
+    const { username, tel, email } = req.body;
 
     try {
-      const emailParam = req.query.email;
-      const usernameParam = req.query.username;
-      const telParam = req.query.tel;
+      const query: {
+        username?: string
+        tel?: string
+        email?: string
+      } = {}
+      if (username) query.username = Crypto.encrypt(username, "username");
+      if (tel) query.tel = Crypto.encrypt(tel, "tel");
+      if (email) query.email = Crypto.encrypt(email, "email");
 
-      const encryptedEmail: string =
-        typeof emailParam === "string"
-          ? Crypto.encrypt(emailParam, "email")
-          : null;
-      const encryptedUsername: string =
-        typeof usernameParam === "string"
-          ? Crypto.encrypt(usernameParam, "username")
-          : null;
-      const encryptedTel: string =
-        typeof telParam === "string" ? Crypto.encrypt(telParam, "tel") : null;
-      const query: any = {};
-      if (encryptedEmail) query.email = encryptedEmail;
-      if (encryptedUsername) query.username = encryptedUsername;
-      if (encryptedTel) query.tel = encryptedTel;
-
-      const user = await UserModel.findOne(query);
+      const user = await UserModel.findOne(query)
 
       if (user) {
         return res.status(409).json({
@@ -822,12 +812,14 @@ export default class UserController {
           message: "No existing account found with the provided information.",
         });
       }
+
     } catch (error) {
-      console.error("Error checking if user exists:", error);
+      console.log(error);
       return res.status(500).json({
-        error: "Internal Server Error",
+        error: "Impossible d'effectuer la vérification",
       });
     }
+
   };
 
   public readonly signOut = async (

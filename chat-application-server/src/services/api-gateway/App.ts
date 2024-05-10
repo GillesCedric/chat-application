@@ -8,9 +8,7 @@ import fs from 'fs'
 import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import { Server as SocketServer } from "socket.io"
-import session from "express-session"
 import mongoose from 'mongoose'
-import MongoStore from 'connect-mongo'
 import rateLimit from 'express-rate-limit'
 import Proxy from './Proxy'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
@@ -18,8 +16,6 @@ import { apiGWLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import { Services, Tokens } from '../../utils/Keywords'
-import Mailer from '../../modules/mailer/Mailer'
-import { SendFileOptions } from 'express-serve-static-core'
 import sanitize from 'sanitize-filename'
 import JWTUtils from '../../modules/jwt/JWT'
 import CSRF from '../../middlewares/CSRF'

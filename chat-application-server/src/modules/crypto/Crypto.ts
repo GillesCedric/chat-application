@@ -1,15 +1,19 @@
 import * as crypto from 'crypto'
 import CONFIG from '../../config/config.json'
 
+/**
+ * @typedef encryptionKeys
+ * @description 
+ */
 export type encryptionKeys = 'token' | 'password' | 'database' | 'data'
 
 export type deterministEncryptionKeys = 'username' | 'tel' | 'email' | 'status' | 'boolean'
+
 /**
  * @class Crypto
  * @author Gilles Cédric
  * @description this class is used for the the encryption and decryption in the application
  * @exports
- * @default
  * @since 23/05/2022
  */
 export class Crypto {
@@ -104,7 +108,7 @@ export class Crypto {
 		const initializationVector = determinist ? Buffer.from(this.hash.sha256(data.toLowerCase() + CONFIG.appname + process.env[`${key.toUpperCase()}_DETERMINISTE_IV_GENERATION_KEY`]).slice(0, 32), 'hex') : crypto.randomBytes(16)
 
 		if (encryptionKey.length != 32 || initializationVector.length != 16)
-			throw new Error("Invalid Key or Iv Size") //TODO: Log the error
+			throw new Error("Invalid Key or Iv Size")
 
 		const cipher = crypto.createCipheriv('aes-256-cbc', encryptionKey, initializationVector)
 		return Buffer.from(
@@ -123,7 +127,7 @@ export class Crypto {
 		const encryptionKey = Buffer.from(process.env[`${key.toUpperCase()}_ENCRYPTION_KEY`], 'hex')
 
 		if (encryptionKey.length != 32)
-			throw new Error("Invalid Key Size") //TODO: Log the error
+			throw new Error("Invalid Key Size")
 
 		const iv = Buffer.from(data.substring(data.lastIndexOf('.') + 1, data.length), 'base64')
 		const buff = Buffer.from(data.substring(0, data.lastIndexOf('.') - 1), 'base64')
