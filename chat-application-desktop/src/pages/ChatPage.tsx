@@ -25,6 +25,7 @@ import ConversationRepository, {
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToYesterday } from "../utils/utilsFunctions";
 import { useSocketContext } from "../context/SocketContext";
+import API from "../modules/api/API";
 const ChatPage = () => {
   const [conversations, setConversations] = useState<ConversationModel[]>([]);
   const newConversation = useSocketListener(SocketKeywords.newConversation);
@@ -37,12 +38,12 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   useEffect(() => {
-    fetchConversations();  
+    fetchConversations();
 
     const handleNewMessage = (data: any) => {
       console.log(data);
-      addMessage(); 
-      setMessages(prevMessages => [...prevMessages, data]);
+      addMessage();
+      setMessages((prevMessages) => [...prevMessages, data]);
     };
 
     const handleNewConversation = (data: any) => {
@@ -61,9 +62,7 @@ const ChatPage = () => {
         unsubscribe(SocketKeywords.newConversation, handleNewConversation);
       };
     }
-
-  }, [isConnected, subscribe, unsubscribe]);  // Réexécute l'effet seulement quand Socket.socket change
-
+  }, [isConnected, subscribe, unsubscribe]); // Réexécute l'effet seulement quand Socket.socket change
 
   const handleSendMessage = (newMessage: string, csrfToken: string) => {
     if (conversation === null) {
@@ -75,7 +74,8 @@ const ChatPage = () => {
       message: newMessage,
       _csrf: csrfToken,
     });
-     };
+  };
+  const [csrfToken, setCsrfToken] = useState("");
 
   const handleSelectConversation = (conversation: ConversationModel): void => {
     setConversation(conversation);
@@ -96,7 +96,27 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+      console.log(csrfToken);
+    });
+    ConversationRepository.updateChat(conversation._id, csrfToken)
+      .then((response) => {
+        console.log(response);
+        if (response.error) {
+          notify("Error reading messages : " + response.error);
+        }
+      })
+      .catch((error) => {
+        notify("Error reading messages : " + error);
+      });
   };
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+      console.log(csrfToken);
+    });
+  }, []);
   const fetchConversations = () => {
     ConversationRepository.getConversations()
       .then((response: any) => {
@@ -113,7 +133,6 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-    
   };
 
   useEffect(() => {
@@ -149,8 +168,9 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${conversations.length === 0 ? "" : "flex-none"
-                }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
+                conversations.length === 0 ? "" : "flex-none"
+              }`}
             >
               <div className="sticky top-0 z-50">
                 <SearchBar />

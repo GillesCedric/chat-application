@@ -7,8 +7,7 @@ import { ToastContainer } from "react-toastify";
 import { notify } from "../components/toastify";
 import API from "../modules/api/API";
 import { Avatar } from "../components/Avatar";
-import { AVATAR_DEFAULT } from "../utils/keywords";
-import { AVATAR_IDENTIFIER } from "../utils/keywords";
+import { AVATAR_IDENTIFIERS, BEGINING_URL_AVATAR } from "../utils/keywords";
 import CONFIG from "../config/config.json";
 
 export default function Register() {
@@ -65,7 +64,7 @@ export default function Register() {
     if (backButtonRef.current) {
       if (visibility) {
         backButtonRef.current.className =
-          "w-full mr-14 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
+          "w-32 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
       } else {
         backButtonRef.current.className = "hidden";
       }
@@ -75,8 +74,12 @@ export default function Register() {
   const nextButtonVisible = (visibility: boolean) => {
     if (nextButtonRef.current) {
       if (visibility) {
-        nextButtonRef.current.className =
-          "w-full mr-14 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
+        let wLength = "w-full";
+        if ( backButtonRef.current &&   backButtonRef.current.className !== "hidden") {
+          wLength = "w-32";
+        }
+          nextButtonRef.current.className = wLength + 
+            " text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
       } else {
         nextButtonRef.current.className = "hidden";
       }
@@ -101,7 +104,7 @@ export default function Register() {
         telSectionRef.current &&
         passwordSectionRef.current &&
         avatarSectionRef.current,
-        nextButtonRef.current)
+      nextButtonRef.current)
     ) {
       nextButtonRef.current.blur();
       switch (etape) {
@@ -176,7 +179,7 @@ export default function Register() {
         passwordSectionRef.current &&
         nameSectionRef.current &&
         avatarSectionRef.current,
-        backButtonRef.current)
+      backButtonRef.current)
     ) {
       backButtonRef.current.blur();
 
@@ -319,7 +322,7 @@ export default function Register() {
       } else if (!FormValidator.isFrNumber(tel.replace(/-/g, ""))) {
         setErrorMessage(
           "The phone number must be 10 digit long and start with " +
-          FormValidator.FR_NUMBER_STARTER.join(" or ")
+            FormValidator.FR_NUMBER_STARTER.join(" or ")
         );
         telCheckRef.current.className =
           "block text-sm text-red-600 dark:text-red-500";
@@ -366,10 +369,10 @@ export default function Register() {
     // Default return false if refs are not set properly
     return false;
   };
-  const [picture, setPicture] = useState<AVATAR_IDENTIFIER | null>(null);
+  const [picture, setPicture] = useState<AVATAR_IDENTIFIERS | null>(null);
   const [useInitials, setUseInitials] = useState(false);
 
-  const handleAvatarClick = (avatar: AVATAR_IDENTIFIER) => {
+  const handleAvatarClick = (avatar: AVATAR_IDENTIFIERS) => {
     if (picture === avatar) {
       setPicture(null);
     } else {
@@ -398,7 +401,7 @@ export default function Register() {
         email: emailRef.current?.value,
         password: passwordRef.current?.value,
         tel: telRef.current?.value.replace(/-/g, ""),
-        picture: useInitials ? AVATAR_IDENTIFIER.none : picture,
+        picture: useInitials ? AVATAR_IDENTIFIERS.none : picture,
         _csrf: csrfTokenRef.current?.value,
       };
       console.log(userdata);
@@ -590,22 +593,24 @@ export default function Register() {
                 </h3>
                 <div className="flex justify-between">
                   <img
-                    className={`w-32 h-32 p-1 rounded-full ring-2 ${picture === AVATAR_IDENTIFIER.man
-                      ? "ring-blue-500"
-                      : "ring-gray-300 dark:ring-gray-500"
-                      }`}
-                    src={`${CONFIG.api_url}/images/profile/man.png`}
+                    className={`w-32 h-32 p-1 rounded-full ring-2 ${
+                      picture === AVATAR_IDENTIFIERS.man
+                        ? "ring-blue-500"
+                        : "ring-gray-300 dark:ring-gray-500"
+                    }`}
+                    src={BEGINING_URL_AVATAR + AVATAR_IDENTIFIERS.man}
                     alt="Bordered avatar"
-                    onClick={() => handleAvatarClick(AVATAR_IDENTIFIER.man)}
+                    onClick={() => handleAvatarClick(AVATAR_IDENTIFIERS.man)}
                   />
                   <img
-                    className={`w-32 h-32  p-1 rounded-full ring-2 ${picture === AVATAR_IDENTIFIER.girl
-                      ? "ring-blue-500"
-                      : "ring-gray-300 dark:ring-gray-500"
-                      }`}
-                    src="https://d1wnwqwep8qkqc.cloudfront.net/uploads/stage/stage_image/67515/optimized_product_thumb_stage.jpg"
+                    className={`w-32 h-32  p-1 rounded-full ring-2 ${
+                      picture === AVATAR_IDENTIFIERS.girl
+                        ? "ring-blue-500"
+                        : "ring-gray-300 dark:ring-gray-500"
+                    }`}
+                    src={BEGINING_URL_AVATAR + AVATAR_IDENTIFIERS.girl}
                     alt="Bordered avatar"
-                    onClick={() => handleAvatarClick(AVATAR_IDENTIFIER.girl)}
+                    onClick={() => handleAvatarClick(AVATAR_IDENTIFIERS.girl)}
                   />
                 </div>
                 <div className="flex items-center mt-7">
@@ -670,14 +675,14 @@ export default function Register() {
                   {errorMessage}
                 </p>
               </div>
-              <div className="flex">
+              <div className="flex justify-between items-center ">
                 <button
                   ref={backButtonRef}
                   onClick={(event) => {
                     event.preventDefault();
                     moveBack();
                   }}
-                  className="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="w-32 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Back
                 </button>
@@ -687,7 +692,7 @@ export default function Register() {
                     event.preventDefault();
                     moveOn();
                   }}
-                  className="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="w-32 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Next
                 </button>
@@ -697,7 +702,7 @@ export default function Register() {
                     event.preventDefault();
                     signUp();
                   }}
-                  className="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  className="w-32 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Sign up
                 </button>

@@ -1,3 +1,5 @@
+import CONFIG from "../config/config.json";
+
 export enum SocketKeywords {
   join = "join",
   connection = "connection",
@@ -22,10 +24,9 @@ export enum FriendsRequestStatus {
 
 export const DEFAULT_COMMENT =
   "Hey there 👋🏾. \n I want to get in touch with you, let's chat. ";
-export const BEGINING_URL = "http://localhost:4004/chat-communication/data/users"; 
-export const AVATAR_DEFAULT = "/default/profile/none"; 
-export enum AVATAR_IDENTIFIER {
-  man = "man.png", 
-  girl = "girl.jpg", 
-  none =  "none",
+export const BEGINING_URL_AVATAR = `${CONFIG.api_url}/images/profile/`;
+export enum AVATAR_IDENTIFIERS {
+  man = "man.png",
+  girl = "girl.jpg",
+  none = "none",
 }

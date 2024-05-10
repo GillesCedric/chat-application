@@ -88,4 +88,26 @@ export default class ConversationRepository {
       return { error: error };
     }
   }
+  public static async  updateChat(id: string, csrfToken: string): Promise<any> {
+    try {
+      const response = await API.updateChat(id, {
+        "csrf-token": csrfToken,
+      });
+      if (response.message) {
+        console.log(response.message);
+        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error("Failed to update chat :", response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log("Errors : " + response.errros);
+        return { error: "Failed to update chat" };
+      }
+    } catch (error) {
+      console.error("Failed to update chat", error);
+      return { error: error };
+    }
+  }
 }

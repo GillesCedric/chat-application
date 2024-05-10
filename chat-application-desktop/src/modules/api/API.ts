@@ -336,7 +336,6 @@ export default class API {
     data: any,
     headers: HeadersInit = {}
   ): Promise<any> => {
-    console.log(id);
     let responseData = null;
     let handleRequest = false;
     const url = this.apiUrl + "/users/friends/request/" + id;
@@ -355,6 +354,29 @@ export default class API {
     }
     handleRequest = await this.handleRequest(responseData);
     if (handleRequest) return this.updateFriendRequest(id, data);
+    return responseData;
+  };
+  public static readonly updateChat = async (
+    id : string,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    const url = this.apiUrl + "/conversations/" + id;
+    try {
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.updateChat(id);
     return responseData;
   };
 }
