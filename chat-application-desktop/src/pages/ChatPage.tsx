@@ -75,16 +75,7 @@ const ChatPage = () => {
       message: newMessage,
       _csrf: csrfToken,
     });
-    const savedMessage: MessageModel = {
-      _id: "",
-      sender: "",
-      message: newMessage,
-      status: "",
-      createdAt: convertToYesterday(new Date().toISOString()).toISOString(),
-      isOwnedByUser: true,
-    };
-    //setMessages([...messsages, savedMessage]);
-  };
+     };
 
   const handleSelectConversation = (conversation: ConversationModel): void => {
     setConversation(conversation);
@@ -122,6 +113,7 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
+    
   };
 
   useEffect(() => {
