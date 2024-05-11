@@ -1,3 +1,7 @@
+/**
+Ce code crée un pont de communication sécurisé entre le processus de rendu d'Electron et le code JavaScript du navigateur en utilisant contextBridge. Il expose deux objets dans le contexte global du navigateur : electron.store pour gérer le stockage de données et electron.security pour les opérations de cryptage et de décryptage. Cela permet d'accéder de manière sécurisée aux fonctionnalités d'Electron depuis le code JavaScript du navigateur.
+* @module preload
+ */
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {

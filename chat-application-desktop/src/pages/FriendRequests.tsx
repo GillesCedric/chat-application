@@ -1,3 +1,7 @@
+/**
+* Cette page est celle visible par les utilisateurs pour gérer leurs demandes d'amis
+* @module pages/FriendRequests
+ */
 import React, { useEffect, useState } from "react";
 import { FriendRequestComponent } from "../components/FriendRequestComponent";
 import ChatHeader from "../components/ChatHeader";
@@ -48,7 +52,7 @@ export const FriendRequest = () => {
         unsubscribe(SocketKeywords.newConversation, handleNewConversation);
       };
     }
-  }, [subscribe, unsubscribe , isConnected]);
+  }, [subscribe, unsubscribe, isConnected]);
 
   return (
     <div className="h-screen flex flex-col">

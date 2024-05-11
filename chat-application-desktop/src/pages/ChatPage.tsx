@@ -1,3 +1,7 @@
+/**
+* Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
+* @module pages/ChatPage
+ */
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
 

@@ -1,3 +1,8 @@
+/**
+*
+*Ce code définit une classe API qui facilite les requêtes HTTP vers une API distante. Il inclut des méthodes pour l'authentification, la vérification de l'authenticité des jetons, l'envoi de messages, la gestion des amis, etc. Les requêtes sont configurées avec des en-têtes comprenant des jetons d'authentification et sont envoyées avec les données nécessaires au format JSON. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API, notamment pour actualiser les jetons d'authentification et rediriger vers la page de connexion en cas d'erreur d'authentification.
+ * @module modules/API
+ */
 import { Crypto } from "../crypto/Crypto";
 import CONFIG from "../../config/config.json";
 import { Tokens } from "../..//utils/Tokens";

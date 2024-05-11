@@ -1,3 +1,14 @@
+/**
+*
+* 
+
+Ce code définit une classe SecureStore qui gère le stockage sécurisé des données de manière chiffrée à l'aide de l'algorithme de chiffrement AES-256-CBC. La classe utilise le module electron-store pour stocker les données de manière persistante dans l'application Electron. La clé de chiffrement est générée de manière sécurisée lors de l'initialisation de l'instance de SecureStore et est utilisée pour chiffrer et déchiffrer les données stockées.
+
+Les données sont chiffrées avant d'être stockées en utilisant la méthode encryptData, qui génère un vecteur d'initialisation aléatoire (IV) pour chaque chiffrement. Les données sont déchiffrées à l'aide de la méthode decryptData en utilisant la même clé et le même IV utilisés lors du chiffrement.
+
+La classe offre des méthodes simples pour définir, obtenir et vérifier l'existence des données dans le store sécurisé. En interne, elle utilise les fonctionnalités de chiffrement fournies par le module crypto de Node.js pour garantir la sécurité des données stockées.
+* @module modules/store/store
+ */
 import Store from 'electron-store'
 import { app, safeStorage } from 'electron';
 import crypto, { createCipheriv, createDecipheriv } from 'crypto';
