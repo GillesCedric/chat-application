@@ -18,6 +18,7 @@ interface IUser extends mongoose.Document {
   picture: string;
   status: string
   friends: mongoose.Types.ObjectId[];
+  publicKey: string
   createdAt: Date;
   updatedAt: Date;
 }
@@ -77,6 +78,10 @@ const userSchema = new mongoose.Schema({
       default: []
     },
   ],
+  publicKey: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now

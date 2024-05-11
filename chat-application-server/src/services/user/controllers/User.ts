@@ -446,6 +446,7 @@ export default class UserController {
           "database"
         ),
         status: Crypto.encrypt(UserStatus.offline, "status"),
+        publicKey: req.body.publicKey,
         friends: [],
 
       })

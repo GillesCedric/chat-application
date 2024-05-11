@@ -389,7 +389,7 @@ export default function Register() {
     }
     return true;
   };
-  const signUp = () => {
+  const signUp = async () => {
     if (checkPassword()) {
       const userdata = {
         firstname: firstnameRef.current?.value,
@@ -400,6 +400,7 @@ export default function Register() {
         tel: telRef.current?.value.replace(/-/g, ""),
         picture: useInitials ? AVATAR_IDENTIFIER.none : picture,
         _csrf: csrfTokenRef.current?.value,
+        publicKey: window.electron.security.getPublicKey()
       };
       console.log(userdata);
       console.log(csrfToken);

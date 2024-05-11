@@ -22,11 +22,11 @@ export default class API {
     credentials: "include",
   };
 
-  private static readonly generateBody = async (data: any) => {
-    const access_token = await window.electron.store.get(
+  private static readonly generateBody = (data: any) => {
+    const access_token = window.electron.store.get(
       "chat-application-access_token"
     );
-    const refresh_token = await window.electron.store.get(
+    const refresh_token = window.electron.store.get(
       "chat-application-refresh_token"
     );
 
@@ -37,13 +37,13 @@ export default class API {
     });
   };
 
-  private static readonly generateURL = async (url: string) => {
+  private static readonly generateURL = (url: string) => {
     const urlObject = new URL(url);
 
-    const access_token = await window.electron.store.get(
+    const access_token = window.electron.store.get(
       "chat-application-access_token"
     );
-    const refresh_token = await window.electron.store.get(
+    const refresh_token = window.electron.store.get(
       "chat-application-refresh_token"
     );
 
@@ -69,10 +69,10 @@ export default class API {
       );
       return false;
     } else if (responseData.error && responseData.error == "unauthenticated") {
-      const access_token = await window.electron.store.get(
+      const access_token = window.electron.store.get(
         "chat-application-access_token"
       );
-      const refresh_token = await window.electron.store.get(
+      const refresh_token = window.electron.store.get(
         "chat-application-refresh_token"
       );
       const response = await this.refreshTokens({
@@ -176,7 +176,7 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = await this.generateURL(
+      const url = this.generateURL(
         this.apiUrl + "/chats/conversations/" + id
       );
       const response = await fetch(url, {
@@ -201,7 +201,7 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = await this.generateURL(this.apiUrl + "/chats/conversations/");
+      const url = this.generateURL(this.apiUrl + "/chats/conversations/");
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -231,7 +231,7 @@ export default class API {
           ...this.headers,
           ...headers,
         },
-        body: await this.generateBody(data),
+        body: this.generateBody(data),
       });
       responseData = await response.json();
     } catch (error) {
@@ -254,7 +254,7 @@ export default class API {
           ...this.headers,
           ...headers,
         },
-        body: await this.generateBody(data),
+        body: this.generateBody(data),
       });
       responseData = await response.json();
     } catch (error) {
@@ -296,7 +296,7 @@ export default class API {
           ...this.headers,
           ...headers,
         },
-        body: await this.generateBody(data),
+        body: this.generateBody(data),
       });
       responseData = await response.json();
     } catch (error) {
@@ -312,7 +312,7 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = await this.generateURL(
+      const url = this.generateURL(
         this.apiUrl + "/users/friends/request"
       );
       const response = await fetch(url, {
