@@ -1,7 +1,7 @@
 /**
  * 
  * Ce code constitue un composant React pour l'ajout d'amis.Lorsque l'utilisateur clique sur le bouton "Send invitation", un modal s'ouvre pour saisir le nom d'utilisateur et un commentaire optionnel pour l'invitation.Le composant utilise la bibliothèque FontAwesome pour les icônes et React Toastify pour afficher les notifications.L'état du modal est géré via useState pour contrôler son ouverture et sa fermeture. Lorsque l'utilisateur soumet le formulaire, une requête est envoyée au serveur via l'API pour envoyer une demande d'ami.Les erreurs sont gérées et affichées à l'utilisateur via les notifications.
- * s
+ * 
  * @module components/AddFriend
  */
 
