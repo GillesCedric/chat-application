@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
-import { Conversation } from "../components/Conversation";
+
 import ChatInput from "../components/ChatInput";
 import { ChatDataTest } from "../components/ChatDataTest";
 import ConversationHeader from "../components/ConversationHeader";
@@ -37,11 +37,11 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   useEffect(() => {
-    fetchConversations();  
+    fetchConversations();
 
     const handleNewMessage = (data: any) => {
       console.log(data);
-      addMessage(); 
+      addMessage();
       setMessages(prevMessages => [...prevMessages, data]);
     };
 
@@ -75,7 +75,7 @@ const ChatPage = () => {
       message: newMessage,
       _csrf: csrfToken,
     });
-     };
+  };
 
   const handleSelectConversation = (conversation: ConversationModel): void => {
     setConversation(conversation);
@@ -113,7 +113,7 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-    
+
   };
 
   useEffect(() => {
@@ -183,7 +183,7 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-                    <Conversation messages={messsages} />
+
                   </div>
 
                   <div className="flex-none bg-white">

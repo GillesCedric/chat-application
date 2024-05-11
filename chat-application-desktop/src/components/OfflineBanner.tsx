@@ -1,9 +1,20 @@
+/**
+ * Le composant OfflineBanner affiche une bannière indiquant l'état de la connexion réseau.
+ * Il prend un seul argument :
+ * - isOnline: Un booléen indiquant si l'utilisateur est actuellement connecté à internet.
+ * Le composant utilise cette information pour afficher un message et une couleur de fond appropriés.
+ * Lorsque l'utilisateur est en ligne, le message "Connected" est affiché avec un fond vert, sinon "Waiting for network" est affiché avec un fond rouge.
+ * Le composant utilise également une animation de chargement pour indiquer l'état de connexion en cours.
+ * En résumé, le composant OfflineBanner offre une indication visuelle claire de l'état de la connexion réseau de l'utilisateur.
+ *@module components/OfflineBanner 
+*/
+
 export const OfflineBanner = ({
   isOnline,
 }: {
   isOnline: boolean;
-	}) => {
-	const backgroundColor = isOnline ? "bg-green-400" : "bg-red-400";
+}) => {
+  const backgroundColor = isOnline ? "bg-green-400" : "bg-red-400";
   const text = isOnline ? "Connected" : "Waiting for network";
   return (
     <div className={`flex items-center justify-center ${backgroundColor}`}>

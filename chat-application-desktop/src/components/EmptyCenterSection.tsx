@@ -1,3 +1,9 @@
+/**
+ * Le composant EmptyCenterSection affiche une section centrale lorsque le contenu est vide.
+ * Il affiche un message principal et un paragraphe supplémentaire pour guider l'utilisateur.
+ * 
+ * @module components/EmptyCenterSection
+ */
 export const EmptyCenterSection = ({
   message,
   smallParagraph,

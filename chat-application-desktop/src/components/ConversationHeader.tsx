@@ -1,8 +1,13 @@
+/**
+*Le composant ConversationHeader affiche l'en-tête d'une liste de messages dans une interface de chat. Il présente le nom de l'utilisateur, son statut en ligne/hors ligne, et l'URL de son avatar. En outre, il offre des fonctionnalités telles que la recherche, l'affichage des options supplémentaires, et la possibilité d'intégrer d'autres fonctionnalités via des boutons.
+  
+@module components/ConversationHeader
+ */
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Avatar } from "./Avatar";
-const MessageListHeader = ({ name, status, avatar } : {name : string , status : boolean , avatar : string}) => {
+const MessageListHeader = ({ name, status, avatar }: { name: string, status: boolean, avatar: string }) => {
   return (
     <div className=" rounded-t-lg py-2 px-3 bg-white flex justify-between items-center border-b-2">
       <div className="flex items-center">
@@ -10,9 +15,8 @@ const MessageListHeader = ({ name, status, avatar } : {name : string , status : 
         <div className="ml-4">
           <p className="text-grey-darkest font-semibold">{name}</p>
           <p
-            className={`text-grey-darker text-xs ${
-              status ? "text-green-700" : "text-red-500"
-            }`}
+            className={`text-grey-darker text-xs ${status ? "text-green-700" : "text-red-500"
+              }`}
           >
             {status ? "Online" : "Offline"}
           </p>

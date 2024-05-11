@@ -1,3 +1,10 @@
+/**
+ * Le composant Conversations affiche une liste de conversations dans une interface de chat.
+ * Il prend en entrée une liste d'objets ConversationModel, représentant chaque conversation.
+ * Le composant permet à l'utilisateur de sélectionner une conversation à partir de la liste.
+ * 
+ * @module components/Conversations
+ */
 import { Avatar } from "./Avatar";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToDate, getDateDivider } from "../utils/utilsFunctions";
@@ -14,9 +21,8 @@ const ConversationItem = ({
 }) => {
   return (
     <div
-      className={`flex items-center px-4 py-3 text-black cursor-pointer rounded-md ${
-        isSelected ? "bg-gray-300" : "hover:bg-gray-300"
-      }`}
+      className={`flex items-center px-4 py-3 text-black cursor-pointer rounded-md ${isSelected ? "bg-gray-300" : "hover:bg-gray-300"
+        }`}
       onClick={() => changeConversation(conversation)}
     >
       <Avatar avatar={conversation.picture} fullname={conversation.fullname} />

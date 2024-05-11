@@ -1,3 +1,4 @@
+
 import {
   createContext,
   useContext,
@@ -63,7 +64,7 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
   };
 
   return (
-    <SocketContext.Provider value={{isConnected, subscribe, unsubscribe}}>
+    <SocketContext.Provider value={{ isConnected, subscribe, unsubscribe }}>
       {children}
     </SocketContext.Provider>
   );

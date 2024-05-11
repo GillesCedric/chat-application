@@ -1,3 +1,10 @@
+/**
+ * Le composant FriendRequestComponent représente une demande d'ami dans l'interface utilisateur.
+ * Il affiche les détails de la demande d'ami, y compris le nom de l'expéditeur, le commentaire, et la date de création.
+ * Les utilisateurs peuvent accepter ou rejeter la demande, ainsi que supprimer la demande.
+ * 
+ * @module components/FriendRequestComponent
+ */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
@@ -10,7 +17,7 @@ export const FriendRequestComponent = ({
   friendRequest,
 }: {
   friendRequest: any;
-  }) => {
+}) => {
   const [csrfToken, setCsrfToken] = useState("");
   useEffect(() => {
     API.getCSRFToken().then((data: any) => {
@@ -23,7 +30,7 @@ export const FriendRequestComponent = ({
       status: FriendsRequestStatus.accepted,
       _csrf: csrfToken,
     };
-    User.updateFriendRequest(friendRequestId ,data )
+    User.updateFriendRequest(friendRequestId, data)
       .then((response: any) => {
         if (response.message) {
           console.log(response.message);
@@ -40,7 +47,7 @@ export const FriendRequestComponent = ({
   const handleDelete = () => {
     User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.deleted,
-      _csrf : csrfToken
+      _csrf: csrfToken
     })
       .then((response: any) => {
         if (response.message) {
@@ -71,14 +78,14 @@ export const FriendRequestComponent = ({
       });
   };
 
-  const formatDate = (isoString : string) : string => {
+  const formatDate = (isoString: string): string => {
     const date = new Date(isoString);
     return (
       date.toLocaleDateString("en-US", {
-        weekday: "long", 
-        year: "numeric", 
-        month: "long", 
-        day: "numeric", 
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }) +
       " " +
       date.toLocaleTimeString("en-US", {
@@ -102,7 +109,7 @@ export const FriendRequestComponent = ({
           >
             <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
           </svg>
-          Since { formatDate( friendRequest.createdAt)}
+          Since {formatDate(friendRequest.createdAt)}
         </span>
         <button
           className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"

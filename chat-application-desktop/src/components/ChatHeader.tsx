@@ -1,9 +1,14 @@
+/**
+ *Ce composant représente l'en-tête. Il affiche le nom du chat ("ChatBOT") avec une icône de messagerie. Il contient également des liens de navigation vers différentes sections telles que la page d'accueil, les demandes d'amis, les contacts et les paramètres. De plus, il inclut une icône de notification qui ouvre un tiroir de notifications lorsqu'on clique dessus. Ce tiroir affiche une liste de notifications, telles que des succès, des erreurs ou des avertissements, avec leur état de lecture.
+ * 
+ * @module components/ChatHeaders
+ */
+
 import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
-import NotificationRepository from "../modules/manager/NotificationRepository";  
-;
+import NotificationRepository from "../modules/manager/NotificationRepository";
 import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
@@ -24,16 +29,16 @@ const ChatHeader = () => {
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
-/*   useEffect(() => {
-    NotificationRepository.getNotifications(data).then((response: any) => {
-      if (response.message) {
-        setNotifications(response.message);
-        setNotificationCount(notifications.length);
-      } else {
-        notify(response.error, "error");
-      }
-    });
-  }); */
+  /*   useEffect(() => {
+      NotificationRepository.getNotifications(data).then((response: any) => {
+        if (response.message) {
+          setNotifications(response.message);
+          setNotificationCount(notifications.length);
+        } else {
+          notify(response.error, "error");
+        }
+      });
+    }); */
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
