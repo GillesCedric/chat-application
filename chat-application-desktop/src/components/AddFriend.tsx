@@ -19,7 +19,7 @@ export const AddFriend = () => {
       <div className="flex gap-3">
         <button
           onClick={toggleModal} // Toggle modal on click
-          className="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 transition-all duration-500 rounded-full text-white text-xs font-semibold leading-4"
+          className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 transition-all duration-500 rounded-full text-white text-xs font-semibold leading-4"
         >
           Send invitation
         </button>

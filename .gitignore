@@ -43,6 +43,9 @@ archives
 # dist directories
 /chat-application-*/dist/
 
+# doc directories
+/chat-application-*/docs/
+
 # TypeScript v1 declaration files
 /chat-application-*/typings/
 

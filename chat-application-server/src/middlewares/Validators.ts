@@ -89,6 +89,12 @@ export abstract class UserValidators extends Validators {
         body('code').escape().trim().stripLow().isLength({ min: 6, max: 6 }).isNumeric()
     ]
 
+    public static readonly checkUnique = [
+        body('tel').escape().trim().stripLow().isMobilePhone('fr-FR').optional(),
+        body('email').escape().trim().stripLow().isEmail().optional(),
+        body('username').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }).optional(),
+    ]
+
 }
 export abstract class ChatValidators extends Validators {
 
@@ -109,7 +115,7 @@ export abstract class ChatValidators extends Validators {
     public static readonly addChats = [
         body('access_token').escape().trim().stripLow().isJWT(),
         param('id').escape().trim().stripLow().isMongoId(),
-        body('message').trim().stripLow().isLength({ min: 0, max: 250 }),
+        body('message').trim().stripLow().isLength({ min: 0, max: 500 }),
     ]
 
     public static readonly updateChat = [

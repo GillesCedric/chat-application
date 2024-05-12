@@ -97,7 +97,6 @@ export default class App {
         this.app.use(bodyParser.json())
         this.app.use(bodyParser.urlencoded({ extended: true }))
 
-        //TODO refexion about the rate limit of the notification service
         // this.app.use(rateLimit({
         //     windowMs: 10 * 60 * 1000, // 10 minutes
         //     limit: 100, // 100 calls,

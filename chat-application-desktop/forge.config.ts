@@ -13,23 +13,27 @@ import { rendererConfig } from './webpack.renderer.config';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
-    icon: "./src/assets/chat-application"
+    icon: "./src/assets/chat-application",
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({
-    iconUrl: "https://chat-application/images/application/chat-application.ico",
-    setupIcon: "./src/assets/chat-application.ico",
-  }), new MakerZIP({
-
-  }, ['darwin']), new MakerRpm({
-    options: {
-      icon: "./src/assets/chat-application.png"
-    }
-  }), new MakerDeb({
-    options: {
-      icon: "./src/assets/chat-application.png"
-    }
-  })],
+  makers: [
+    new MakerSquirrel({
+      iconUrl:
+        "https://chat-application/images/application/chat-application.ico",
+      setupIcon: "./src/assets/chat-application.ico",
+    }),
+    new MakerZIP({}, ["darwin"]),
+    new MakerRpm({
+      options: {
+        icon: "./src/assets/chat-application.png",
+      },
+    }),
+    new MakerDeb({
+      options: {
+        icon: "./src/assets/chat-application.png",
+      },
+    }),
+  ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
@@ -39,19 +43,19 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: './src/index.html',
-            js: './src/renderer.ts',
-            name: 'main_window',
+            html: "./src/index.html",
+            js: "./src/renderer.ts",
+            name: "main_window",
             preload: {
-              js: './src/preload.ts',
+              js: "./src/preload.ts",
             },
           },
         ],
       },
-      port: 3001, //Custom Electron port
 
-      /* port : 3003,  */
-      loggerPort: 9012 //Custom Electron Logger port
+
+      //port: 3001, //Custom Electron port
+      //loggerPort: 9012
     }),
     // Fuses are used to enable/disable various Electron functionality
     // at package time, before code signing the application
