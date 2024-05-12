@@ -291,7 +291,8 @@ export default class ChatController {
               _id: savedChat._id,
               message: req.body.message,
               readBy: savedChat.readBy,
-              isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
+              isOwnedByUser: savedChat.sender.equals(conversaton.members[0]),
+              createdAt : savedChat.createdAt
             },
             event: SocketKeywords.newMessage
           })

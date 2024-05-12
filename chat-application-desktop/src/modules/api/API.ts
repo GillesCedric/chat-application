@@ -92,7 +92,7 @@ export default class API {
       }
       //TODO redirect to the login page
       redirect("/signin");
-      return false
+      return false;
     }
     return false;
   };
@@ -357,12 +357,13 @@ export default class API {
     return responseData;
   };
   public static readonly updateChat = async (
-    id : string,
+    id: string,
+    data: { _csrf: string },
     headers: HeadersInit = {}
   ): Promise<any> => {
     let responseData = null;
     let handleRequest = false;
-    const url = this.apiUrl + "/conversations/" + id;
+    const url = this.apiUrl + "/chats/conversations/" + id;
     try {
       const response = await fetch(url, {
         method: "PUT",
@@ -370,13 +371,14 @@ export default class API {
           ...this.headers,
           ...headers,
         },
+        body: await this.generateBody(data),
       });
       responseData = await response.json();
     } catch (error) {
       console.log("error " + error);
     }
     handleRequest = await this.handleRequest(responseData);
-    if (handleRequest) return this.updateChat(id);
+    if (handleRequest) return this.updateChat(id, data);
     return responseData;
   };
 }

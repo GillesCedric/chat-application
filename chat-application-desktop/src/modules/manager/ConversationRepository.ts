@@ -25,7 +25,6 @@ export default class ConversationRepository {
     try {
       const response = await API.getUserConversation(id);
       if (response.message) {
-        console.log(response.message);
         return { data: response.data };
       } else {
         return { error: response.errors ? response.errors : response.error };
@@ -72,7 +71,7 @@ export default class ConversationRepository {
         "csrf-token": data._csrf,
       });
       if (response.message) {
-        console.log(response.message);
+       /*  console.log(response.message); */
         return {
           message: response.message,
         };
@@ -88,13 +87,19 @@ export default class ConversationRepository {
       return { error: error };
     }
   }
-  public static async  updateChat(id: string, csrfToken: string): Promise<any> {
+  public static async updateChat(id: string, csrfToken: string): Promise<any> {
     try {
-      const response = await API.updateChat(id, {
-        "csrf-token": csrfToken,
-      });
+      const response = await API.updateChat(
+        id,
+        {
+          _csrf: csrfToken,
+        },
+        {
+          "csrf-token": csrfToken,
+        }
+      );/*  console.log(response); */
       if (response.message) {
-        console.log(response.message);
+        /* console.log(response.message); */
         return {
           message: response.message,
         };
