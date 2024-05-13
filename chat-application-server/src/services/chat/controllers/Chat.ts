@@ -34,7 +34,7 @@ export default class ChatController {
 
     try {
 
-      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
+      //const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
       if (await this.checkIfConversationExists(req.body.members)) {
         return res.status(401).json({
@@ -42,53 +42,60 @@ export default class ChatController {
         });
       }
 
-      const conversation = new ConversationModel({ members: req.body.members.sort((a: mongoose.Types.ObjectId, b: mongoose.Types.ObjectId) => a.toString().localeCompare(b.toString())) });
+      const symmetricKey = Crypto.generateSymmetricKey()
+      console.log(symmetricKey.toString('hex'))
+
+      // Récupérer les clés publiques des membres et chiffrer la clé symétrique
+      const encryptedKeys = await Promise.all(req.body.members.map(async (memberId: mongoose.Types.ObjectId) => {
+        const member = await UserModel.findById(memberId);
+        return {
+          user: memberId,
+          encryptedKey: Crypto.encryptSymmetricKey(symmetricKey, member.publicKey)
+        };
+      }));
+
+      const conversation = new ConversationModel({
+        members: req.body.members.sort((a: mongoose.Types.ObjectId, b: mongoose.Types.ObjectId) => a.toString().localeCompare(b.toString())),
+        encryptedKeys: encryptedKeys,
+        chats: []
+      });
 
       const savedConversation = await conversation.save()
 
-      const otherMember = await UserModel.findById(savedConversation.members.find(id => !id.equals(userId)))
+      const notifications = savedConversation.members.map(async memberId => {
+        const otherMembers = savedConversation.members.filter(id => !id.equals(memberId));
+        const otherMemberDetails = await Promise.all(otherMembers.map(async otherMemberId => {
+          const otherMember = await UserModel.findById(otherMemberId);
+          return {
+            userId: otherMember._id,
+            username: Crypto.decrypt(otherMember.username, "username"),
+            picture: Crypto.decrypt(otherMember.picture, "database"),
+            status: Crypto.decrypt(otherMember.status, "status")
+          };
+        }));
 
-      await Promise.all([
-        fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
-          method: Method.post,
-          headers: headers(req.headers["user-agent"]),
-          body: JSON.stringify({
-            access_token: req.body.access_token,
-            receiver: req.body.members[0],
-            data: {
-              _id: savedConversation._id,
-              lastMessageDate: null,
-              lastMessageDetails: null,
-              unreadCount: 0,
-              userId: otherMember._id,
-              username: Crypto.decrypt(otherMember.username, "username"),
-              picture: Crypto.decrypt(otherMember.picture, "database"),
-              status: Crypto.decrypt(otherMember.status, "status")
-            },
-            event: SocketKeywords.newConversation
+        // Envoyer une notification pour chaque autre membre
+        await Promise.all(otherMemberDetails.map(otherMember =>
+          fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
+            method: Method.post,
+            headers: headers(req.headers["user-agent"]),
+            body: JSON.stringify({
+              access_token: req.body.access_token,
+              receiver: memberId.toString(),
+              data: {
+                _id: savedConversation._id,
+                lastMessageDate: null,
+                lastMessageDetails: null,
+                unreadCount: 0,
+                ...otherMember
+              },
+              event: SocketKeywords.newConversation
+            })
           })
-        })
-        ,
-        fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
-          method: Method.post,
-          headers: headers(req.headers["user-agent"]),
-          body: JSON.stringify({
-            access_token: req.body.access_token,
-            receiver: req.body.members[1],
-            data: {
-              _id: savedConversation._id,
-              lastMessageDate: null,
-              lastMessageDetails: null,
-              unreadCount: 0,
-              userId: otherMember._id,
-              username: Crypto.decrypt(otherMember.username, "username"),
-              picture: Crypto.decrypt(otherMember.picture, "database"),
-              status: Crypto.decrypt(otherMember.status, "status")
-            },
-            event: SocketKeywords.newConversation
-          })
-        })
-      ])
+        ));
+      });
+
+      await Promise.all(notifications);
 
       return res.status(200).json({
         message: "Conversation enregistrée avec succèss",
@@ -202,7 +209,19 @@ export default class ChatController {
           $addFields: {
             lastMessageDate: { $arrayElemAt: ['$lastMessage.createdAt', 0] },
             lastMessageDetails: { $arrayElemAt: ['$lastMessage', 0] },
-            unreadCount: { $size: '$unreadMessages' } // Calcul du nombre de messages non lus
+            unreadCount: { $size: '$unreadMessages' }, // Calcul du nombre de messages non lus
+            encryptedKey: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$encryptedKeys",
+                    as: "key",
+                    cond: { $eq: ["$$key.user", new mongoose.Types.ObjectId(userId)] }
+                  }
+                },
+                0
+              ]
+            }
           }
         },
         {
@@ -212,10 +231,10 @@ export default class ChatController {
             'memberDetails.lastname': 1,
             'memberDetails.picture': 1,
             'memberDetails.status': 1,
-            'memberDetails.publicKey': 1,
             'lastMessageDetails.message': 1,
             'lastMessageDate': 1,
-            unreadCount: 1
+            unreadCount: 1,
+            'encryptedKey.encryptedKey': 1
           }
         }
       ])
@@ -240,7 +259,8 @@ export default class ChatController {
           fullname: `${Crypto.decrypt(conversation.memberDetails.firstname, 'database')} ${Crypto.decrypt(conversation.memberDetails.lastname, 'database')}`,
           picture: Crypto.decrypt(conversation.memberDetails.picture, "database"),
           status: Crypto.decrypt(conversation.memberDetails.status, "status"),
-          publicKey: conversation.memberDetails.publicKey
+          encryptedKey: conversation.encryptedKey && conversation.encryptedKey.encryptedKey,
+          decryptedKey: null
         };
       });
 
@@ -264,6 +284,29 @@ export default class ChatController {
     const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
 
     try {
+      const conversation = await ConversationModel.findById(req.params.id)
+
+      if (!conversation) {
+        return res.status(401).json({
+          error: "Cette conversation n'existe pas",
+        });
+      }
+
+      // Ensure there are other members to receive the chat
+      if (!conversation.members || conversation.members.length < 2) {
+        return res.status(401).json({
+          error: "Pas assez de membres dans la conversation",
+        });
+      }
+
+      const recipient = conversation.members.find(member => !member._id.equals(userId));
+
+      if (!recipient) {
+        return res.status(401).json({
+          error: "Le destinataire de cette conversation n'existe pas",
+        });
+      }
+      console.log(recipient)
       // Créer un nouvel objet chat
       const chat = new ChatModel({
         conversation: new mongoose.Types.ObjectId(req.params.id),
@@ -276,48 +319,37 @@ export default class ChatController {
       const savedChat = await chat.save()
 
       // Mettre à jour la conversation en ajoutant ce nouveau chat au tableau `chats`
-      const conversaton = await ConversationModel.findByIdAndUpdate(
+      await ConversationModel.findByIdAndUpdate(
         req.params.id,
         { $push: { chats: savedChat._id } },
-        { new: true, upsert: true }
-      )
+        { new: true }
+      );
 
-      await Promise.all([
-        fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
-          method: Method.post,
-          headers: headers(req.headers["user-agent"]),
-          body: JSON.stringify({
-            access_token: req.body.access_token,
-            receiver: conversaton.members[0],
-            data: {
-              _id: savedChat._id,
-              message: req.body.message,
-              readBy: savedChat.readBy,
-              isOwnedByUser: savedChat.sender.equals(conversaton.members[0])
-            },
-            event: SocketKeywords.newMessage
+      const notificationPromises = conversation.members
+        //.filter(memberId => !memberId.equals(userId))
+        .map(memberId =>
+          fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
+            method: 'POST',
+            headers: headers(req.headers["user-agent"]),
+            body: JSON.stringify({
+              access_token: req.body.access_token,
+              receiver: memberId.toString(),
+              data: {
+                _id: savedChat._id,
+                message: req.body.message,
+                readBy: savedChat.readBy,
+                isOwnedByUser: savedChat.sender.equals(memberId)
+              },
+              event: SocketKeywords.newMessage
+            })
           })
-        }),
-        fetch(`${protocol()}://${SERVICES[process.env.NODE_ENV][Services.socket].domain}:${SERVICES[process.env.NODE_ENV][Services.socket].port}/`, {
-          method: Method.post,
-          headers: headers(req.headers["user-agent"]),
-          body: JSON.stringify({
-            access_token: req.body.access_token,
-            receiver: conversaton.members[1],
-            data: {
-              _id: savedChat._id,
-              message: req.body.message,
-              readBy: savedChat.readBy,
-              isOwnedByUser: savedChat.sender.equals(conversaton.members[1])
-            },
-            event: SocketKeywords.newMessage
-          })
-        })
-      ])
+        );
+
+      await Promise.all(notificationPromises);
 
       return res.status(200).json({
         message: "Message enregistré avec succèss",
-      })
+      });
 
     } catch (error) {
       console.error('Failed to add chat or update conversation:', error);

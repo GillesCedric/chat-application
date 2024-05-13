@@ -10,11 +10,17 @@ contextBridge.exposeInMainWorld('electron', {
 		},
 	},
 	security: {
-		encrypt(val: string): string {
-			return ipcRenderer.sendSync('electron-security-encrypt', val);
+		encryptWithPublicKey(val: string, key: string): string {
+			return ipcRenderer.sendSync('electron-security-encryptWithPublicKey', val, key);
 		},
-		decrypt(val: string): string {
-			return ipcRenderer.sendSync('electron-security-decrypt', val);
+		decryptWithPrivateKey(val: string): string {
+			return ipcRenderer.sendSync('electron-security-decryptWithPrivateKey', val);
+		},
+		encryptWithSymmetricKey(val: string, key: string): string {
+			return ipcRenderer.sendSync('electron-security-encryptWithSymmetricKey', val, key);
+		},
+		decryptWithSymmetricKey(val: string, key: string): string {
+			return ipcRenderer.sendSync('electron-security-decryptWithSymmetricKey', val, key);
 		},
 		getPublicKey(): string {
 			return ipcRenderer.sendSync('electron-security-getPublicKey');

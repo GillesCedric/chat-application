@@ -28,25 +28,35 @@ export default class SecureStore {
 	}
 
 	private generatePassphrase(): string {
-		return safeStorage.encryptString(Crypto.random(16)).toString('hex')
+		return safeStorage.encryptString(Crypto.random(32)).toString('hex')
 	}
 
 	private encryptData(data: string): string {
-		const iv = crypto.randomBytes(16);
-		const cipher = createCipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
-		let encrypted = cipher.update(data, 'utf8', 'hex');
-		encrypted += cipher.final('hex');
-		return iv.toString('hex') + ':' + encrypted;
+		try {
+			const iv = crypto.randomBytes(16);
+			const cipher = createCipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
+			let encrypted = cipher.update(data, 'utf8', 'hex');
+			encrypted += cipher.final('hex');
+			return iv.toString('hex') + ':' + encrypted;
+		} catch (error) {
+			console.log(error)
+		}
+		
 	}
 
 	private decryptData(data: string): string {
-		const parts = data.split(':');
-		const iv = Buffer.from(parts.shift(), 'hex');
-		const encryptedText = parts.join(':');
-		const decipher = createDecipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
-		let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-		decrypted += decipher.final('utf8');
-		return decrypted;
+		try {
+			const parts = data.split(':');
+			const iv = Buffer.from(parts.shift(), 'hex');
+			const encryptedText = parts.join(':');
+			const decipher = createDecipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
+			let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+			decrypted += decipher.final('utf8');
+			return decrypted;
+		} catch (error) {
+			console.log(error)
+		}
+		
 	}
 
 	private createStore() {

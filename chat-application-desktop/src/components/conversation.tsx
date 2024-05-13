@@ -35,17 +35,19 @@ export const Conversation = ({ messages }: { messages: MessageModel[] }) => {
           />
         </div>
       ) : (
-        messages.map((message, index) => (
-          <div key={index}>
-            {/* Check if it's the first message or if the date is different from the previous message */}
-            {(index === 0 ||
-              new Date(messages[index - 1].createdAt).toDateString() !==
-              new Date(message.createdAt).toDateString()) && (
-                <DateDivider date={convertToDate(message.createdAt)} />
-              )}
-            <MessageItem message={message} />
-          </div>
-        ))
+          messages.map((message, index) => { 
+            return (
+              <div key={index}>
+                {/* Check if it's the first message or if the date is different from the previous message */}
+                {(index === 0 ||
+                  new Date(messages[index - 1].createdAt).toDateString() !==
+                  new Date(message.createdAt).toDateString()) && (
+                    <DateDivider date={convertToDate(message.createdAt)} />
+                  )}
+                <MessageItem message={message} />
+              </div>
+            )
+          })
       )}
       <div ref={messagesEndRef} />
     </div>

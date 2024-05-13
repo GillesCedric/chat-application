@@ -81,6 +81,7 @@ const userSchema = new mongoose.Schema({
   publicKey: {
     type: String,
     required: true,
+    //TODO add unique before the push in production
   },
   createdAt: {
     type: Date,

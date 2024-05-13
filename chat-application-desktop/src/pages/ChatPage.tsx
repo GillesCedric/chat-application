@@ -37,11 +37,13 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   useEffect(() => {
-    fetchConversations();  
+    fetchConversations();
 
     const handleNewMessage = (data: any) => {
       console.log(data);
-      addMessage(); 
+      addMessage();
+      console.log(conversation)
+      //const decryptedData = window.electron.security.decryptWithSymmetricKey(data, conversation.decryptedKey)
       setMessages(prevMessages => [...prevMessages, data]);
     };
 
@@ -70,24 +72,26 @@ const ChatPage = () => {
       notify("Error sending message, cannot get conversation", "error");
       return;
     }
-    // Add new message to the messages state
+
+    //Add new message to the messages state
     ConversationRepository.addMessage(conversation._id, {
-      message: newMessage,
+      message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
       _csrf: csrfToken,
     });
-     };
+
+  };
 
   const handleSelectConversation = (conversation: ConversationModel): void => {
     setConversation(conversation);
     ConversationRepository.getUserConversation(conversation._id)
       .then((response: any) => {
         if (!response.error) {
-          console.log("Messages : " + response.data.length);
-          console.log(
-            response.data.map((data: any) => {
-              console.log(data);
-            })
-          );
+          // console.log("Messages : " + response.data.length);
+          // console.log(
+          //   response.data.map((data: any) => {
+          //     console.log(data);
+          //   })
+          // );
           setMessages(response.data);
         } else {
           notify(response.error, "error");
@@ -99,10 +103,16 @@ const ChatPage = () => {
   };
   const fetchConversations = () => {
     ConversationRepository.getConversations()
-      .then((response: any) => {
+      .then(async (response: any) => {
         console.log(response);
         if (!response.error) {
-          setConversations(response.data);
+          const conversations = await Promise.all<ConversationModel[]>(response.data.map((conversation: ConversationModel) => {
+            conversation.decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
+            //delete conversation.encryptedKey
+            return conversation
+          }))
+          console.log(conversations)
+          setConversations(conversations);
         } else {
           notify(response.error, "error");
         }
@@ -113,7 +123,7 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-    
+
   };
 
   useEffect(() => {
@@ -183,7 +193,16 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-                    <Conversation messages={messsages} />
+                        <Conversation messages={messsages.map((message) => {
+                          return {
+                            _id: message._id,
+                            sender: message.sender,
+                            message: window.electron.security.decryptWithSymmetricKey(message.message, conversation.decryptedKey),
+                            status: message.status,
+                            createdAt: message.createdAt,
+                            isOwnedByUser: message.isOwnedByUser
+                          }
+                    })} />
                   </div>
 
                   <div className="flex-none bg-white">
