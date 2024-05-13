@@ -6,8 +6,12 @@ declare global {
 			store: {
 				get: (key: string) => any;
 				set: (key: string, val: any) => void;
-				// any other methods you've defined...
-			};
-		};
+			},
+			security: {
+				encrypt: (val: string, publicKey: string) => string;
+				decrypt: (val: string) => string;
+				getPublicKey: () => string;
+			},
+		}
 	}
 }

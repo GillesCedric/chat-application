@@ -26,6 +26,7 @@ export abstract class UserValidators extends Validators {
         body('tel').escape().trim().stripLow().isMobilePhone('fr-FR'),
         body('email').escape().trim().stripLow().isEmail(),
         body('password', 'Password must contains al least 8 characters, 1 lowercase, 1 uppercase and 1 symbol').escape().trim().stripLow().isStrongPassword(),
+        body('publicKey').escape().trim().stripLow().notEmpty(),
     ]
 
     public static readonly signIn = [

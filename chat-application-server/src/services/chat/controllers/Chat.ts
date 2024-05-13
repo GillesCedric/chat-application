@@ -124,7 +124,7 @@ export default class ChatController {
         data: chats.map(chat => ({
           _id: chat._id,
           sender: chat.sender,
-          message: Crypto.decrypt(chat.message, "database"),
+          message: chat.message,
           readBy: chat.readBy,
           createdAt: chat.createdAt,
           isOwnedByUser: chat.sender.toString() === userId
@@ -212,6 +212,7 @@ export default class ChatController {
             'memberDetails.lastname': 1,
             'memberDetails.picture': 1,
             'memberDetails.status': 1,
+            'memberDetails.publicKey': 1,
             'lastMessageDetails.message': 1,
             'lastMessageDate': 1,
             unreadCount: 1
@@ -233,12 +234,13 @@ export default class ChatController {
           _id: conversation._id,
           lastMessage: {
             date: conversation.lastMessageDate,
-            message: conversation.lastMessageDetails && conversation.lastMessageDetails.message && Crypto.decrypt(conversation.lastMessageDetails.message, "database")
+            message: conversation.lastMessageDetails && conversation.lastMessageDetails.message
           },
           unreadCount: conversation.unreadCount,
           fullname: `${Crypto.decrypt(conversation.memberDetails.firstname, 'database')} ${Crypto.decrypt(conversation.memberDetails.lastname, 'database')}`,
           picture: Crypto.decrypt(conversation.memberDetails.picture, "database"),
           status: Crypto.decrypt(conversation.memberDetails.status, "status"),
+          publicKey: conversation.memberDetails.publicKey
         };
       });
 
@@ -266,7 +268,7 @@ export default class ChatController {
       const chat = new ChatModel({
         conversation: new mongoose.Types.ObjectId(req.params.id),
         sender: new mongoose.Types.ObjectId(userId),
-        message: Crypto.encrypt(req.body.message, "database"),
+        message: req.body.message,
         readBy: [new mongoose.Types.ObjectId(userId)],
       })
 
