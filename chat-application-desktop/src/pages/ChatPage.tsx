@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
 import { Conversation } from "../components/Conversation";
 import ChatInput from "../components/ChatInput";
-import { ChatDataTest } from "../components/ChatDataTest";
 import ConversationHeader from "../components/ConversationHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
-import Socket from "../modules/socket/Socket";
-import { friend } from "../components/FriendDataTest";
 import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
@@ -15,15 +12,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
-import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
-import User from "../modules/manager/User";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import ConversationRepository, {
   MessageModel,
 } from "../modules/manager/ConversationRepository";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
-import { convertToYesterday } from "../utils/utilsFunctions";
 import { useSocketContext } from "../context/SocketContext";
 import API from "../modules/api/API";
 const ChatPage = () => {
@@ -46,8 +40,8 @@ const ChatPage = () => {
     fetchConversations();
 
     const handleNewMessage = (data: any) => {
-      console.log(data);
-      addMessage();
+/*       console.log(data);
+ */      addMessage();
       setMessages((prevMessages) => [...prevMessages, data]);
       fetchConversations();
     };

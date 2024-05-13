@@ -330,6 +330,30 @@ export default class API {
     if (handleRequest) return this.getFriendsRequests();
     return responseData;
   };
+  public static readonly getNotifications = async (
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = await this.generateURL(
+        this.apiUrl + "/notifications/"
+      );
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getNotifications();
+    return responseData;
+  };
 
   public static readonly updateFriendRequest = async (
     id: string,

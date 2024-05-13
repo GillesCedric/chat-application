@@ -13,32 +13,64 @@ import {
   faUser,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-const NavLink = ({ children, href }: { children: any; href: string }) => {
-  const navigate = useNavigate();
-  return (
-    <span
-      onClick={() => navigate(href)}
-      className="cursor-pointer relative inline-block ease-in-out group transition duration-300 hover:text-blue-500 cursor-pointer"
-    >
-      {children}
-    </span>
-  );
-};
+import User from "../modules/manager/User";
+import { useSocketContext } from "../context/SocketContext";
+import { SocketKeywords } from "../utils/keywords";
 
 const ChatHeader = () => {
+  const [friendRequestCount, setFriendRequestsCount] = useState(0);
+  const fetchFriendRequests = async () => {
+    try {
+      const response = await User.getFriendsRequests();
+      if (response.message) {
+        console.log(response);
+        setFriendRequestsCount(response.data.length);
+      } else {
+        console.log(response.error);
+        notify(response.error, "error");
+      }
+    } catch (error) {
+      console.error("Error fetching friend requests:", error);
+      notify(error, "error");
+    }
+  };
+  const fetchNotifications = async () => {
+    try {
+      const response = await NotificationRepository.getNotifications();
+      if (response.message) {
+        console.log(response.data);
+        setFriendRequestsCount(response.data.length);
+      } else {
+        console.log(response.error);
+        notify(response.error, "error");
+      }
+    } catch (error) {
+      console.error("Error fetching friend requests:", error);
+      notify(error, "error");
+    }
+  };
+  const { isConnected, subscribe, unsubscribe } = useSocketContext();
+
+  useEffect(() => {
+    fetchFriendRequests();
+    fetchNotifications();
+    const handleNewNotification = (data: any) => {
+      fetchNotifications();
+      fetchFriendRequests();
+    };
+    if (isConnected) {
+      // S'abonner aux événements
+      subscribe(SocketKeywords.newNotification, handleNewNotification);
+      // Fonction de nettoyage pour se désabonner
+      return () => {
+        unsubscribe(SocketKeywords.newMessage, handleNewNotification);
+      };
+    }
+  }, [isConnected, subscribe, unsubscribe]);
+
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
-  /*   useEffect(() => {
-    NotificationRepository.getNotifications(data).then((response: any) => {
-      if (response.message) {
-        setNotifications(response.message);
-        setNotificationCount(notifications.length);
-      } else {
-        notify(response.error, "error");
-      }
-    });
-  }); */
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
@@ -67,10 +99,16 @@ const ChatHeader = () => {
           title="Friends requests"
         >
           <FontAwesomeIcon icon={faUsers} />
+          <span className="sr-only">Notifications</span>
+          {friendRequestCount > 0 && (
+            <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
+              {friendRequestCount}
+            </div>
+          )}
         </Link>
         <Link
           className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          to="/Profile"
+          to="/settings"
           title="User Profile"
         >
           <FontAwesomeIcon icon={faUser} />

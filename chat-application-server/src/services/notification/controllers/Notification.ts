@@ -21,7 +21,8 @@ export default class NotificationController {
       }
 
       return res.status(200).json({
-        notifications,
+        message: "success",
+        data : notifications,
       });
 
     } catch (error) {
