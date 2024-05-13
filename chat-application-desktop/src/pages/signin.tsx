@@ -6,7 +6,7 @@ import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthContext } from "../context/AuthContext";
-import { error } from "console";
+
 export default function SignIn() {
   const { authUser, setAuthUser } = useAuthContext();
   const [csrfToken, setCsrfToken] = useState("");

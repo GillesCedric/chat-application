@@ -10,11 +10,13 @@ const ConversationItem = ({
   changeConversation,
   isSelected,
 }: {
+
   conversation: ConversationModel;
   changeConversation: (
     conversation: ConversationModel ) => void;
   isSelected: boolean;
-}) => {
+  }) => {
+  const decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
   return (
     <div
       className={`flex items-center px-4 py-3 text-black cursor-pointer rounded-md ${
@@ -26,7 +28,7 @@ const ConversationItem = ({
       <div className="ml-4">
         <p className="font-semibold">{conversation.fullname}</p>
         <p className="text-grey-dark text-sm">
-          {conversation.lastMessage.message}
+          {conversation.lastMessage.message ? window.electron.security.decryptWithSymmetricKey(conversation.lastMessage.message, decryptedKey) : null}
         </p>
       </div>
       <span className="ml-auto text-grey-dark text-sm">

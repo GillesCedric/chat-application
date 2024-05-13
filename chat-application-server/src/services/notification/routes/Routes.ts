@@ -7,20 +7,10 @@ export default class Routes {
     new NotificationController();
 
   public static readonly routes = (app: Application): void => {
-    app
-      .route("/:id")
-      .put(
-        ...NotificationValidators.updateNotification,
-        NotificationValidators.errors,
-        this.notificationController.updateNotification
-      );
-    app
-      .route("/")
-      .post(
-        ...NotificationValidators.sendNotification,
-        NotificationValidators.errors,
-        this.notificationController.sendNotification
-      )
-      .get(this.notificationController.getUserNotifications);
-  };
+    app.route("/:id").put(...NotificationValidators.updateNotification, NotificationValidators.errors, this.notificationController.updateNotification)
+    app.route("/")
+      .post(...NotificationValidators.sendNotification, NotificationValidators.errors, this.notificationController.sendNotification)
+      .get(...NotificationValidators.getNotifications, NotificationValidators.errors, this.notificationController.getUserNotifications)
+  
+  }
 }

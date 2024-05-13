@@ -69,9 +69,10 @@ const ChatPage = () => {
       notify("Error sending message, cannot get conversation", "error");
       return;
     }
-    // Add new message to the messages state
+
+    //Add new message to the messages state
     ConversationRepository.addMessage(conversation._id, {
-      message: newMessage,
+      message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
       _csrf: csrfToken,
     });
   };
@@ -107,10 +108,16 @@ const ChatPage = () => {
 
   const fetchConversations = () => {
     ConversationRepository.getConversations()
-      .then((response: any) => {
+      .then(async (response: any) => {
         console.log(response);
         if (!response.error) {
-          setConversations(response.data);
+          const conversations = await Promise.all<ConversationModel[]>(response.data.map((conversation: ConversationModel) => {
+            conversation.decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
+            //delete conversation.encryptedKey
+            return conversation
+          }))
+          console.log(conversations)
+          setConversations(conversations);
         } else {
           notify(response.error, "error");
         }
@@ -191,7 +198,16 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-                    <Conversation messages={messsages} />
+                        <Conversation messages={messsages.map((message) => {
+                          return {
+                            _id: message._id,
+                            sender: message.sender,
+                            message: window.electron.security.decryptWithSymmetricKey(message.message, conversation.decryptedKey),
+                            status: message.status,
+                            createdAt: message.createdAt,
+                            isOwnedByUser: message.isOwnedByUser
+                          }
+                    })} />
                   </div>
 
                   <div className="flex-none bg-white">

@@ -10,9 +10,12 @@ import SERVICES from '../../../config/services.json'
 export default class NotificationController {
   public readonly getUserNotifications = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
+      const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], Tokens.accessToken)
 
-      const notifications = await NotificationModel.find({ receiver: userId })
+      const notifications = await NotificationModel.find({
+        receiver: userId,
+        status: Crypto.encrypt(NotificationStatus.pending, "status")
+      })
 
       if (!notifications) {
         return res.status(422).json({
@@ -20,12 +23,25 @@ export default class NotificationController {
         });
       }
 
+      const decryptedNotifications = notifications.map(notification => {
+        return {
+          _id: notification._id,
+          sender: notification.sender,
+          receiver: notification.receiver,
+          content: Crypto.decrypt(notification.content, "database"),
+          status: Crypto.decrypt(NotificationStatus.pending, "status"),
+          createdAt: notification.createdAt,
+          updatedAt: notification.updatedAt
+        }
+      })
+
       return res.status(200).json({
         message: "success",
-        data : notifications,
+        data: decryptedNotifications,
       });
 
     } catch (error) {
+      console.log(error)
       return res.status(422).json({
         error: "Impossible de récupérer les notifications",
       });

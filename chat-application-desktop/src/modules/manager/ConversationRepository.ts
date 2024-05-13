@@ -10,10 +10,12 @@ export type ConversationModel = {
   fullname: string;
   picture: string;
   status: string;
+  encryptedKey: string;
+  decryptedKey: string;
 };
 
 export type MessageModel = {
-  _id: string;
+_id: string;
   sender: string;
   message: string;
   status: string;

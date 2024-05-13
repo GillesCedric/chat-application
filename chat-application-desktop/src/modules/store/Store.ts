@@ -1,21 +1,62 @@
 import Store from 'electron-store'
-import { app } from 'electron';
-import crypto from 'crypto';
+import { app, safeStorage } from 'electron';
+import crypto, { createCipheriv, createDecipheriv } from 'crypto';
+import { Crypto } from '../crypto/Crypto';
 import path from 'path';
 import fs from 'fs'
 
 export default class SecureStore {
-	private secretKey: string
+	private encryptionKey: Buffer
 	private store: Store
 	private instancePath: string
 
-	constructor(secretKey: string) {
-		this.secretKey = secretKey
-		this.instancePath = path.join(app.getPath('userData'), `chat-application-${crypto.randomInt(100)}`)
-		this.createStore()
+	constructor(suffix: number) {
+		//this.createStore()
 		this.store = new Store({
-			cwd: this.instancePath
+			//TODO remove the path in production
+			cwd: path.join(app.getPath('userData'), `chat-application-${suffix}`),
+			name: "store"
 		})
+		this.init()
+	}
+
+	private init() {
+		if (!this.store.has('chat-application-store-secret_key'))
+			this.store.set('chat-application-store-secret_key', this.generatePassphrase())
+
+		this.encryptionKey = Buffer.from(safeStorage.decryptString(Buffer.from(this.store.get('chat-application-store-secret_key') as string, 'hex')), 'utf8');
+	}
+
+	private generatePassphrase(): string {
+		return safeStorage.encryptString(Crypto.random(32)).toString('hex')
+	}
+
+	private encryptData(data: string): string {
+		try {
+			const iv = crypto.randomBytes(16);
+			const cipher = createCipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
+			let encrypted = cipher.update(data, 'utf8', 'hex');
+			encrypted += cipher.final('hex');
+			return iv.toString('hex') + ':' + encrypted;
+		} catch (error) {
+			console.log(error)
+		}
+		
+	}
+
+	private decryptData(data: string): string {
+		try {
+			const parts = data.split(':');
+			const iv = Buffer.from(parts.shift(), 'hex');
+			const encryptedText = parts.join(':');
+			const decipher = createDecipheriv('aes-256-cbc', this.encryptionKey.subarray(0, 32), iv);
+			let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+			decrypted += decipher.final('utf8');
+			return decrypted;
+		} catch (error) {
+			console.log(error)
+		}
+		
 	}
 
 	private createStore() {
@@ -25,13 +66,14 @@ export default class SecureStore {
 	}
 
 	set(key: string, value: any): void {
-		this.store.set(key, value)
+		this.store.set(key, this.encryptData(value))
 	}
 
 	get(key: string): any {
-		return this.store.get(key)
+		return this.decryptData(this.store.get(key) as string)
+	}
+
+	has(key: string): boolean {
+		return this.store.has(key)
 	}
 }
-
-
-export const secureStore = new SecureStore("chat-application-desktop-encryption-generation-key")
