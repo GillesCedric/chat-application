@@ -17,6 +17,5 @@ export default class Routes {
       .get(...ChatValidators.getUserConversationChats, ChatValidators.errors, this.ChatController.getUserConversationChats)
       .post(...ChatValidators.addChats, ChatValidators.errors, this.ChatController.addChats)
       .put(...ChatValidators.updateChat, ChatValidators.errors, this.ChatController.updateChat)
-
   };
 }

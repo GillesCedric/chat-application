@@ -2,6 +2,8 @@ import { Avatar } from "./Avatar";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToDate, getDateDivider } from "../utils/utilsFunctions";
 import { AddFriend } from "./AddFriend";
+import API from "../modules/api/API";
+import { useEffect, useState } from "react";
 
 const ConversationItem = ({
   conversation,
@@ -10,7 +12,8 @@ const ConversationItem = ({
 }: {
 
   conversation: ConversationModel;
-  changeConversation: (conversation: ConversationModel) => void;
+  changeConversation: (
+    conversation: ConversationModel ) => void;
   isSelected: boolean;
   }) => {
   const decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
@@ -47,7 +50,8 @@ const Conversations = ({
 }: {
   conversations: ConversationModel[];
   selectedConversation: ConversationModel | null;
-  changeConversation: (conversation: ConversationModel) => void;
+  changeConversation: (
+    conversation: ConversationModel) => void;
 }) => {
   return (
     <div className="w-70 z-10 relative">
@@ -74,6 +78,5 @@ const Conversations = ({
     </div>
   );
 };
-
 
 export default Conversations;

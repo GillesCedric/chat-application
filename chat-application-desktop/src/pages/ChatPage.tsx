@@ -25,10 +25,9 @@ import ConversationRepository, {
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToYesterday } from "../utils/utilsFunctions";
 import { useSocketContext } from "../context/SocketContext";
+import API from "../modules/api/API";
 const ChatPage = () => {
   const [conversations, setConversations] = useState<ConversationModel[]>([]);
-  const newConversation = useSocketListener(SocketKeywords.newConversation);
-  const newMessage = useSocketListener(SocketKeywords.newMessage);
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();
   const wasOnlineRef = useRef(isOnline);
@@ -36,19 +35,25 @@ const ChatPage = () => {
   const [conversation, setConversation] = useState<ConversationModel>(null);
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
+  const [csrfToken, setCsrfToken] = useState("");
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
+
   useEffect(() => {
     fetchConversations();
 
     const handleNewMessage = (data: any) => {
       console.log(data);
       addMessage();
-      console.log(conversation)
-      //const decryptedData = window.electron.security.decryptWithSymmetricKey(data, conversation.decryptedKey)
-      setMessages(prevMessages => [...prevMessages, data]);
+      setMessages((prevMessages) => [...prevMessages, data]);
+      fetchConversations();
     };
 
     const handleNewConversation = (data: any) => {
-      console.log(data);
+      /* console.log(data); */
       fetchConversations();
     };
 
@@ -63,11 +68,9 @@ const ChatPage = () => {
         unsubscribe(SocketKeywords.newConversation, handleNewConversation);
       };
     }
+  }, [isConnected, subscribe, unsubscribe]); // Réexécute l'effet seulement quand Socket.socket change
 
-  }, [isConnected, subscribe, unsubscribe]);  // Réexécute l'effet seulement quand Socket.socket change
-
-
-  const handleSendMessage = (newMessage: string, csrfToken: string) => {
+  const handleSendMessage = (newMessage: string) => {
     if (conversation === null) {
       notify("Error sending message, cannot get conversation", "error");
       return;
@@ -78,20 +81,16 @@ const ChatPage = () => {
       message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
       _csrf: csrfToken,
     });
-
   };
 
-  const handleSelectConversation = (conversation: ConversationModel): void => {
+  const handleSelectConversation = async (
+    conversation: ConversationModel
+  ): Promise<any> => {
     setConversation(conversation);
     ConversationRepository.getUserConversation(conversation._id)
       .then((response: any) => {
         if (!response.error) {
-          // console.log("Messages : " + response.data.length);
-          // console.log(
-          //   response.data.map((data: any) => {
-          //     console.log(data);
-          //   })
-          // );
+          console.log("Conversation : " + response.data);
           setMessages(response.data);
         } else {
           notify(response.error, "error");
@@ -100,7 +99,19 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
+
+    ConversationRepository.updateChat(conversation._id, csrfToken)
+      .then((response) => {
+        console.log(response);
+        if (response.error) {
+          notify("Error reading messages : " + response.error);
+        }
+      })
+      .catch((error) => {
+        notify("Error reading messages : " + error);
+      });
   };
+
   const fetchConversations = () => {
     ConversationRepository.getConversations()
       .then(async (response: any) => {
@@ -123,7 +134,6 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-
   };
 
   useEffect(() => {
@@ -159,8 +169,9 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${conversations.length === 0 ? "" : "flex-none"
-                }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
+                conversations.length === 0 ? "" : "flex-none"
+              }`}
             >
               <div className="sticky top-0 z-50">
                 <SearchBar />
