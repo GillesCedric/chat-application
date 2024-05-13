@@ -123,7 +123,7 @@ export default class App {
 
         this.app.use(BasicAuthentication.authenticate)
 
-        this.app.use(CSRF.authenticate)
+        //this.app.use(CSRF.authenticate)
 
         this.app.use(Session.authenticate)
 

@@ -8,8 +8,10 @@ declare global {
 				set: (key: string, val: any) => void;
 			},
 			security: {
-				encrypt: (val: string, publicKey: string) => string;
-				decrypt: (val: string) => string;
+				encryptWithPublicKey: (val: string, publicKey: string) => string;
+				decryptWithPrivateKey: (val: string) => string;
+				encryptWithSymmetricKey: (val: string, key: string) => string;
+				decryptWithSymmetricKey: (val: string, key: string) => string;
 				getPublicKey: () => string;
 			},
 		}
