@@ -1,3 +1,17 @@
+/**
+*
+* 
+Ce code définit une classe Security qui gère la sécurité des données dans l'application Electron. Elle utilise des fonctionnalités de chiffrement et de déchiffrement fournies par le module crypto de Node.js pour générer et gérer des clés RSA et pour chiffrer et déchiffrer des messages. La classe utilise également le module electron-store pour stocker de manière sécurisée les clés et les informations sensibles telles que la passphrase utilisée pour protéger la clé privée.
+
+La méthode init initialise la classe en générant une passphrase si elle n'existe pas déjà, et en générant une paire de clés RSA si elles n'existent pas déjà dans le stockage sécurisé.
+
+Les méthodes getKeys et getDecryptedKeys récupèrent respectivement les clés publiques et privées, avec la clé privée déchiffrée à l'aide de la passphrase.
+
+Les méthodes encrypt et decrypt sont utilisées pour chiffrer et déchiffrer des messages à l'aide des clés publiques et privées respectivement.
+
+Dans l'ensemble, cette classe offre une couche de sécurité pour les données sensibles de l'application Electron, en utilisant des techniques de chiffrement robustes pour protéger les informations confidentielles.
+ * @module modules/security/Security
+ */
 import { app, safeStorage } from 'electron';
 import { createCipheriv, createDecipheriv, createPrivateKey, generateKeyPairSync, privateDecrypt, publicEncrypt, randomBytes, constants } from 'crypto';
 import { Crypto } from '../crypto/Crypto';

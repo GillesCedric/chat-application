@@ -1,4 +1,9 @@
+/**
+*
+Ce code définit une classe Crypto qui gère des opérations de chiffrement et de déchiffrement ainsi que la génération de chaînes aléatoires. Il utilise l'algorithme de chiffrement AES-256-CBC. Les méthodes statiques encode et decode encodent et décodent respectivement des chaînes en base64. La méthode statique random génère une chaîne aléatoire de longueur spécifiée en utilisant un ensemble de caractères prédéfinis, comprenant des lettres, des chiffres et des caractères spéciaux.
 
+ * @module modules/Crypto
+ */
 export class Crypto {
 
 	private readonly encryption_method: string = 'aes-256-cbc'

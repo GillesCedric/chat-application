@@ -1,6 +1,10 @@
+/**
+* Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
+* @module pages/ChatPage
+ */
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
-import { Conversation } from "../components/conversation";
+
 import ChatInput from "../components/ChatInput";
 import { ChatDataTest } from "../components/ChatDataTest";
 import ConversationHeader from "../components/ConversationHeader";
@@ -37,19 +41,12 @@ const ChatPage = () => {
 
   const [csrfToken, setCsrfToken] = useState("");
   useEffect(() => {
-    API.getCSRFToken().then((data: any) => {
-      setCsrfToken(data.token);
-    });
-  }, []);
-
-  useEffect(() => {
     fetchConversations();
 
     const handleNewMessage = (data: any) => {
       console.log(data);
       addMessage();
-      setMessages((prevMessages) => [...prevMessages, data]);
-      fetchConversations();
+      setMessages(prevMessages => [...prevMessages, data]);
     };
 
     const handleNewConversation = (data: any) => {
@@ -134,6 +131,7 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
+
   };
 
   useEffect(() => {
@@ -204,16 +202,7 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-                        <Conversation messages={messsages.map((message) => {
-                          return {
-                            _id: message._id,
-                            sender: message.sender,
-                            message: window.electron.security.decryptWithSymmetricKey(message.message, conversation.decryptedKey),
-                            status: message.status,
-                            createdAt: message.createdAt,
-                            isOwnedByUser: message.isOwnedByUser
-                          }
-                    })} />
+
                   </div>
 
                   <div className="flex-none bg-white">

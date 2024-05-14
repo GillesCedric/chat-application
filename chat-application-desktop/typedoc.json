@@ -6,5 +6,14 @@
 		"./src"
 	],
 	"entryPointStrategy": "expand",
-	"tsconfig": "./tsconfig.json"
+	"tsconfig": "./tsconfig.json",
+	"exclude": [
+		"**/index.ts",
+		"**/index.tsx",
+		"**/global.d.ts",
+		"**/components/ChatDataTest.tsx",
+		"**/components/Test.tsx",
+		"**/components/FriendDataTest.tsx",
+		"**/components/Protected.tsx"
+	]
 }

@@ -1,3 +1,8 @@
+/**
+ *Le composant Conversation rend une liste de messages dans une interface de chat. Il prend en entrée une liste de messages et affiche chaque message dans un élément de liste. Le composant gère également le défilement automatique vers le bas lorsque de nouveaux messages sont ajoutés, garantissant une expérience de chat fluide. Si aucun message n'est présent, il affiche un message indiquant que la conversation est vide et encourage l'utilisateur à envoyer des messages.
+ * 
+ * @module components/Conversation
+ */
 import { MessageModel } from "../modules/manager/ConversationRepository";
 import { EmptyCenterSection } from "./EmptyCenterSection";
 import { DateDivider } from "./DateDivider";
@@ -5,9 +10,9 @@ import { convertToDate, getTime, needsDateDivider } from "../utils/utilsFunction
 import { useEffect, useRef } from "react";
 
 export const Conversation = ({ messages }: { messages: MessageModel[] }) => {
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef(null)
 
-  // Function to scroll to the bottom
+  // Fonction pour faire défiler vers le bas
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -15,7 +20,7 @@ export const Conversation = ({ messages }: { messages: MessageModel[] }) => {
   // Effect to scroll to the bottom on each message addition
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages]);  // Dépendance aux messages
 
   return (
     <div
