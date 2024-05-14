@@ -4,13 +4,11 @@ import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
 import NotificationRepository from "../modules/manager/NotificationRepository";
 import { notify } from "./toastify";
-import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
-  faBell,
+  faGear,
   faHome,
-  faUser,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
@@ -19,6 +17,11 @@ import { SocketKeywords } from "../utils/keywords";
 
 const ChatHeader = () => {
   const [friendRequestCount, setFriendRequestsCount] = useState(0);
+  const data: any[] = [];
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsCount, setNotificationsCount] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
   const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
@@ -38,8 +41,9 @@ const ChatHeader = () => {
     try {
       const response = await NotificationRepository.getNotifications();
       if (response.message) {
-        console.log(response.data);
-        setFriendRequestsCount(response.data.length);
+        /*         console.log(response.data);*/
+        setNotifications(response.data);
+        setNotificationsCount(response.data.length);
       } else {
         console.log(response.error);
         notify(response.error, "error");
@@ -67,11 +71,6 @@ const ChatHeader = () => {
       };
     }
   }, [isConnected, subscribe, unsubscribe]);
-
-  const data: any[] = [];
-  const [notifications, setNotifications] = useState([]);
-  const [notificatonCount, setNotificationCount] = useState(1);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -111,63 +110,18 @@ const ChatHeader = () => {
           to="/settings"
           title="User Profile"
         >
-          <FontAwesomeIcon icon={faUser} />
+          <FontAwesomeIcon icon={faGear} />
         </Link>
-        <NotificationIcon count={notificatonCount} onClick={toggleDrawer} />
+        <NotificationIcon count={notificationsCount} onClick={toggleDrawer} />
         <NotificationDrawer
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
-          initialNotifications={notificationsData}
-          notificationCount={notificatonCount}
+          initialNotifications={notifications}
+          notificationCount={notificationsCount}
         />
       </nav>
     </header>
   );
 };
-
-const notificationsData = [
-  {
-    id: 1,
-    type: "success",
-    message: "Your file was uploaded successfully!",
-    unread: true,
-  },
-  {
-    id: 2,
-    type: "error",
-    message: "Failed to process your request. Please try again.",
-    unread: true,
-  },
-  {
-    id: 3,
-    type: "warning",
-    message: "Your subscription is about to expire.",
-    unread: true,
-  },
-  {
-    id: 4,
-    type: "success",
-    message: "Your settings have been saved.",
-    unread: false,
-  },
-  {
-    id: 5,
-    type: "error",
-    message: "There was a problem with your payment.",
-    unread: false,
-  },
-  {
-    id: 6,
-    type: "warning",
-    message: "You have used 90% of your data limit.",
-    unread: true,
-  },
-  {
-    id: 7,
-    type: "success",
-    message: "Your account has been updated successfully.",
-    unread: false,
-  },
-];
 
 export default ChatHeader;

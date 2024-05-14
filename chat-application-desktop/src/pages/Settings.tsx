@@ -2,7 +2,7 @@ import ChatHeader from "../components/ChatHeader";
 
 export const Settings = () => {
   return (
-    <div className="h-screen ">
+    <div className="h-screen">
       <ChatHeader />
       <SettingPage />
     </div>
@@ -29,7 +29,7 @@ const SettingPage = () => {
 
   return (
     <>
-      <div className="bg-white w-full h-full flex px-3 md:px-16 lg:px-28 text-[#22232f]">
+      <div className="bg-white w-full h-full flex px-3 md:px-16 lg:px-28 text-[#3e3e43]">
         <main className="w-full h-full py-1 ">
           <div className="p-2 md:p-4">
             <div className="w-full px-6 pb-8 mt-8 sm:max-w-xl sm:rounded-lg">

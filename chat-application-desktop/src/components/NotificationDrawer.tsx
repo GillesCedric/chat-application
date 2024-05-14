@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faBroom } from "@fortawesome/free-solid-svg-icons";
 import { Notification } from "./Notification";
+import { NotificationModel } from "../modules/manager/NotificationRepository";
 
 export const NotificationDrawer = ({
   isOpen,
@@ -11,26 +12,18 @@ export const NotificationDrawer = ({
 }: {
   isOpen: boolean;
   onClose: any;
-  initialNotifications: any;
-  notificationCount: any;
+  initialNotifications: NotificationModel[];
+  notificationCount: number;
 }) => {
   const drawerRef = useRef();
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState([]);
+  
 
   const handleClose = (e: any) => {
     if (drawerRef.current === e.target) {
       onClose();
     }
   };
-
-  const markAllAsRead = () => {
-    const updatedNotifications = notifications.map((notification: any) => ({
-      ...notification,
-      unread: false,
-    }));
-    setNotifications(updatedNotifications);
-  };
-
   const clearAllNotifications = () => {
     setNotifications([]);
   };
@@ -67,12 +60,6 @@ export const NotificationDrawer = ({
           </div>
         )}
         <div className="absolute inset-x-0 bottom-0 grid grid-cols-2 gap-4 p-4 bg-white dark:bg-gray-700">
-          <button
-            onClick={markAllAsRead}
-            className="px-4 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-200 rounded-lg focus:outline-none hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            Mark all as read
-          </button>
           <button
             onClick={clearAllNotifications}
             className="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"

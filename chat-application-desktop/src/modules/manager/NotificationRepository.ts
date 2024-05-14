@@ -1,5 +1,13 @@
 import API from "../api/API";
-
+export type NotificationModel = {
+  _id: string;
+  sender: string;
+  receiver: string;
+  content: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
 export default class NotificationRepository {
   public static async getNotifications(): Promise<any> {
     try {

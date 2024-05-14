@@ -40,8 +40,8 @@ const ChatPage = () => {
     fetchConversations();
 
     const handleNewMessage = (data: any) => {
-/*       console.log(data);
- */      addMessage();
+      /*       console.log(data);
+       */ addMessage();
       setMessages((prevMessages) => [...prevMessages, data]);
       fetchConversations();
     };
@@ -72,9 +72,14 @@ const ChatPage = () => {
 
     //Add new message to the messages state
     ConversationRepository.addMessage(conversation._id, {
-      message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
+      message: window.electron.security.encryptWithSymmetricKey(
+        newMessage,
+        conversation.decryptedKey
+      ),
       _csrf: csrfToken,
     });
+
+    updateChat(conversation._id);
   };
 
   const handleSelectConversation = async (
@@ -93,10 +98,14 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
+    updateChat(conversation._id);
+  };
 
-    ConversationRepository.updateChat(conversation._id, csrfToken)
+  const updateChat = (conversationId : string) => {
+    ConversationRepository.updateChat(conversationId, csrfToken)
       .then((response) => {
-        console.log(response);
+        /* console.log(response); */
+        fetchConversations();
         if (response.error) {
           notify("Error reading messages : " + response.error);
         }
@@ -105,18 +114,22 @@ const ChatPage = () => {
         notify("Error reading messages : " + error);
       });
   };
-
   const fetchConversations = () => {
     ConversationRepository.getConversations()
       .then(async (response: any) => {
         console.log(response);
         if (!response.error) {
-          const conversations = await Promise.all<ConversationModel[]>(response.data.map((conversation: ConversationModel) => {
-            conversation.decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
-            //delete conversation.encryptedKey
-            return conversation
-          }))
-          console.log(conversations)
+          const conversations = await Promise.all<ConversationModel[]>(
+            response.data.map((conversation: ConversationModel) => {
+              conversation.decryptedKey =
+                window.electron.security.decryptWithPrivateKey(
+                  conversation.encryptedKey
+                );
+              //delete conversation.encryptedKey
+              return conversation;
+            })
+          );
+          console.log(conversations);
           setConversations(conversations);
         } else {
           notify(response.error, "error");
@@ -198,16 +211,22 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-                        <Conversation messages={messsages.map((message) => {
-                          return {
-                            _id: message._id,
-                            sender: message.sender,
-                            message: window.electron.security.decryptWithSymmetricKey(message.message, conversation.decryptedKey),
-                            status: message.status,
-                            createdAt: message.createdAt,
-                            isOwnedByUser: message.isOwnedByUser
-                          }
-                    })} />
+                    <Conversation
+                      messages={messsages.map((message) => {
+                        return {
+                          _id: message._id,
+                          sender: message.sender,
+                          message:
+                            window.electron.security.decryptWithSymmetricKey(
+                              message.message,
+                              conversation.decryptedKey
+                            ),
+                          status: message.status,
+                          createdAt: message.createdAt,
+                          isOwnedByUser: message.isOwnedByUser,
+                        };
+                      })}
+                    />
                   </div>
 
                   <div className="flex-none bg-white">

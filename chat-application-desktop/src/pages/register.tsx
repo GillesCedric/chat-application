@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import User from "../modules/manager/User";
 import FormValidator from "../modules/validator/form/FormValidator";
 import { ToastContainer } from "react-toastify";
@@ -392,6 +392,7 @@ export default function Register() {
     }
     return true;
   };
+  const navigate = useNavigate(); 
   const signUp = async () => {
     if (checkPassword()) {
       const userdata = {
@@ -414,6 +415,7 @@ export default function Register() {
             notify(response.error, "error");
           } else {
             notify(response.message, "success");
+            navigate("/signin")
           }
         })
         .catch((error: any) => {
