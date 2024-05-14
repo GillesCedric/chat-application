@@ -1,6 +1,21 @@
+/**
+ * Le composant Home est une fonction React qui affiche une interface utilisateur pour ajouter un contact.
+ * Il inclut un formulaire permettant à l'utilisateur de saisir un nom d'utilisateur et de soumettre ou annuler l'ajout du contact.
+ * Le composant utilise Tailwind CSS pour le style, offrant une interface moderne et réactive.
+ * 
+ * @module components/Home
+ */
+
 import React from 'react'
 
-export default function Home() {
+/**
+ * Composant Home.
+ * @returns {JSX.Element} Élément JSX représentant l'interface d'ajout de contact.
+ * @example
+ * // Utilisation du composant Home
+ * <Home />
+ */
+export default function Home(): JSX.Element {
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="flex items-center justify-center h-screen bg-blue-100">

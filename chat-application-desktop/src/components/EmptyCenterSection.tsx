@@ -4,17 +4,36 @@
  * 
  * @module components/EmptyCenterSection
  */
+
+import React from "react";
+
+/**
+ * Composant EmptyCenterSection.
+ * 
+ * Affiche une section centrale lorsque le contenu est vide.
+ * Il affiche un message principal et un paragraphe supplémentaire pour guider l'utilisateur.
+ * 
+ * @param message Le message principal à afficher.
+ * @param smallParagraph Le paragraphe supplémentaire à afficher.
+ * @returns {JSX.Element} Le composant EmptyCenterSection.
+ */
 export const EmptyCenterSection = ({
   message,
   smallParagraph,
 }: {
+  /**
+   * Le message principal à afficher dans la section centrale lorsque le contenu est vide.
+   */
   message: string;
+  /**
+   * Le paragraphe supplémentaire à afficher dans la section centrale lorsque le contenu est vide.
+   * Il peut contenir des détails complémentaires, des instructions ou des conseils pour l'utilisateur.
+   */
   smallParagraph: string;
-}) => {
+}): JSX.Element => {
   return (
     <div
-      className="w-full h-full flex items-center flex-wrap justify-center gap-10 
-		"
+      className="w-full h-full flex items-center flex-wrap justify-center gap-10"
     >
       <div className="">
         <img

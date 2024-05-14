@@ -14,6 +14,7 @@
 		"**/components/ChatDataTest.tsx",
 		"**/components/Test.tsx",
 		"**/components/FriendDataTest.tsx",
-		"**/components/Protected.tsx"
+		"**/components/Protected.tsx",
+		"**/components/ConversationDataTest.tsx"
 	]
 }

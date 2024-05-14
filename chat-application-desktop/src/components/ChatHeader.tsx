@@ -1,5 +1,9 @@
 /**
- *Ce composant représente l'en-tête. Il affiche le nom du chat ("ChatBOT") avec une icône de messagerie. Il contient également des liens de navigation vers différentes sections telles que la page d'accueil, les demandes d'amis, les contacts et les paramètres. De plus, il inclut une icône de notification qui ouvre un tiroir de notifications lorsqu'on clique dessus. Ce tiroir affiche une liste de notifications, telles que des succès, des erreurs ou des avertissements, avec leur état de lecture.
+ * Ce composant représente l'en-tête. Il affiche le nom du chat ("ChatBOT") avec une icône de messagerie. 
+ * Il contient également des liens de navigation vers différentes sections telles que la page d'accueil, 
+ * les demandes d'amis, les contacts et les paramètres. De plus, il inclut une icône de notification 
+ * qui ouvre un tiroir de notifications lorsqu'on clique dessus. Ce tiroir affiche une liste de notifications, 
+ * telles que des succès, des erreurs ou des avertissements, avec leur état de lecture.
  * 
  * @module components/ChatHeaders
  */
@@ -13,22 +17,19 @@ import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
 import { useNavigate } from "react-router-dom";
-const NavLink = ({ children, href }: { children: any; href: string }) => {
-  const navigate = useNavigate();
-  return (
-    <span
-      onClick={() => navigate(href)}
-      className="cursor-pointer relative inline-block ease-in-out group transition duration-300 hover:text-blue-500 cursor-pointer"
-    >
-      {children}
-    </span>
-  );
-};
 
-const ChatHeader = () => {
+/**
+ * Composant ChatHeader.
+ * 
+ * @function ChatHeader
+ * @returns {JSX.Element} Le composant ChatHeader.
+ * 
+ */
+const ChatHeader = (): JSX.Element => {
   const data: any[] = [];
   const [notifications, setNotifications] = useState([]);
   const [notificatonCount, setNotificationCount] = useState(1);
+
   /*   useEffect(() => {
       NotificationRepository.getNotifications(data).then((response: any) => {
         if (response.message) {
@@ -39,11 +40,13 @@ const ChatHeader = () => {
         }
       });
     }); */
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
+
   return (
     <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
       <div className="flex items-center">
@@ -69,6 +72,27 @@ const ChatHeader = () => {
         />
       </nav>
     </header>
+  );
+};
+
+/**
+ * Composant NavLink.
+ * 
+ * @function NavLink
+ * @param {Object} props - Les propriétés du composant.
+ * @param {any} props.children - Le contenu du lien.
+ * @param {string} props.href - L'URL vers laquelle le lien pointe.
+ * @returns {JSX.Element} Le composant NavLink.
+ */
+const NavLink = ({ children, href }: { children: any; href: string }): JSX.Element => {
+  const navigate = useNavigate();
+  return (
+    <span
+      onClick={() => navigate(href)}
+      className="cursor-pointer relative inline-block ease-in-out group transition duration-300 hover:text-blue-500 cursor-pointer"
+    >
+      {children}
+    </span>
   );
 };
 

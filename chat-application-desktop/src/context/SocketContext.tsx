@@ -5,12 +5,13 @@
  * - isConnected: Un booléen indiquant si la connexion WebSocket est établie.
  * - subscribe: Une fonction pour s'abonner à un événement WebSocket et définir un gestionnaire pour ce dernier.
  * - unsubscribe: Une fonction pour se désabonner d'un événement WebSocket et supprimer un gestionnaire pour ce dernier.
- * 
+ *
  * Le module expose également un hook personnalisé `useSocketContext` pour utiliser le contexte de socket dans les composants de l'application.
- *Le module expose également un hook personnalisé `useAuthContext` pour utiliser le contexte d'authentification dans les composants de l'application.
- * 
+ * Le module expose également un hook personnalisé `useAuthContext` pour utiliser le contexte d'authentification dans les composants de l'application.
+ *
  * @module context/SocketContext
  */
+
 import {
   createContext,
   useContext,
@@ -21,25 +22,40 @@ import {
 import Socket from "../modules/socket/Socket";
 import { useAuthContext } from "./AuthContext";
 
+/**
+ * Type décrivant le contenu du contexte de socket.
+ */
 type SocketContextType = {
   isConnected: boolean;
   subscribe: (event: string, handler: (data: any) => void) => void;
   unsubscribe: (event: string, handler: (data: any) => void) => void;
 };
 
-// Créer le contexte avec un objet par défaut
+/**
+ * Contexte de socket utilisé pour la gestion de la connexion WebSocket.
+ */
 const SocketContext = createContext<SocketContextType | null>(null)
 
-// Hook personnalisé pour utiliser le contexte d'authentification
+/**
+ * Hook personnalisé permettant d'utiliser le contexte de socket dans les composants de l'application.
+ * @returns Le contexte de socket.
+ */
 export const useSocketContext = () => {
   return useContext(SocketContext);
 };
 
+/**
+ * Props du composant SocketContextProvider.
+ */
 type SocketContextProviderProps = {
   children: ReactNode;
 };
 
-// Fournisseur de contexte de socket
+/**
+ * Fournisseur de contexte de socket.
+ * @param props Les props du composant.
+ * @returns Fournisseur de contexte de socket.
+ */
 export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
   children,
 }) => {
@@ -81,4 +97,3 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
     </SocketContext.Provider>
   );
 }
-

@@ -4,15 +4,28 @@
  * 
  * @module components/EmptySection
  */
+
 import React, { useState } from "react";
 import { AddFriend } from "./AddFriend";
-export const EmptySection = () => {
+
+/**
+ * Composant EmptySection.
+ * 
+ * Affiche une section vide lorsqu'il n'y a aucun ami dans la liste.
+ * Il permet à l'utilisateur d'envoyer une demande d'ami pour démarrer une nouvelle conversation.
+ * 
+ * @returns {JSX.Element} Le composant EmptySection.
+ */
+export const EmptySection = (): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Function to toggle modal visibility
+  /**
+   * Fonction pour basculer la visibilité de la fenêtre modale.
+   */
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
+
   return (
     <div className="w-full flex items-center flex-wrap justify-center gap-10">
       <div className="grid gap-4 w-72">
@@ -133,10 +146,10 @@ export const EmptySection = () => {
         </svg>
         <div>
           <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
-            There are no friend in your list
+            There are no friends in your list
           </h2>
           <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
-            Try sending some to friend request to start messaging
+            Try sending some friend requests to start messaging
           </p>
           <AddFriend />
         </div>

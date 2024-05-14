@@ -5,6 +5,7 @@
  * 
  * @module components/FriendRequestComponent
  */
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
@@ -13,18 +14,35 @@ import { notify } from "./toastify";
 import { useEffect, useState } from "react";
 import API from "../modules/api/API";
 
+/**
+ * Composant FriendRequestComponent.
+ * 
+ * Représente une demande d'ami dans l'interface utilisateur. Affiche les détails de la demande d'ami,
+ * y compris le nom de l'expéditeur, le commentaire, et la date de création.
+ * Les utilisateurs peuvent accepter ou rejeter la demande, ainsi que supprimer la demande.
+ * 
+ * @param friendRequest Un objet représentant la demande d'ami, incluant les informations sur l'expéditeur, le commentaire, et la date de création.
+ * @returns {JSX.Element} Le composant FriendRequestComponent.
+ */
 export const FriendRequestComponent = ({
   friendRequest,
 }: {
+  /**
+   * Un objet représentant la demande d'ami. 
+   * Contient les informations telles que l'identifiant de la demande, le nom de l'expéditeur, le commentaire, et la date de création.
+   */
   friendRequest: any;
-}) => {
+}): JSX.Element => {
   const [csrfToken, setCsrfToken] = useState("");
+
   useEffect(() => {
     API.getCSRFToken().then((data: any) => {
       setCsrfToken(data.token);
     });
   }, []);
+
   const friendRequestId: string = friendRequest._id;
+
   const handleAccept = () => {
     const data = {
       status: FriendsRequestStatus.accepted,
@@ -40,14 +58,14 @@ export const FriendRequestComponent = ({
       })
       .catch((error: any) => {
         console.log(error);
-        notify("An error occur !", "error");
+        notify("An error occurred!", "error");
       });
   };
 
   const handleDelete = () => {
     User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.deleted,
-      _csrf: csrfToken
+      _csrf: csrfToken,
     })
       .then((response: any) => {
         if (response.message) {
@@ -89,9 +107,9 @@ export const FriendRequestComponent = ({
       }) +
       " " +
       date.toLocaleTimeString("en-US", {
-        hour: "2-digit", // "02"
-        minute: "2-digit", // "00"
-        second: "2-digit", // "00"
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       })
     );
   };

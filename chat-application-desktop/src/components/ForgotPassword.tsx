@@ -5,18 +5,32 @@
  * 
  * @module components/ForgotPassword
  */
+
 import React, { useRef, useState } from "react";
 import FormValidator from "../modules/validator/form/FormValidator";
 import { Link } from "react-router-dom";
 import { NotifyAsync } from "./NotifyAsync";
 import { myAsyncFunction } from "./Test";
 import { ToastContainer } from "react-toastify";
-const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const emailRef = useRef<HTMLInputElement>(null);
-  const emailErrorRef = useRef<HTMLDivElement>(null);
 
+/**
+ * Composant ForgotPassword.
+ * 
+ * Affiche un formulaire de réinitialisation de mot de passe et vérifie la validité de l'e-mail avant de soumettre le formulaire.
+ * 
+ * @returns {JSX.Element} Le composant ForgotPassword.
+ */
+const ForgotPassword = (): JSX.Element => {
+  const [email, setEmail] = useState<string>(""); // État pour stocker l'email de l'utilisateur
+  const [errorMessage, setErrorMessage] = useState<string>(""); // État pour stocker le message d'erreur de validation de l'email
+  const emailRef = useRef<HTMLInputElement>(null); // Référence pour l'input email
+  const emailErrorRef = useRef<HTMLDivElement>(null); // Référence pour le message d'erreur
+
+  /**
+   * Vérifie la validité de l'email saisi.
+   * 
+   * @returns {boolean} True si l'email est valide, sinon false.
+   */
   const checkEmail = (): boolean => {
     setErrorMessage("");
     const emailValue = email.trim();
@@ -38,10 +52,15 @@ const ForgotPassword = () => {
     }
   };
 
+  /**
+   * Gère la soumission du formulaire.
+   * 
+   * @param {React.FormEvent<HTMLFormElement>} event - L'événement de soumission du formulaire.
+   */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (checkEmail()) {
-      // Proceed with form submission
+      // Procéder à la soumission du formulaire si l'email est valide
       console.log("Email is valid:", email);
       NotifyAsync("Pending", "success", "Error", myAsyncFunction);
     }
@@ -122,7 +141,7 @@ const ForgotPassword = () => {
           </Link>
           <Link
             className="pl-3 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-blue-600 dark:text-gray-500 dark:hover:text-gray-200"
-            to="/signIn" //TODO put the right route 
+            to="/signIn" //TODO mettre la bonne route
           >
             Contact us!
           </Link>

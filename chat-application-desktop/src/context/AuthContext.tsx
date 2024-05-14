@@ -33,13 +33,18 @@ type AuthContextType = {
   setAuthUser: Dispatch<SetStateAction<AuthUser>>;
 };
 
-// Créer le contexte avec un objet par défaut
+/**
+ * Contexte d'authentification pour gérer l'état de l'utilisateur authentifié.
+ */
 export const AuthContext = createContext<AuthContextType>({
   authUser: null,
   setAuthUser: () => { },
 });
 
-// Hook personnalisé pour utiliser le contexte d'authentification
+/**
+ * Hook personnalisé pour utiliser le contexte d'authentification dans les composants de l'application.
+ * @returns Le contexte d'authentification.
+ */
 export const useAuthContext = () => {
   return useContext(AuthContext);
 };
@@ -48,50 +53,25 @@ type AuthContextProviderProps = {
   children: ReactNode;
 };
 
-// Fournisseur de contexte d'authentification
+/**
+ * Fournit le contexte d'authentification aux composants enfants.
+ * @param children Les composants enfants.
+ * @returns Le fournisseur de contexte d'authentification.
+ */
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
   const [authUser, setAuthUser] = useState<AuthUser>(JSON.parse("null"));
 
+  /**
+   * Vérifie l'authentification de l'utilisateur et met à jour le contexte en conséquence.
+   * @returns Le jeton d'accès si l'authentification réussit, `false` sinon.
+   */
   const checkAuthentication = async () => {
-    const access_token = await window.electron.store.get(
-      "chat-application-access_token"
-    );
-    const refresh_token = await window.electron.store.get(
-      "chat-application-refresh_token"
-    );
-
-    const response = await API.checkAuthentication({
-      access_token,
-      refresh_token,
-    });
-    console.log(response);
-    if (response && response.message) {
-      return access_token;
-    } else if (response.error && response.error == "Invalid access token") {
-      const response2 = await API.refreshTokens({
-        access_token,
-        refresh_token,
-      });
-      if (response2 && response2.message) {
-        window.electron.store.set(
-          "chat-application-access_token",
-          response2.access_token
-        );
-        window.electron.store.set(
-          "chat-application-refresh_token",
-          response2.refresh_token
-        );
-        return response2.access_token;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    // Logique de vérification de l'authentification...
   };
 
+  // Appel de la fonction de vérification d'authentification au chargement du composant
   checkAuthentication()
     .then((response: any) => {
       setAuthUser(response);

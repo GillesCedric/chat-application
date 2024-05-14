@@ -6,16 +6,36 @@
  * Lorsque l'utilisateur est en ligne, le message "Connected" est affiché avec un fond vert, sinon "Waiting for network" est affiché avec un fond rouge.
  * Le composant utilise également une animation de chargement pour indiquer l'état de connexion en cours.
  * En résumé, le composant OfflineBanner offre une indication visuelle claire de l'état de la connexion réseau de l'utilisateur.
- *@module components/OfflineBanner 
-*/
+ * 
+ * @module components/OfflineBanner
+ */
 
-export const OfflineBanner = ({
-  isOnline,
-}: {
-  isOnline: boolean;
-}) => {
+import React from "react";
+
+/**
+ * Propriétés pour le composant OfflineBanner.
+ * @typedef {Object} OfflineBannerProps
+ * @property {boolean} isOnline - Un booléen indiquant si l'utilisateur est actuellement connecté à internet.
+ *    - true: L'utilisateur est connecté à internet. La bannière affichera "Connected" avec un fond vert.
+ *    - false: L'utilisateur est déconnecté d'internet. La bannière affichera "Waiting for network" avec un fond rouge.
+ */
+
+/**
+ * Composant OfflineBanner.
+ * @param {OfflineBannerProps} props - Les propriétés du composant.
+ * @returns {JSX.Element} Élément JSX représentant la bannière de connexion réseau.
+ * @example
+ * // Utilisation du composant OfflineBanner
+ * // Si l'utilisateur est en ligne
+ * <OfflineBanner isOnline={true} />
+ * // Si l'utilisateur est hors ligne
+ * <OfflineBanner isOnline={false} />
+ */
+export const OfflineBanner: React.FC<{ isOnline: boolean }> = ({ isOnline }) => {
+  // Détermine la couleur de fond et le texte en fonction de l'état de la connexion
   const backgroundColor = isOnline ? "bg-green-400" : "bg-red-400";
   const text = isOnline ? "Connected" : "Waiting for network";
+
   return (
     <div className={`flex items-center justify-center ${backgroundColor}`}>
       <div role="status">
