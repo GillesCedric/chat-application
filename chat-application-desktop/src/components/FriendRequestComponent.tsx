@@ -56,7 +56,7 @@ export const FriendRequestComponent = ({
 
   const handleReject = () => {
     User.updateFriendRequest(friendRequestId, {
-      status: FriendsRequestStatus.deleted,
+      status: FriendsRequestStatus.rejected,
       _csrf: csrfToken,
     })
       .then((response: any) => {

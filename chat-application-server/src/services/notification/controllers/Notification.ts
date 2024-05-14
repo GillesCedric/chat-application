@@ -29,7 +29,7 @@ export default class NotificationController {
           sender: notification.sender,
           receiver: notification.receiver,
           content: Crypto.decrypt(notification.content, "database"),
-          status: Crypto.decrypt(NotificationStatus.pending, "status"),
+          status: Crypto.decrypt(notification.status, "status"),
           createdAt: notification.createdAt,
           updatedAt: notification.updatedAt
         }
@@ -93,14 +93,12 @@ export default class NotificationController {
     //check if the username exits
     try {
 
-      await NotificationModel.findOneAndUpdate({
-        sender: userId,
-      }, {
+      await NotificationModel.findByIdAndUpdate(req.params.id, {
         status: Crypto.encrypt(NotificationStatus.deleted, "status")
       })
 
       return res.status(200).json({
-        message: "Notification envoyée avec succèss",
+        message: "Notification modifiée avec succèss",
       })
 
     } catch (error) {
