@@ -18,7 +18,7 @@ export const convertToYesterday = (isoString: string): Date => {
 };
 
 export const getDateDivider = (date: Date): string => {
-	if (typeof date === "string" || isNaN(date.getTime())) {
+  if (typeof date === "string" || isNaN(date.getTime())) {
     return "";
   }
   const today = new Date();
