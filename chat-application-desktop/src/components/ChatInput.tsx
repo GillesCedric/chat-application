@@ -78,7 +78,7 @@ const ChatInput = ({
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
-      onSendMessage(message, csrfToken);
+      onSendMessage(message);
       setMessage("");
     }
     resetTextAreaToDefault(event);
@@ -107,7 +107,6 @@ const ChatInput = ({
 
   return (
     <form onSubmit={handleSend} className="rounded-b-lg">
-      <input ref={csrfTokenRef} type="hidden" name="_csrf" value={csrfToken} />
       <div className="flex items-center py-2 px-3 bg-gray-50 dark:bg-gray-700">
         <button
           type="button"

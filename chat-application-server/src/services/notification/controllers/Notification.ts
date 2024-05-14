@@ -10,9 +10,12 @@ import SERVICES from '../../../config/services.json'
 export default class NotificationController {
   public readonly getUserNotifications = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken)
+      const userId = await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], Tokens.accessToken)
 
-      const notifications = await NotificationModel.find({ receiver: userId })
+      const notifications = await NotificationModel.find({
+        receiver: userId,
+        status: Crypto.encrypt(NotificationStatus.pending, "status")
+      })
 
       if (!notifications) {
         return res.status(422).json({
@@ -20,11 +23,25 @@ export default class NotificationController {
         });
       }
 
+      const decryptedNotifications = notifications.map(notification => {
+        return {
+          _id: notification._id,
+          sender: notification.sender,
+          receiver: notification.receiver,
+          content: Crypto.decrypt(notification.content, "database"),
+          status: Crypto.decrypt(notification.status, "status"),
+          createdAt: notification.createdAt,
+          updatedAt: notification.updatedAt
+        }
+      })
+
       return res.status(200).json({
-        notifications,
+        message: "success",
+        data: decryptedNotifications,
       });
 
     } catch (error) {
+      console.log(error)
       return res.status(422).json({
         error: "Impossible de récupérer les notifications",
       });
@@ -76,14 +93,12 @@ export default class NotificationController {
     //check if the username exits
     try {
 
-      await NotificationModel.findOneAndUpdate({
-        sender: userId,
-      }, {
+      await NotificationModel.findByIdAndUpdate(req.params.id, {
         status: Crypto.encrypt(NotificationStatus.deleted, "status")
       })
 
       return res.status(200).json({
-        message: "Notification envoyée avec succèss",
+        message: "Notification modifiée avec succèss",
       })
 
     } catch (error) {

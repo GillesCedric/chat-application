@@ -30,18 +30,30 @@ ipcMain.on("electron-store-set", (event, key, val) => {
   secureStore.set(key, val);
 });
 
-ipcMain.on("electron-security-encrypt", (event, val, publicKey: string) => {
-  event.returnValue = security.encrypt(val, publicKey);
+ipcMain.on("electron-security-encryptWithPublicKey", (event, val, publicKey: string) => {
+  event.returnValue = security.encryptWithPublicKey(val, publicKey);
 });
 
-ipcMain.on("electron-security-decrypt", (event, val) => {
-  event.returnValue = security.decrypt(val);
+ipcMain.on("electron-security-decryptWithPrivateKey", (event, val) => {
+  event.returnValue = security.decryptWithPrivateKey(val);
+});
+
+ipcMain.on("electron-security-encryptWithSymmetricKey", (event, val, key: string) => {
+  event.returnValue = security.encryptWithSymmetricKey(val, key);
+});
+
+ipcMain.on("electron-security-decryptWithSymmetricKey", (event, val, key: string) => {
+  event.returnValue = security.decryptWithSymmetricKey(val, key);
 });
 
 ipcMain.on("electron-security-getPublicKey", (event) => {
   const { publicKey } = security.getKeys();
   event.returnValue = publicKey
 });
+
+const suffix = 2
+//TODO remove the suffix in production
+//const suffix = crypto.randomInt(100)
 
 
 const getSystemFingerprint = async () => {
@@ -119,8 +131,9 @@ const createWindow = async (): Promise<void> => {
   if (fingerprint)
     mainWindow.webContents.setUserAgent(`${mainWindow.webContents.userAgent} Fingerprint/${fingerprint}`)
  */
+
   mainWindow.webContents.setUserAgent(
-    `${mainWindow.webContents.userAgent} Fingerprint/${crypto.randomInt(500)}`
+    `${mainWindow.webContents.userAgent} Fingerprint/${suffix}}`
   );
 
   // and load the index.html of the app.
@@ -141,14 +154,12 @@ app.on("ready", () => {
   //   return secureStore.set(key, value)
   // })
 
-  //TODO remove the suffix in production
-  const suffix = crypto.randomInt(100)
   secureStore = new SecureStore(suffix)
   security = new Security(suffix)
 
   /* Acces token persitency here */
-  secureStore.set("chat-application-access_token", "null");
-  secureStore.set("chat-application-refresh_token", "null");
+  //secureStore.set("chat-application-access_token", "null");
+  //secureStore.set("chat-application-refresh_token", "null");
 
   createWindow();
 

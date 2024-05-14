@@ -55,7 +55,6 @@ const ConversationHeader = ({ name, status, avatar }: { name: string, status: bo
           type="button"
           className="p-2 text-gray-500 hover:bg-gray-200 rounded-full focus:outline-none"
         >
-          {/* SVG icon or any other icon component */}
         </button>
       </div>
     </div>

@@ -47,3 +47,24 @@ const startOfWeek = (date: Date): Date => {
   const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
   return new Date(date.setDate(diff));
 };
+
+// Helper function to format date
+export const formatDate = (dateString : string) => {
+  const date = new Date(dateString);
+  const today = new Date();
+  if (date.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0)) {
+    return "TODAY";
+  } else {
+    return date.toLocaleDateString(); // Adjust this to your locale and format preferences
+  }
+};
+
+// Function to determine if a new date divider should be added
+export const needsDateDivider = (currentMessage : any, previousMessage : any) => {
+  if (!previousMessage) return true; // Always add a divider for the first message
+
+  const currentDate = new Date(currentMessage.createdAt).setHours(0, 0, 0, 0);
+  const previousDate = new Date(previousMessage.createdAt).setHours(0, 0, 0, 0);
+/*   console.log(currentMessage , previousMessage)
+ */  return currentDate !== previousDate;
+};

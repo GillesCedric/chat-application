@@ -1,3 +1,5 @@
+import CONFIG from "../config/config.json";
+
 export enum SocketKeywords {
   join = "join",
   connection = "connection",

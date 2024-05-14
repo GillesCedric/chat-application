@@ -21,13 +21,15 @@ export type ConversationModel = {
   fullname: string;
   picture: string;
   status: string;
+  encryptedKey: string;
+  decryptedKey: string;
 };
 
 /**
  * Modèle de message
  */
 export type MessageModel = {
-  _id: string;
+_id: string;
   sender: string;
   message: string;
   status: string;
@@ -45,7 +47,6 @@ export default class ConversationRepository {
     try {
       const response = await API.getUserConversation(id);
       if (response.message) {
-        console.log(response.message);
         return { data: response.data };
       } else {
         return { error: response.errors ? response.errors : response.error };
@@ -104,7 +105,7 @@ export default class ConversationRepository {
         "csrf-token": data._csrf,
       });
       if (response.message) {
-        console.log(response.message);
+       /*  console.log(response.message); */
         return {
           message: response.message,
         };
@@ -117,6 +118,34 @@ export default class ConversationRepository {
       }
     } catch (error) {
       console.error("Failed to send message", error);
+      return { error: error };
+    }
+  }
+  public static async updateChat(id: string, csrfToken: string): Promise<any> {
+    try {
+      const response = await API.updateChat(
+        id,
+        {
+          _csrf: csrfToken,
+        },
+        {
+          "csrf-token": csrfToken,
+        }
+      );/*  console.log(response); */
+      if (response.message) {
+        /* console.log(response.message); */
+        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error("Failed to update chat :", response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log("Errors : " + response.errros);
+        return { error: "Failed to update chat" };
+      }
+    } catch (error) {
+      console.error("Failed to update chat", error);
       return { error: error };
     }
   }
