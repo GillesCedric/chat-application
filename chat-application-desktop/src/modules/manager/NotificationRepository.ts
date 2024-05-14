@@ -14,8 +14,8 @@ export default class NotificationRepository {
       const response = await API.getNotifications();
       console.log(response);
       if (response.message) {
-        console.log("Notifications successfully loaded ");
-        return { data: response.data };
+/*         console.log("Notifications successfully loaded ");
+ */        return { data: response.data };
       }
       if (response.error) {
         console.error(

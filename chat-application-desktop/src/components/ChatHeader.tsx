@@ -2,7 +2,7 @@ import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
-import NotificationRepository from "../modules/manager/NotificationRepository";
+import NotificationRepository, { NotificationModel } from "../modules/manager/NotificationRepository";
 import { notify } from "./toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
 import { Link } from "react-router-dom";
@@ -13,12 +13,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { useSocketContext } from "../context/SocketContext";
-import { SocketKeywords } from "../utils/keywords";
+import { NotificationStatus, SocketKeywords } from "../utils/keywords";
+import { ToastContainer } from "react-toastify";
 
 const ChatHeader = () => {
   const [friendRequestCount, setFriendRequestsCount] = useState(0);
-  const data: any[] = [];
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationModel[]>([]);
   const [notificationsCount, setNotificationsCount] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -26,7 +26,6 @@ const ChatHeader = () => {
     try {
       const response = await User.getFriendsRequests();
       if (response.message) {
-        console.log(response);
         setFriendRequestsCount(response.data.length);
       } else {
         console.log(response.error);
@@ -40,8 +39,8 @@ const ChatHeader = () => {
   const fetchNotifications = async () => {
     try {
       const response = await NotificationRepository.getNotifications();
-      if (response.message) {
-        /*         console.log(response.data);*/
+      if (response.data) {
+                /* console.log(response.data); */
         setNotifications(response.data);
         setNotificationsCount(response.data.length);
       } else {
@@ -65,6 +64,7 @@ const ChatHeader = () => {
     if (isConnected) {
       // S'abonner aux événements
       subscribe(SocketKeywords.newNotification, handleNewNotification);
+
       // Fonction de nettoyage pour se désabonner
       return () => {
         unsubscribe(SocketKeywords.newMessage, handleNewNotification);
@@ -117,7 +117,6 @@ const ChatHeader = () => {
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
           initialNotifications={notifications}
-          notificationCount={notificationsCount}
         />
       </nav>
     </header>

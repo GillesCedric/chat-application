@@ -16,7 +16,9 @@ export const Notification = ({
 }) => {
   const handleDismiss = (id: string) => {
     const newNotifications = notifications.map((notification: any) =>
-      notification._id === id ? { ...notification, unread: false } : notification
+      notification._id === id
+        ? { ...notification, unread: false }
+        : notification
     );
     setNotifications(newNotifications);
   };
@@ -34,7 +36,7 @@ export const Notification = ({
           role="alert"
         >
           <span className="absolute top-2 right-2 text-xs text-gray-500 dark:text-gray-400">
-            {formatDate( notification.createdAt)}
+            {formatDate(notification.createdAt)}
           </span>
           <div
             className={`inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg ${
@@ -45,7 +47,7 @@ export const Notification = ({
           >
             {getNotificationIcon("warning")}
           </div>
-          <div className="ms-3 text-sm font-normal">{notification.content}</div>
+          <div className="ms-3 text-sm font-normal py-1">{notification.content}</div>
           <button
             type="button"
             className="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
@@ -54,7 +56,7 @@ export const Notification = ({
           >
             <FontAwesomeIcon
               icon={faTrash}
-              className="w-5 h-5"
+              className="w-5 h-5 mt-1"
               title="Delete"
             />
           </button>

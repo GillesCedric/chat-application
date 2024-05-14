@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
-import { Conversation } from "../components/conversation";
+import { Conversation } from "../components/Conversation";
 import ChatInput from "../components/ChatInput";
 import ConversationHeader from "../components/ConversationHeader";
 import ChatHeader from "../components/ChatHeader";

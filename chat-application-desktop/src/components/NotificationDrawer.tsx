@@ -8,22 +8,25 @@ export const NotificationDrawer = ({
   isOpen,
   onClose,
   initialNotifications,
-  notificationCount,
 }: {
   isOpen: boolean;
   onClose: any;
   initialNotifications: NotificationModel[];
-  notificationCount: number;
 }) => {
-  const drawerRef = useRef();
-  const [notifications, setNotifications] = useState([]);
-  
+  const drawerRef = useRef(null);
+  const [notifications, setNotifications] =
+    useState<NotificationModel[]>(initialNotifications);
+
+  useEffect(() => {
+    setNotifications(initialNotifications);
+  }, [initialNotifications]);
 
   const handleClose = (e: any) => {
     if (drawerRef.current === e.target) {
       onClose();
     }
   };
+
   const clearAllNotifications = () => {
     setNotifications([]);
   };
@@ -33,7 +36,7 @@ export const NotificationDrawer = ({
       ref={drawerRef}
       onClick={handleClose}
       className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${
-        isOpen ? " opacity-100  " : "opacity-0 pointer-events-none"
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
       <div
@@ -75,26 +78,24 @@ export const NotificationDrawer = ({
 
 export const EmptySectionNotification = () => {
   return (
-    <>
-      <div className="w-full flex items-center flex-wrap justify-center gap-10 h-screen">
-        <div className="grid gap-4 w-60 ">
-          <img
-            className="w-42 h-12 mx-auto"
-            style={{ filter: "drop-shadow(2px 4px 6px gray)" }}
-            src="https://static.vecteezy.com/system/resources/previews/021/975/474/original/no-notification-3d-render-icon-illustration-with-transparent-background-empty-state-png.png"
-            alt="belt"
-          />
-          <div>
-            <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
-              Notification center empty
-            </h2>
-            <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
-              New notifications will appear here <br />
-              stay tuned 🔔
-            </p>
-          </div>
+    <div className="w-full flex items-center flex-wrap justify-center gap-10 h-screen">
+      <div className="grid gap-4 w-60">
+        <img
+          className="w-42 h-12 mx-auto"
+          style={{ filter: "drop-shadow(2px 4px 6px gray)" }}
+          src="https://static.vecteezy.com/system/resources/previews/021/975/474/original/no-notification-3d-render-icon-illustration-with-transparent-background-empty-state-png.png"
+          alt="belt"
+        />
+        <div>
+          <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
+            Notification center empty
+          </h2>
+          <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
+            New notifications will appear here <br />
+            stay tuned 🔔
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
