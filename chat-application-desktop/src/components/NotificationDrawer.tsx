@@ -1,3 +1,9 @@
+/**
+ *Le composant NotificationDrawer est une fonction React qui affiche un tiroir latéral dans une application.Ce tiroir contient une liste de notifications, permettant à l'utilisateur de voir les dernières notifications reçues. Il offre également des fonctionnalités pour marquer toutes les notifications comme lues ou pour effacer toutes les notifications d'un seul coup.Le composant EmptySectionNotification est inclus pour afficher un message lorsque la liste de notifications est vide, indiquant à l'utilisateur qu'aucune nouvelle notification n'est disponible pour le moment. En résumé, le NotificationDrawer offre une interface conviviale pour gérer les notifications de l'application de manière efficace.
+ * 
+ * @module components/NotificationDrawer
+ */
+
 import React, { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faBroom } from "@fortawesome/free-solid-svg-icons";
@@ -39,14 +45,12 @@ export const NotificationDrawer = ({
     <div
       ref={drawerRef}
       onClick={handleClose}
-      className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${
-        isOpen ? " opacity-100  " : "opacity-0 pointer-events-none"
-      }`}
+      className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${isOpen ? " opacity-100  " : "opacity-0 pointer-events-none"
+        }`}
     >
       <div
-        className={`flex flex-col justify-between fixed inset-y-0 right-0 p-4 overflow-y-auto bg-white dark:bg-gray-700 w-80 duration-700 transition-transform transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`flex flex-col justify-between fixed inset-y-0 right-0 p-4 overflow-y-auto bg-white dark:bg-gray-700 w-80 duration-700 transition-transform transform ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

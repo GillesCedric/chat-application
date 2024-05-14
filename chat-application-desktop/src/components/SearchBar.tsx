@@ -1,3 +1,13 @@
+/**
+ * Le composant SearchBar est utilisé pour afficher une barre de recherche dans l'interface utilisateur.
+ * Il est composé d'un champ de saisie de texte où l'utilisateur peut saisir sa requête de recherche.
+ * Le composant est conçu pour rechercher des prénoms ou des noms de famille dans une liste de données.
+ * Il inclut également une icône de loupe pour lancer la recherche.
+ * En résumé, le composant SearchBar offre une interface conviviale pour permettre à l'utilisateur d'effectuer des recherches dans l'application.
+ * 
+ * @module components/SearchBar
+ */
+
 export const SearchBar = () => {
   return <SB1 />;
 };

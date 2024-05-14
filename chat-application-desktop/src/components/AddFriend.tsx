@@ -1,3 +1,10 @@
+/**
+ * 
+ * Ce code constitue un composant React pour l'ajout d'amis.Lorsque l'utilisateur clique sur le bouton "Send invitation", un modal s'ouvre pour saisir le nom d'utilisateur et un commentaire optionnel pour l'invitation.Le composant utilise la bibliothèque FontAwesome pour les icônes et React Toastify pour afficher les notifications.L'état du modal est géré via useState pour contrôler son ouverture et sa fermeture. Lorsque l'utilisateur soumet le formulaire, une requête est envoyée au serveur via l'API pour envoyer une demande d'ami.Les erreurs sont gérées et affichées à l'utilisateur via les notifications.
+ * 
+ * @module components/AddFriend
+ */
+
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,6 +14,7 @@ import { notify } from "./toastify";
 import { ToastContainer } from "react-toastify";
 import { DEFAULT_COMMENT } from "../utils/keywords";
 import API from "../modules/api/API";
+
 
 export const AddFriend = () => {
   // Close modal if clicked outside of it

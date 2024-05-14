@@ -1,3 +1,8 @@
+/**
+Cette page permet aux utilisateurs de se connecter à leur compte. Il utilise des références (useRef) pour accéder aux champs de formulaire, des états (useState) pour gérer les données et des effets (useEffect) pour effectuer des actions au chargement de la page. L'utilisateur peut saisir son email et son mot de passe, cocher une case de souvenir, et accéder à des liens pour la récupération de mot de passe ou l'inscription. Lorsque l'utilisateur clique sur "Sign in", les données sont envoyées à l'API pour authentification.
+* @module pages/signin
+ */
+
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import API from "../modules/api/API";
@@ -16,7 +21,7 @@ export default function SignIn() {
   const passwordRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    API.getCSRFToken().then((data : any) => {
+    API.getCSRFToken().then((data: any) => {
       setCsrfToken(data.token);
     });
   }, []);

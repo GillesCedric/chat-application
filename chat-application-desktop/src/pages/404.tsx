@@ -1,3 +1,7 @@
+/**
+Cette page représente une page d'erreur 404 (page non trouvée) dans une application web. Elle est affichée lorsque l'utilisateur tente d'accéder à une URL qui n'existe pas sur le site.
+* @module pages/404
+ */
 import React from "react"
 
 export default class NotFound extends React.Component<{}> {
@@ -15,7 +19,7 @@ export default class NotFound extends React.Component<{}> {
 							<mask id="prefix__b" fill="#fff">
 								<use xlinkHref="#prefix__a" />
 							</mask>
-							
+
 							<path fill="#EDEDF0" fillRule="nonzero" d="M-14.199 211.2H481.36V301.2H-14.199z" mask="url(#prefix__b)" />
 							<g className="paes">
 								<g className="pao-baixo">

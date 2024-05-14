@@ -1,3 +1,10 @@
+/**
+ * Ce module contient les données de notifications pour l'application.
+ * Ces données sont utilisées pour afficher des notifications à l'utilisateur.
+ * Chaque notification a un identifiant unique, un type (success, error, warning), un message et un indicateur de lecture.
+ * 
+ * @module components/NotifData
+ */
 const notificationsData = [
   {
     id: 1,

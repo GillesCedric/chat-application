@@ -1,3 +1,9 @@
+/**
+ *Ce composant représente la zone de saisie du chat. Il permet à l'utilisateur d'entrer un message à envoyer. Il inclut des fonctionnalités telles que l'envoi de messages, l'affichage d'une sélection d'emoji, et l'ajustement automatique de la taille de la zone de texte en fonction du contenu. Le composant affiche également des boutons pour envoyer le message et ouvrir la sélection d'emoji. Lorsqu'un message est envoyé, il est transmis à la fonction onSendMessage fournie en tant que prop.
+ * 
+ * @module components/ChatInput
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -50,10 +56,10 @@ const ChatInput = ({
     }
   };
 
-  const onEmojiClick = ( emojiObject: any) => {
+  const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
     setShowEmojiPicker(false);
-    console.log(emojiObject); 
+    console.log(emojiObject);
   };
 
   return (
@@ -68,7 +74,7 @@ const ChatInput = ({
         </button>
         {showEmojiPicker && (
           <EmojiPicker
-            onEmojiClick={(emojiObject: EmojiClickData ) => {onEmojiClick(emojiObject)}}
+            onEmojiClick={(emojiObject: EmojiClickData) => { onEmojiClick(emojiObject) }}
             style={{ position: "absolute", bottom: "50px", right: "20px" }}
           />
         )}

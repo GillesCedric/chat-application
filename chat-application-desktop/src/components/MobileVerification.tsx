@@ -1,3 +1,10 @@
+/**
+ * Le composant MobileVerification est utilisé pour la vérification du numéro de téléphone mobile.
+ * Il permet à l'utilisateur d'entrer un code de vérification à 4 chiffres et de soumettre le formulaire pour vérification.
+ * Il gère également le déplacement du focus entre les champs, la validation de la saisie clavier et la gestion de la saisie par collage.
+ * 
+ * @module components/MobileVerification
+ */
 import React, { useState, useRef } from "react";
 
 const MobileVerification: React.FC = () => {

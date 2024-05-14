@@ -1,3 +1,7 @@
+/**
+Cette page d'inscription, développée en React, permet aux utilisateurs de créer un compte. Elle utilise des états (useState) pour gérer les interactions utilisateur et des effets (useEffect) pour répondre aux changements d'état. Des références (useRef) sont utilisées pour accéder aux éléments du formulaire. La validation des entrées est effectuée avant d'interagir avec une API pour l'enregistrement des utilisateurs.
+* @module pages/register
+ */
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";

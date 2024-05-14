@@ -1,3 +1,8 @@
+/**
+*
+*Ce code définit une classe User qui encapsule les fonctionnalités liées à un utilisateur, telles que l'enregistrement, l'envoi de demandes d'amis, la mise à jour des demandes d'amis et la récupération des demandes d'amis. Les méthodes statiques fournies effectuent des opérations asynchrones en utilisant les méthodes correspondantes de la classe API pour interagir avec l'API distante. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API et fournir des messages d'erreur appropriés en cas d'échec.
+ * @module modules/manager/User
+ */
 import API from "../api/API";
 
 export default class User {
