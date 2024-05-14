@@ -51,7 +51,7 @@ ipcMain.on("electron-security-getPublicKey", (event) => {
   event.returnValue = publicKey
 });
 
-const suffix = 2
+const suffix = 1
 //TODO remove the suffix in production
 //const suffix = crypto.randomInt(100)
 
