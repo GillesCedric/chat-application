@@ -1,11 +1,29 @@
 import mongoose from "mongoose";
 
+interface IEncryptedKey {
+  user: mongoose.Types.ObjectId;
+  encryptedKey: String;
+}
+
 interface IConversation extends mongoose.Document {
   members: mongoose.Types.ObjectId[];
+  encryptedKeys: IEncryptedKey[];
   chats: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+const encryptedKeySchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Users',
+    required: true
+  },
+  encryptedKey: {
+    type: String,
+    required: true
+  },
+});
 
 const conversationSchema = new mongoose.Schema({
   members: [
@@ -13,13 +31,13 @@ const conversationSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Users',
     },
-  ], // An array of members, where each member is represented as an object
+  ],
+  encryptedKeys: [encryptedKeySchema], // Stocke la clé de chiffrement chiffrée pour chaque utilisateur
   chats: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Chats',
     },
-
   ],
   createdAt: {
     type: Date,
@@ -34,6 +52,9 @@ const conversationSchema = new mongoose.Schema({
 });
 
 conversationSchema.pre('save', function (next) {
+  // Assurer l'unicité des membres pour éviter les doublons
+  this.members = Array.from(new Set(this.members));
+
   // Tri des membres par leur ID avant de sauvegarder la conversation
   this.members.sort();
   next();

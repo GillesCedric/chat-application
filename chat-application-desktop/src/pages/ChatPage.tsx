@@ -19,7 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { OfflineBanner } from "../components/OfflineBanner";
 import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
-import { useSocketListener } from "../hooks/useSocketListener";
+//import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
 import User from "../modules/manager/User";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
@@ -29,10 +29,9 @@ import ConversationRepository, {
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToYesterday } from "../utils/utilsFunctions";
 import { useSocketContext } from "../context/SocketContext";
+import API from "../modules/api/API";
 const ChatPage = () => {
   const [conversations, setConversations] = useState<ConversationModel[]>([]);
-  const newConversation = useSocketListener(SocketKeywords.newConversation);
-  const newMessage = useSocketListener(SocketKeywords.newMessage);
   const [showBanner, setShowBanner] = useState(false);
   const isOnline = useCheckOnlineStatus();
   const wasOnlineRef = useRef(isOnline);
@@ -40,6 +39,7 @@ const ChatPage = () => {
   const [conversation, setConversation] = useState<ConversationModel>(null);
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
+  const [csrfToken, setCsrfToken] = useState("");
   useEffect(() => {
     fetchConversations();
 
@@ -50,7 +50,7 @@ const ChatPage = () => {
     };
 
     const handleNewConversation = (data: any) => {
-      console.log(data);
+      /* console.log(data); */
       fetchConversations();
     };
 
@@ -65,33 +65,29 @@ const ChatPage = () => {
         unsubscribe(SocketKeywords.newConversation, handleNewConversation);
       };
     }
+  }, [isConnected, subscribe, unsubscribe]); // Réexécute l'effet seulement quand Socket.socket change
 
-  }, [isConnected, subscribe, unsubscribe]);  // Réexécute l'effet seulement quand Socket.socket change
-
-
-  const handleSendMessage = (newMessage: string, csrfToken: string) => {
+  const handleSendMessage = (newMessage: string) => {
     if (conversation === null) {
       notify("Error sending message, cannot get conversation", "error");
       return;
     }
-    // Add new message to the messages state
+
+    //Add new message to the messages state
     ConversationRepository.addMessage(conversation._id, {
-      message: newMessage,
+      message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
       _csrf: csrfToken,
     });
   };
 
-  const handleSelectConversation = (conversation: ConversationModel): void => {
+  const handleSelectConversation = async (
+    conversation: ConversationModel
+  ): Promise<any> => {
     setConversation(conversation);
     ConversationRepository.getUserConversation(conversation._id)
       .then((response: any) => {
         if (!response.error) {
-          console.log("Messages : " + response.data.length);
-          console.log(
-            response.data.map((data: any) => {
-              console.log(data);
-            })
-          );
+          console.log("Conversation : " + response.data);
           setMessages(response.data);
         } else {
           notify(response.error, "error");
@@ -100,13 +96,31 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
+
+    ConversationRepository.updateChat(conversation._id, csrfToken)
+      .then((response) => {
+        console.log(response);
+        if (response.error) {
+          notify("Error reading messages : " + response.error);
+        }
+      })
+      .catch((error) => {
+        notify("Error reading messages : " + error);
+      });
   };
+
   const fetchConversations = () => {
     ConversationRepository.getConversations()
-      .then((response: any) => {
+      .then(async (response: any) => {
         console.log(response);
         if (!response.error) {
-          setConversations(response.data);
+          const conversations = await Promise.all<ConversationModel[]>(response.data.map((conversation: ConversationModel) => {
+            conversation.decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
+            //delete conversation.encryptedKey
+            return conversation
+          }))
+          console.log(conversations)
+          setConversations(conversations);
         } else {
           notify(response.error, "error");
         }
@@ -153,8 +167,9 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${conversations.length === 0 ? "" : "flex-none"
-                }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
+                conversations.length === 0 ? "" : "flex-none"
+              }`}
             >
               <div className="sticky top-0 z-50">
                 <SearchBar />

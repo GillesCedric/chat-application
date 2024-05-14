@@ -9,16 +9,21 @@ import { Avatar } from "./Avatar";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
 import { convertToDate, getDateDivider } from "../utils/utilsFunctions";
 import { AddFriend } from "./AddFriend";
+import API from "../modules/api/API";
+import { useEffect, useState } from "react";
 
 const ConversationItem = ({
   conversation,
   changeConversation,
   isSelected,
 }: {
+
   conversation: ConversationModel;
-  changeConversation: (conversation: ConversationModel) => void;
+  changeConversation: (
+    conversation: ConversationModel ) => void;
   isSelected: boolean;
-}) => {
+  }) => {
+  const decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
   return (
     <div
       className={`flex items-center px-4 py-3 text-black cursor-pointer rounded-md ${isSelected ? "bg-gray-300" : "hover:bg-gray-300"
@@ -29,7 +34,7 @@ const ConversationItem = ({
       <div className="ml-4">
         <p className="font-semibold">{conversation.fullname}</p>
         <p className="text-grey-dark text-sm">
-          {conversation.lastMessage.message}
+          {conversation.lastMessage.message ? window.electron.security.decryptWithSymmetricKey(conversation.lastMessage.message, decryptedKey) : null}
         </p>
       </div>
       <span className="ml-auto text-grey-dark text-sm">
@@ -51,7 +56,8 @@ const Conversations = ({
 }: {
   conversations: ConversationModel[];
   selectedConversation: ConversationModel | null;
-  changeConversation: (conversation: ConversationModel) => void;
+  changeConversation: (
+    conversation: ConversationModel) => void;
 }) => {
   return (
     <div className="w-70 z-10 relative">
@@ -78,6 +84,5 @@ const Conversations = ({
     </div>
   );
 };
-
 
 export default Conversations;

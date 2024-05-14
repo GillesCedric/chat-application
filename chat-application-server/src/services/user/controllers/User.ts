@@ -716,6 +716,9 @@ export default class UserController {
       } else if ((user.id == friendRequest.sender && req.body.status == FriendsRequestStatus.deleted) || (user.id == friendRequest.receiver && req.body.status == FriendsRequestStatus.rejected)) {
         friendRequest.status = Crypto.encrypt(req.body.status, 'status')
         await friendRequest.save()
+        return res.status(200).json({
+          message: "Demande d'amis annulée succèss",
+        })
       } else if (user.id == friendRequest.receiver && req.body.status == FriendsRequestStatus.accepted) {
 
         friendRequest.status = Crypto.encrypt(req.body.status, 'status')

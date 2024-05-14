@@ -30,9 +30,9 @@ export class Crypto {
 		return atob(text)
 	}
 
-	public static readonly random = (length: number = this.randomLength): string => {
+	public static readonly random = (length: number = this.randomLength, specialCharacters: boolean = false): string => {
 		let text = ''
-		for (let i = 0; i < length; i++) text += this.chars2[Math.random() * this.chars.length]
+		for (let i = 0; i < length; i++) text += specialCharacters ? this.chars2[Math.random() * this.chars.length] : this.chars[Math.floor(Math.random() * this.chars.length)]
 		return text
 	}
 

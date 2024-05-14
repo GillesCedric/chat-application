@@ -138,6 +138,49 @@ export class Crypto {
 		)
 	}
 
+	public static readonly encryptWithPublicKey = (message: string, publicKey: string) => {
+		try {
+			const buffer = Buffer.from(message, 'utf8');
+			const encryptedMessage = crypto.publicEncrypt(publicKey.replace(/\\n/g, '\n'), buffer);
+			return encryptedMessage.toString('base64');
+		} catch (error) {
+			throw new Error(error)
+		}
+	}
+
+	private static readonly formatPublicKey = (key: string) => {
+		// Supprimer tous les sauts de ligne existants
+		let cleanKey = key.replace('\n', '');
+
+		// Extraire l'en-tête et le pied de page
+		const header = "-----BEGIN PUBLIC KEY-----";
+		const footer = "-----END PUBLIC KEY-----";
+
+		// Supprimer l'en-tête et le pied de page pour travailler uniquement sur la base64
+		cleanKey = cleanKey.replace(header, '').replace(footer, '');
+
+		// Ajouter un saut de ligne tous les 64 caractères
+		//const formattedKey = cleanKey.match(/.{1,64}/g).join('\n');
+
+		// Reconstruire la clé complète avec en-tête et pied de page
+		return `${header}${cleanKey}${footer}`;
+	}
+
+	public static readonly encryptSymmetricKey = (symmetricKey: Buffer, publicKey: string) => {
+		console.log(publicKey)
+
+		return crypto.publicEncrypt(
+			{
+				key: publicKey,
+				padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+				oaepHash: "sha256",
+			},
+			symmetricKey
+		).toString('base64')
+	}
+
+	public static readonly generateSymmetricKey = () => crypto.randomBytes(32)
+
 	/**
 	 * @function encode
 	 * @description encode: binary to base64 ASCII
@@ -209,3 +252,4 @@ export class Crypto {
 	public static readonly identifier = (suffix: string | number = '', length: number = this.randomLength): string => Date.now() + this.random(length) + suffix
 
 }
+

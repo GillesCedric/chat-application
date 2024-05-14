@@ -12,7 +12,7 @@ export default class Routes {
     app.route("/:id").put(...NotificationValidators.updateNotification, NotificationValidators.errors, this.notificationController.updateNotification)
     app.route("/")
       .post(...NotificationValidators.sendNotification, NotificationValidators.errors, this.notificationController.sendNotification)
-      .get(this.notificationController.getUserNotifications)
+      .get(...NotificationValidators.getNotifications, NotificationValidators.errors, this.notificationController.getUserNotifications)
   
   }
 }

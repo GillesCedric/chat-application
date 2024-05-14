@@ -38,23 +38,13 @@ const textAreaAdjust = (element: HTMLTextAreaElement) => {
 const ChatInput = ({
   onSendMessage,
 }: {
-  onSendMessage: (message: string, csrfToken: string) => void;
+  onSendMessage: (message: string) => void;
 }) => {
-  const [message, setMessage] = useState("");
-  const [csrfToken, setCsrfToken] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const csrfTokenRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    API.getCSRFToken().then((data) => {
-      setCsrfToken(data.token);
-    });
-  }, []);
-
+  const [message, setMessage] = useState("");  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
-      onSendMessage(message, csrfToken);
+      onSendMessage(message);
       setMessage("");
     }
     resetTextAreaToDefault(event);
@@ -74,7 +64,6 @@ const ChatInput = ({
 
   return (
     <form onSubmit={handleSend} className="rounded-b-lg">
-      <input ref={csrfTokenRef} type="hidden" name="_csrf" value={csrfToken} />
       <div className="flex items-center py-2 px-3 bg-gray-50 dark:bg-gray-700">
         <button
           type="button"

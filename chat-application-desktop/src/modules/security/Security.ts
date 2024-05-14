@@ -13,7 +13,7 @@ Dans l'ensemble, cette classe offre une couche de sécurité pour les données s
  * @module modules/security/Security
  */
 import { app, safeStorage } from 'electron';
-import { createPrivateKey, generateKeyPairSync, privateDecrypt, publicEncrypt } from 'crypto';
+import { createCipheriv, createDecipheriv, createPrivateKey, generateKeyPairSync, privateDecrypt, publicEncrypt, randomBytes, constants } from 'crypto';
 import { Crypto } from '../crypto/Crypto';
 import Store from 'electron-store'
 import path from 'path';
@@ -82,30 +82,64 @@ export default class Security {
 
 			return { publicKey, decryptedPrivateKey }
 		} catch (error) {
-			throw new Error(error)
+			console.log(error)
 		}
 	}
 
-	public encrypt(message: string, publicKey: string) {
+	public encryptWithPublicKey(message: string, publicKey: string) {
 		try {
 			const buffer = Buffer.from(message, 'utf8');
 			const encryptedMessage = publicEncrypt(publicKey, buffer);
 			return encryptedMessage.toString('base64');
 		} catch (error) {
-			throw new Error(error)
+			console.log(error)
 		}
 	}
 
-	public decrypt(message: string) {
-
+	public decryptWithPrivateKey(message: string) {
 		const { decryptedPrivateKey } = this.getDecryptedKeys()
 		try {
 			const buffer = Buffer.from(message, 'base64');
-			const decryptedMessage = privateDecrypt({ key: decryptedPrivateKey, passphrase: this.getPassphrase() }, buffer);
-			return decryptedMessage.toString('utf8');
+			const decrypted = privateDecrypt(
+				{
+					key: decryptedPrivateKey,
+					padding: constants.RSA_PKCS1_OAEP_PADDING,
+					oaepHash: "sha256",
+				},
+				buffer
+			).toString('hex')
+			console.log(decrypted)
+			return decrypted
 		} catch (error) {
-			throw new Error(error)
+			console.log(error)
 		}
 	}
+
+	public encryptWithSymmetricKey(message: string, symmetricKey: string) {
+		try {
+			const iv = randomBytes(16); // Initialisation Vector
+			const cipher = createCipheriv('aes-256-cbc', Buffer.from(symmetricKey, 'hex'), iv);
+			let encrypted = cipher.update(message, 'utf8', 'hex');
+			encrypted += cipher.final('hex');
+			return iv.toString('hex') + ':' + encrypted;
+		} catch (error) {
+			console.log(error)
+		}
+		
+	}
+
+	public decryptWithSymmetricKey(encryptedMessage: string, symmetricKey: string) {
+		try {
+			const [iv, encrypted] = encryptedMessage.split(':');
+			const decipher = createDecipheriv('aes-256-cbc', Buffer.from(symmetricKey, 'hex'), Buffer.from(iv, 'hex'));
+			let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+			decrypted += decipher.final('utf8');
+			return decrypted;
+		} catch (error) {
+			console.log(error)
+		}
+	
+}
+
 
 }
