@@ -29,7 +29,7 @@ export default class NotificationController {
           sender: notification.sender,
           receiver: notification.receiver,
           content: Crypto.decrypt(notification.content, "database"),
-          status: Crypto.decrypt(NotificationStatus.pending, "status"),
+          status: Crypto.decrypt(notification.status, "status"),
           createdAt: notification.createdAt,
           updatedAt: notification.updatedAt
         }
