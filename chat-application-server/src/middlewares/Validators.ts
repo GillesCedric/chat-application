@@ -34,6 +34,10 @@ export abstract class UserValidators extends Validators {
         body('password').escape().trim().stripLow().isStrongPassword(),
     ]
 
+    public static readonly signOut = [
+        body('access_token').escape().trim().stripLow().isJWT(),
+    ]
+
     public static readonly sendFriendRequest = [
         body('access_token').escape().trim().stripLow().isJWT(),
         body('username').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }),
