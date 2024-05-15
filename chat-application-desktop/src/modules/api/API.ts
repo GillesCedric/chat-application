@@ -181,9 +181,7 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = this.generateURL(
-        this.apiUrl + "/chats/conversations/" + id
-      );
+      const url = this.generateURL(this.apiUrl + "/chats/conversations/" + id);
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -311,15 +309,36 @@ export default class API {
     if (handleRequest) return this.sendFriendRequest(data);
     return responseData;
   };
+  public static readonly updateProfile = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/me", {
+        method: "PATCH",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.updateProfile(data);
+    return responseData;
+  };
   public static readonly getFriendsRequests = async (
     headers: HeadersInit = {}
   ): Promise<any> => {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = this.generateURL(
-        this.apiUrl + "/users/friends/request"
-      );
+      const url = this.generateURL(this.apiUrl + "/users/friends/request");
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -333,6 +352,50 @@ export default class API {
     }
     handleRequest = await this.handleRequest(responseData);
     if (handleRequest) return this.getFriendsRequests();
+    return responseData;
+  };
+  public static readonly me = async (
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = this.generateURL(this.apiUrl + "/users/me");
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.me();
+    return responseData;
+  };
+  public static readonly getNotifications = async (
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const url = await this.generateURL(this.apiUrl + "/notifications/");
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.getNotifications();
     return responseData;
   };
 
@@ -384,6 +447,75 @@ export default class API {
     }
     handleRequest = await this.handleRequest(responseData);
     if (handleRequest) return this.updateChat(id, data);
+    return responseData;
+  };
+  public static readonly signOut = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/signout", {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.signOut(data);
+    return responseData;
+  };
+  public static readonly verfifyTel = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/verify/tel", {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.verfifyTel(data);
+    return responseData;
+  };
+  public static readonly checkCodeTel = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/activate/tel", {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.checkCodeTel(data);
     return responseData;
   };
 }

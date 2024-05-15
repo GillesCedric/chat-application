@@ -4,7 +4,18 @@
  * @module modules/manager/User
  */
 import API from "../api/API";
-
+export type UserModel = {
+  lastname: string;
+  firstname: string;
+  username: string;
+  tel: string;
+  email: string;
+  isEmailVerified: string;
+  isTelVerified: string;
+  is2FAEnabled: string;
+  picture: string;
+  status: string;
+};
 export default class User {
   public static async register(userData: {
     firstname: string;
@@ -139,6 +150,34 @@ export default class User {
       return { error: error };
     }
   }
+  public static async me(): Promise<any> {
+    try {
+      const response = await API.me();
+      if (response.error) {
+        console.error("Failed to load user's data :", response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        const errors: any[] = response.errors;
+        const finalError: any[] = [];
+        errors.forEach((error) => {
+          finalError.push(error.msg + " for " + error.path, "error");
+        });
+        console.log(
+          finalError.reduce(
+            (accumulation: [], current: []) => accumulation + " " + current,
+            ""
+          )
+        );
+        return { error: "Failed to load user's data" };
+      } else {
+/*         console.log(response);
+ */        return { data: response.user };
+      }
+    } catch (error) {
+      console.error("Failed to load user's data :", error);
+      return { error: error };
+    }
+  }
   public static async getUsersFriends(data: {
     username: string;
   }): Promise<any> {
@@ -174,6 +213,108 @@ export default class User {
       }
     } catch (error) {
       console.error("Error while loading friend list:", error);
+      return { error: error };
+    }
+  }
+  public static async signOut(data: { _csrf: string }): Promise<any> {
+    try {
+      const response = await API.signOut(data, {
+        "csrf-token": data._csrf,
+      });
+      if (response.message) {
+        console.log(response.message);
+        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error(response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response);
+        return {
+          error: "Failed to sign out " + response.errors[0].msg,
+        };
+      }
+    } catch (error) {
+      console.error("Error while adding signing out ", error);
+      return { error: error };
+    }
+  }
+  public static async verifyTel(data: { _csrf: string }): Promise<any> {
+    try {
+      const response = await API.verfifyTel(data, {
+        "csrf-token": data._csrf,
+      });
+      if (response.message) {
+        console.log(response.message);
+        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error(response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response);
+        return {
+          error: "Failed to send sms " + response.errors[0].msg,
+        };
+      }
+    } catch (error) {
+      console.error("Error while sending sms ", error);
+      return { error: error };
+    }
+  }
+  public static async checkCodeTel(data: {
+    _csrf: string;
+    code: string;
+  }): Promise<any> {
+    try {
+      const response = await API.checkCodeTel(data, {
+        "csrf-token": data._csrf,
+      });
+      if (response.message) {
+/*         console.log(response.message);
+ */        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error(response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response);
+        return {
+          error: +response.errors[0].msg,
+        };
+      }
+    } catch (error) {
+      console.error("Error while verifying code ", error);
+      return { error: error };
+    }
+  }
+  public static async updateProfile(data: any): Promise<any> {
+    try {
+      const response = await API.updateProfile(data, {
+        "csrf-token": data._csrf,
+      });
+      console.log(response);
+      if (response.message) {
+        return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error(
+          "Failed to update user info:",
+          response.error
+        );
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response);
+        return {
+          error: "Failed to update user info " + response.errors[0].msg,
+        };
+      }
+    } catch (error) {
+      console.error("Error while updating user info", error);
       return { error: error };
     }
   }

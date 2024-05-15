@@ -1,14 +1,21 @@
 import API from "../api/API";
-
+export type NotificationModel = {
+  _id: string;
+  sender: string;
+  receiver: string;
+  content: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
 export default class NotificationRepository {
-  /* public static async getNotifications(data: any): Promise<any> {
+  public static async getNotifications(): Promise<any> {
     try {
-      const response = await API.getNotifications({
-        userId: data.userId,
-      });
-      if (response.message) {
-        console.log("Notifications successfully loaded ");
-        return { message: response.message };
+      const response = await API.getNotifications();
+/*       console.log(response);
+ */      if (response.message) {
+/*         console.log("Notifications successfully loaded ");
+ */        return { data: response.data };
       }
       if (response.error) {
         console.error(
@@ -36,5 +43,5 @@ export default class NotificationRepository {
       );
       return { error: error };
     }
-  } */
+  }
 }

@@ -10,16 +10,24 @@ import { SocketKeywords } from "../utils/keywords";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import { notify } from "../components/toastify";
 import { useSocketContext } from "../context/SocketContext";
+import API from "../modules/api/API";
 
 export const FriendRequest = () => {
+  const [csrfToken, setCsrfToken] = useState("");
+
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   const [friendRequests, setFriendRequests] = useState([]);
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
   const fetchFriendRequests = async () => {
     try {
       const response = await User.getFriendsRequests();
       if (response.message) {
-        console.log(response);
-        setFriendRequests(response.data);
+/*         console.log(response);
+ */        setFriendRequests(response.data);
       } else {
         console.log(response.error);
         notify(response.error, "error");
@@ -56,7 +64,7 @@ export const FriendRequest = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <ChatHeader />
+      <ChatHeader csrfToken={csrfToken} />
       <div className="m-4">
         <div className=" text-lg font-extrabold text-gray-900 dark:text-white">
           <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
@@ -76,6 +84,7 @@ export const FriendRequest = () => {
               <FriendRequestComponent
                 key={request._id}
                 friendRequest={request}
+                csrfToken={csrfToken}
               />
             </div>
           ))

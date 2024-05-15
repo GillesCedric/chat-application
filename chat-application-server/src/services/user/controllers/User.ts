@@ -88,13 +88,15 @@ export default class UserController {
 
   public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
     const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
-    const { firstname, lastname, username, password, is2FAEnabled } = req.body
+    const { firstname, lastname, username, password, tel, is2FAEnabled } = req.body
     try {
       const updates: {
         firstname?: string
         lastname?: string
         username?: string
         password?: string
+        tel?: string
+        isTelVerified?: string
         is2FAEnabled?: string
       } = {}
       if (firstname) updates.firstname = Crypto.encrypt(firstname, "database");
@@ -104,7 +106,21 @@ export default class UserController {
         password,
         Number.parseInt(process.env.SALT_ROUNDS)
       )
-      if (is2FAEnabled) updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
+      if (tel) {
+        updates.tel = Crypto.encrypt(tel, "tel");
+        updates.isTelVerified = Crypto.encrypt("false", "boolean");
+      } 
+      if (is2FAEnabled) {
+        const user = await UserModel.findById(userId)
+
+        if (!user.isTelVerified) {
+          return res.status(401).json({
+            error: "Votre numéro de téléphone n'est pas vérifié"
+          })
+        }
+
+        updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
+      } 
       // Mise à jour de l'utilisateur dans la base de données
       const updatedUser = await UserModel.findByIdAndUpdate(userId, updates, { new: true }).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status");
 
@@ -347,9 +363,9 @@ export default class UserController {
         validity: validity,
         purpose: Crypto.encrypt(Purposes.verification, 'status')
       })
-
+      const tel = "+33" + Crypto.decrypt(user.tel, 'tel').slice(1);
       await Mailer.sendSMS({
-        to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
+        to: tel, // Change to your recipient
         messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
         body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.VERIFY_TEL_CODE_DELAY),
       })

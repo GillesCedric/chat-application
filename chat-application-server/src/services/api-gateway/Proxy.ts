@@ -35,7 +35,7 @@ export default class Proxy {
 			pathRewrite: { '^/api/v1/notifications': '' },
 			onProxyReq: fixRequestBody,
 			secure: true,
-			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.notification) : undefined
+			agent: process.env.NODE_ENV == 'production' ? httpsAgent(Services.apigw) : undefined
 		}))
 
 	};

@@ -1,12 +1,10 @@
-import { Application } from "express"
-import NotificationController from "../controllers/Notification"
-import {NotificationValidators} from "../../../middlewares/Validators"
-
-
+import { Application } from "express";
+import NotificationController from "../controllers/Notification";
+import { NotificationValidators } from "../../../middlewares/Validators";
 
 export default class Routes {
-
-  private static readonly notificationController: NotificationController = new NotificationController()
+  private static readonly notificationController: NotificationController =
+    new NotificationController();
 
   public static readonly routes = (app: Application): void => {
     app.route("/:id").put(...NotificationValidators.updateNotification, NotificationValidators.errors, this.notificationController.updateNotification)

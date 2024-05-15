@@ -1,108 +1,106 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "1. Start FrontEnd",
-			"detail": "Start the React FrontEnd App",
-			"type": "shell",
-			"command": "npm start",
-			"options": {
-				"cwd": "./chat-application-desktop"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "3. Start API GW Service",
-			"detail": "Start the API GATEWAY App",
-			"type": "shell",
-			"command": "npm run api",
-			"options": {
-				"cwd": "./chat-application-server"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "4. Start Chat Service",
-			"detail": "Start the Chat Microservice App",
-			"type": "shell",
-			"command": "npm run chat",
-			"options": {
-				"cwd": "./chat-application-server"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "5. Start User Service",
-			"detail": "Start the User Microservice App",
-			"type": "shell",
-			"command": "npm run user",
-			"options": {
-				"cwd": "./chat-application-server"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "6. Start Notification Service",
-			"detail": "Start the Notification Microservice App",
-			"type": "shell",
-			"command": "npm run notification",
-			"options": {
-				"cwd": "./chat-application-server"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "7. Start Socket Service",
-			"detail": "Start the Socket Microservice App",
-			"type": "shell",
-			"command": "npm run socket",
-			"options": {
-				"cwd": "./chat-application-server"
-			},
-			"problemMatcher": [],
-			"presentation": {
-				"reveal": "always",
-				"panel": "new"
-			}
-		},
-		{
-			"label": "2. Start Back-End",
-			"detail": "Start the whole back-end : API GW and all the microservices",
-			"dependsOn": [
-				"3. Start API GW Service",
-				"4. Start Chat Service",
-				"5. Start User Service",
-				"6. Start Notification Service",
-				"7. Start Socket Service",
-			],
-			"presentation": {
-				"reveal": "always",
-				"revealProblems": "never",
-				"panel": "new"
-			},
-			"problemMatcher": [
-				"$eslint-compact"
-			]
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "1. Start FrontEnd",
+      "detail": "Start the React FrontEnd App",
+      "type": "shell",
+      "command": "npm start",
+      "options": {
+        "cwd": "./chat-application-desktop"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "3. Start API GW Service",
+      "detail": "Start the API GATEWAY App",
+      "type": "shell",
+      "command": "npm run api",
+      "options": {
+        "cwd": "./chat-application-server"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "4. Start Chat Service",
+      "detail": "Start the Chat Microservice App",
+      "type": "shell",
+      "command": "npm run chat",
+      "options": {
+        "cwd": "./chat-application-server"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "5. Start User Service",
+      "detail": "Start the User Microservice App",
+      "type": "shell",
+      "command": "npm run user",
+      "options": {
+        "cwd": "./chat-application-server"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "6. Start Notification Service",
+      "detail": "Start the Notification Microservice App",
+      "type": "shell",
+      "command": "npm run notification",
+      "options": {
+        "cwd": "./chat-application-server"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "7. Start Socket Service",
+      "detail": "Start the Socket Microservice App",
+      "type": "shell",
+      "command": "npm run socket",
+      "options": {
+        "cwd": "./chat-application-server"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "2. Start Back-End",
+      "detail": "Start the whole back-end : API GW and all the microservices",
+      "dependsOn": [
+        "3. Start API GW Service",
+        "4. Start Chat Service",
+        "5. Start User Service",
+        "6. Start Notification Service",
+        "7. Start Socket Service"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "revealProblems": "never",
+        "panel": "new"
+      },
+      "problemMatcher": ["$eslint-compact"]
+    }
+  ]
 }

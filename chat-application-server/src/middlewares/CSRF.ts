@@ -56,7 +56,7 @@ export default class CSRF {
                 tokenFromBodyOrQuery === tokenFromHeader) {
                 next()
             } else {
-                return response.status(403).json({ error: 'Invalid CSRF token' })
+                return response.status(403).json({ error: 'Invalid CSRF token , please reload this page and try again !' })
             }
         }
 
