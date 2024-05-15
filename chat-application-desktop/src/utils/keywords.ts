@@ -30,3 +30,8 @@ export enum AVATAR_IDENTIFIERS {
   girl = "girl.jpg",
   none = "none",
 }
+
+export enum NotificationStatus {
+  pending = "PENDING",
+  deleted = "DELETED",
+}

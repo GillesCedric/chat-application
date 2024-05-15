@@ -363,9 +363,9 @@ export default class UserController {
         validity: validity,
         purpose: Crypto.encrypt(Purposes.verification, 'status')
       })
-
+      const tel = "+33" + Crypto.decrypt(user.tel, 'tel').slice(1);
       await Mailer.sendSMS({
-        to: Crypto.decrypt(user.tel, 'tel'), // Change to your recipient
+        to: tel, // Change to your recipient
         messagingServiceSid: process.env.TWILLIO_MESSAGING_SERVICE_SID,
         body: fs.readFileSync(path.join(process.cwd(), 'src', 'templates', 'TelVerification.txt'), 'utf8').replace('{{USERNAME}}', Crypto.decrypt(user.username, 'username')).replace('{{CODE}}', userCode).replace('{{APPNAME}}', 'Chat-Application').replace('{{CODE_DELAY}}', process.env.VERIFY_TEL_CODE_DELAY),
       })

@@ -9,7 +9,6 @@ import React, { useRef, useState } from "react";
 import FormValidator from "../modules/validator/form/FormValidator";
 import { Link } from "react-router-dom";
 import { NotifyAsync } from "./NotifyAsync";
-import { myAsyncFunction } from "./Test";
 import { ToastContainer } from "react-toastify";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -42,8 +41,7 @@ const ForgotPassword = () => {
     event.preventDefault();
     if (checkEmail()) {
       // Proceed with form submission
-      console.log("Email is valid:", email);
-      NotifyAsync("Pending", "success", "Error", myAsyncFunction);
+			console.log("Email is valid:", email);
     }
   };
 

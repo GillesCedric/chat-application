@@ -1,17 +1,14 @@
 /**
-* Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
-* @module pages/ChatPage
+ * Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
+ * @module pages/ChatPage
  */
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
-
+import { Conversation } from "../components/conversation";
 import ChatInput from "../components/ChatInput";
-import { ChatDataTest } from "../components/ChatDataTest";
 import ConversationHeader from "../components/ConversationHeader";
 import ChatHeader from "../components/ChatHeader";
 import { SearchBar } from "../components/SearchBar";
-import Socket from "../modules/socket/Socket";
-import { friend } from "../components/FriendDataTest";
 import { useCheckOnlineStatus } from "../hooks/useCheckOnlineStatus";
 import { notify } from "../components/toastify";
 import { ToastContainer } from "react-toastify";
@@ -21,13 +18,11 @@ import { EmptySection } from "../components/EmptySection";
 import { AddFriend } from "../components/AddFriend";
 //import { useSocketListener } from "../hooks/useSocketListener";
 import { SocketKeywords } from "../utils/keywords";
-import User from "../modules/manager/User";
 import { EmptyCenterSection } from "../components/EmptyCenterSection";
 import ConversationRepository, {
   MessageModel,
 } from "../modules/manager/ConversationRepository";
 import { ConversationModel } from "../modules/manager/ConversationRepository";
-import { convertToYesterday } from "../utils/utilsFunctions";
 import { useSocketContext } from "../context/SocketContext";
 import API from "../modules/api/API";
 const ChatPage = () => {
@@ -40,13 +35,19 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   const [csrfToken, setCsrfToken] = useState("");
+   useEffect(() => {
+     API.getCSRFToken().then((data: any) => {
+       setCsrfToken(data.token);
+     });
+   }, []);
   useEffect(() => {
     fetchConversations();
 
     const handleNewMessage = (data: any) => {
-      console.log(data);
-      addMessage();
-      setMessages(prevMessages => [...prevMessages, data]);
+      /*       console.log(data);
+       */ addMessage();
+      setMessages((prevMessages) => [...prevMessages, data]);
+      fetchConversations();
     };
 
     const handleNewConversation = (data: any) => {
@@ -75,9 +76,14 @@ const ChatPage = () => {
 
     //Add new message to the messages state
     ConversationRepository.addMessage(conversation._id, {
-      message: window.electron.security.encryptWithSymmetricKey(newMessage, conversation.decryptedKey),
+      message: window.electron.security.encryptWithSymmetricKey(
+        newMessage,
+        conversation.decryptedKey
+      ),
       _csrf: csrfToken,
     });
+
+    updateChat(conversation._id);
   };
 
   const handleSelectConversation = async (
@@ -96,10 +102,14 @@ const ChatPage = () => {
       .catch((error: any) => {
         notify(error, "error");
       });
+    updateChat(conversation._id);
+  };
 
-    ConversationRepository.updateChat(conversation._id, csrfToken)
+  const updateChat = (conversationId: string) => {
+    ConversationRepository.updateChat(conversationId, csrfToken)
       .then((response) => {
-        console.log(response);
+        /* console.log(response); */
+        fetchConversations();
         if (response.error) {
           notify("Error reading messages : " + response.error);
         }
@@ -108,18 +118,22 @@ const ChatPage = () => {
         notify("Error reading messages : " + error);
       });
   };
-
   const fetchConversations = () => {
     ConversationRepository.getConversations()
       .then(async (response: any) => {
         console.log(response);
         if (!response.error) {
-          const conversations = await Promise.all<ConversationModel[]>(response.data.map((conversation: ConversationModel) => {
-            conversation.decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
-            //delete conversation.encryptedKey
-            return conversation
-          }))
-          console.log(conversations)
+          const conversations = await Promise.all<ConversationModel[]>(
+            response.data.map((conversation: ConversationModel) => {
+              conversation.decryptedKey =
+                window.electron.security.decryptWithPrivateKey(
+                  conversation.encryptedKey
+                );
+              //delete conversation.encryptedKey
+              return conversation;
+            })
+          );
+          console.log(conversations);
           setConversations(conversations);
         } else {
           notify(response.error, "error");
@@ -131,7 +145,6 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-
   };
 
   useEffect(() => {
@@ -157,7 +170,7 @@ const ChatPage = () => {
       {showBanner && <OfflineBanner isOnline={isOnline} />}
       <ToastContainer />
       <div className="sticky top-0 z-10">
-        <ChatHeader />
+        <ChatHeader csrfToken={csrfToken} />
       </div>
       <div className="flex flex-1 overflow-hidden">
         {conversations.length == 0 ? (
@@ -202,7 +215,22 @@ const ChatPage = () => {
                   </div>
 
                   <div className="flex-grow overflow-y-auto scrollbar-none">
-
+                    <Conversation
+                      messages={messsages.map((message) => {
+                        return {
+                          _id: message._id,
+                          sender: message.sender,
+                          message:
+                            window.electron.security.decryptWithSymmetricKey(
+                              message.message,
+                              conversation.decryptedKey
+                            ),
+                          status: message.status,
+                          createdAt: message.createdAt,
+                          isOwnedByUser: message.isOwnedByUser,
+                        };
+                      })}
+                    />
                   </div>
 
                   <div className="flex-none bg-white">
