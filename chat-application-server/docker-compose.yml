@@ -37,7 +37,7 @@ services:
       - user-logs:/app/logs
     depends_on:
       - mongodb
-      
+
   chat:
     build:
       context: .
@@ -115,6 +115,7 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: "false"
     networks:
       - chat-application-network
     depends_on:
@@ -122,6 +123,7 @@ services:
 
 networks:
   chat-application-network:
+
 
 volumes:
   mongodb_data:
