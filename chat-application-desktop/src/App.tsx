@@ -10,7 +10,7 @@ import ChatPage from './pages/ChatPage'
 import { FriendRequest } from './pages/FriendRequests'
 import ForgotPassword from './components/ForgotPassword'
 import VerifyPage from './pages/VerifyPage'
-import { Settings } from './pages/Settings'
+import Settings from './pages/Settings'
 
 
 export default function App() {
@@ -38,7 +38,7 @@ export default function App() {
             element={authUser ? <FriendRequest /> : <Navigate to="/signin" />}
           />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
-          <Route path="/verifyPage" element={<VerifyPage isTelVerification = {true} />} />
+          <Route path="/verifyPage" element={<VerifyPage />} />
 
           <Route path="/logout" element={<Logout />} />
           <Route path="/settings" element={<Settings />} />

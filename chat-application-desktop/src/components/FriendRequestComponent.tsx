@@ -4,29 +4,31 @@ import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
 import { notify } from "./toastify";
 import { useEffect, useState } from "react";
-import API from "../modules/api/API";
+
 import { Avatar } from "./Avatar";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 export const FriendRequestComponent = ({
   friendRequest,
+  csrfToken,
 }: {
   friendRequest: any;
-  }) => {
-  const [csrfToken, setCsrfToken] = useState("");
-  useEffect(() => {
-    API.getCSRFToken().then((data: any) => {
-      setCsrfToken(data.token);
-    });
-  }, []);
+  csrfToken: string;
+}) => {
+  const navigate = useNavigate();
   const friendRequestId: string = friendRequest._id;
   const handleAccept = () => {
     const data = {
       status: FriendsRequestStatus.accepted,
       _csrf: csrfToken,
     };
-    User.updateFriendRequest(friendRequestId ,data )
+    User.updateFriendRequest(friendRequestId, data)
       .then((response: any) => {
         if (response.message) {
-          console.log(response.message);
+          /* console.log(response.message); */
+          notify("Friend request successfully accepted", "success", () => {
+            navigate("/");
+          });
         } else {
           notify(response.message, "error");
         }
@@ -40,7 +42,7 @@ export const FriendRequestComponent = ({
   const handleDelete = () => {
     User.updateFriendRequest(friendRequestId, {
       status: FriendsRequestStatus.deleted,
-      _csrf : csrfToken
+      _csrf: csrfToken,
     })
       .then((response: any) => {
         if (response.message) {
@@ -61,9 +63,10 @@ export const FriendRequestComponent = ({
     })
       .then((response: any) => {
         if (response.message) {
-          console.log(response.message);
+          notify("Friend request rejected ", "success");
         } else {
           console.log(response.error);
+          notify(response.error, "error");
         }
       })
       .catch((error: any) => {
@@ -71,14 +74,14 @@ export const FriendRequestComponent = ({
       });
   };
 
-  const formatDate = (isoString : string) : string => {
+  const formatDate = (isoString: string): string => {
     const date = new Date(isoString);
     return (
       date.toLocaleDateString("en-US", {
-        weekday: "long", 
-        year: "numeric", 
-        month: "long", 
-        day: "numeric", 
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       }) +
       " " +
       date.toLocaleTimeString("en-US", {
@@ -90,57 +93,60 @@ export const FriendRequestComponent = ({
   };
 
   return (
-    <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-      <div className="flex justify-between p-4">
-        <span className="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
-          <svg
-            className="w-2.5 h-2.5 me-1.5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
-          </svg>
-          Since {formatDate(friendRequest.createdAt)}
-        </span>
-        <button
-          className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
-          type="button"
-        >
-          <FontAwesomeIcon
-            icon={faTrash}
-            className="w-5 h-5 hover:text-red-600"
-            onClick={handleDelete}
-          />
-        </button>
-      </div>
-      <div className="flex flex-col items-center pb-4">
-        <Avatar
-          fullname={friendRequest.fullname}
-          avatar={friendRequest.sender.picture}
-        />
-        <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {friendRequest.sender.fullname}
-        </h5>
-        <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
-          {friendRequest.comment}
-        </span>
-        <div className="flex mt-4 justify-between">
+    <>
+      <ToastContainer />
+      <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+        <div className="flex justify-between p-4">
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
+            <svg
+              className="w-2.5 h-2.5 me-1.5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
+            </svg>
+            Since {formatDate(friendRequest.createdAt)}
+          </span>
           <button
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={handleAccept}
+            className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
+            type="button"
           >
-            Accept
-          </button>
-          <button
-            className="py-2 px-4 ml-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-            onClick={handleReject}
-          >
-            Reject
+            <FontAwesomeIcon
+              icon={faTrash}
+              className="w-5 h-5 hover:text-red-600"
+              onClick={handleDelete}
+            />
           </button>
         </div>
+        <div className="flex flex-col items-center pb-4">
+          <Avatar
+            fullname={friendRequest.fullname}
+            avatar={friendRequest.sender.picture}
+          />
+          <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
+            {friendRequest.sender.fullname}
+          </h5>
+          <span className="text-sm text-gray-500 dark:text-gray-400 text-center p-2">
+            {friendRequest.comment}
+          </span>
+          <div className="flex mt-4 justify-between">
+            <button
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onClick={handleAccept}
+            >
+              Accept
+            </button>
+            <button
+              className="py-2 px-4 ml-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-red-700 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+              onClick={handleReject}
+            >
+              Reject
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -16,8 +16,8 @@ export const Avatar = ({
   }) => {
 /*  console.log(BEGINING_URL_AVATAR +" espace" + avatar.split("/").pop());
  */
-  console.log(avatar);
-  return (
+/*   console.log(avatar);
+ */  return (
      <>
        {avatar.split("/").pop() === AVATAR_IDENTIFIERS.none ? (
          <div className=" relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-grey-lighter rounded-full dark:bg-gray-600">
@@ -29,8 +29,7 @@ export const Avatar = ({
          <img
            className="h-12 w-12 rounded-full object-cover"
            src={BEGINING_URL_AVATAR + avatar.split("/").pop()}
-           /*             src={avatar}
-            */ alt={fullname}
+           alt={fullname}
          />
        )}
      </>

@@ -167,7 +167,7 @@ const ChatPage = () => {
       {showBanner && <OfflineBanner isOnline={isOnline} />}
       <ToastContainer />
       <div className="sticky top-0 z-10">
-        <ChatHeader />
+        <ChatHeader csrfToken={csrfToken} />
       </div>
       <div className="flex flex-1 overflow-hidden">
         {conversations.length == 0 ? (

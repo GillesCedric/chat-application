@@ -2,21 +2,25 @@ import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import NotificationIcon from "./NotificationIcon";
-import NotificationRepository, { NotificationModel } from "../modules/manager/NotificationRepository";
+import NotificationRepository, {
+  NotificationModel,
+} from "../modules/manager/NotificationRepository";
 import { notify } from "./toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   faGear,
   faHome,
+  faPowerOff,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { useSocketContext } from "../context/SocketContext";
 import { NotificationStatus, SocketKeywords } from "../utils/keywords";
 import { ToastContainer } from "react-toastify";
+import { LogOutModal } from "./LogoutModal";
 
-const ChatHeader = () => {
+const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
   const [friendRequestCount, setFriendRequestsCount] = useState(0);
   const [notifications, setNotifications] = useState<NotificationModel[]>([]);
   const [notificationsCount, setNotificationsCount] = useState(0);
@@ -40,7 +44,7 @@ const ChatHeader = () => {
     try {
       const response = await NotificationRepository.getNotifications();
       if (response.data) {
-                /* console.log(response.data); */
+        /* console.log(response.data); */
         setNotifications(response.data);
         setNotificationsCount(response.data.length);
       } else {
@@ -53,7 +57,7 @@ const ChatHeader = () => {
     }
   };
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchFriendRequests();
     fetchNotifications();
@@ -75,51 +79,56 @@ const ChatHeader = () => {
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
+
   return (
-    <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
-      <Link className="flex items-center hover:cursor-pointer" to="/">
-        <FontAwesomeIcon
-          icon={faComments}
-          className=" bg-blue-500 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 p-2 mr-2"
-        />
-        <span className="font-semibold">ChatBOT</span>
-      </Link>
-      <nav className="flex space-x-4 items-center justify-center">
-        <Link
-          className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          to="/"
-          title="Home"
-        >
-          <FontAwesomeIcon icon={faHome} />
+    <>
+      <ToastContainer />
+      <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
+        <Link className="flex items-center hover:cursor-pointer" to="/">
+          <FontAwesomeIcon
+            icon={faComments}
+            className=" bg-blue-500 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 p-2 mr-2"
+          />
+          <span className="font-semibold">ChatBOT</span>
         </Link>
-        <Link
-          className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          to="/friendsRequests"
-          title="Friends requests"
-        >
-          <FontAwesomeIcon icon={faUsers} />
-          <span className="sr-only">Notifications</span>
-          {friendRequestCount > 0 && (
-            <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
-              {friendRequestCount}
-            </div>
-          )}
-        </Link>
-        <Link
-          className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          to="/settings"
-          title="User Profile"
-        >
-          <FontAwesomeIcon icon={faGear} />
-        </Link>
-        <NotificationIcon count={notificationsCount} onClick={toggleDrawer} />
-        <NotificationDrawer
-          isOpen={isDrawerOpen}
-          onClose={() => setIsDrawerOpen(false)}
-          initialNotifications={notifications}
-        />
-      </nav>
-    </header>
+        <nav className="flex space-x-4 items-center justify-center">
+          <Link
+            className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            to="/"
+            title="Home"
+          >
+            <FontAwesomeIcon icon={faHome} />
+          </Link>
+          <Link
+            className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            to="/friendsRequests"
+            title="Friends requests"
+          >
+            <FontAwesomeIcon icon={faUsers} />
+            <span className="sr-only">Notifications</span>
+            {friendRequestCount > 0 && (
+              <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900">
+                {friendRequestCount}
+              </div>
+            )}
+          </Link>
+          <Link
+            className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            to="/settings"
+            title="User Profile"
+          >
+            <FontAwesomeIcon icon={faGear} />
+          </Link>
+          <NotificationIcon count={notificationsCount} onClick={toggleDrawer} />
+          <LogOutModal csrfToken={csrfToken} />
+          <NotificationDrawer
+            isOpen={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            initialNotifications={notifications}
+          />
+        </nav>
+      </header>
+    </>
   );
 };
 
