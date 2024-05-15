@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import API from "../modules/api/API";
+import ChatHeader from "../components/ChatHeader";
 import User, { UserModel } from "../modules/manager/User";
 import { notify } from "../components/toastify";
 import { Avatar } from "../components/Avatar";
 import { NotFound } from "../components/NotFound";
 import Modal from "../components/VerifyModal";
 
-const Settings = () => {
+export const Settings = () => {
   const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
@@ -17,6 +18,7 @@ const Settings = () => {
 
   return (
     <div className="h-screen flex flex-col">
+      <ChatHeader csrfToken={csrfToken} />
       <SettingPage csrfToken={csrfToken} />
     </div>
   );
@@ -28,6 +30,8 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [fieldToVerify, setFieldToVerify] = useState("");
   const [fieldToVerifyValue, setValueFieldToVerify] = useState("");
+
+  const [modifiedData, setModifiedData] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
     User.me()
@@ -48,36 +52,30 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
     setEditMode(true);
   };
 
-  const [userData, setUserData] = useState(user);
-
   const handleSaveClick = () => {
     setEditMode(false);
-
-    setUserData((prevState) => {
-      const updatedUserData = {
-        ...prevState,
-        ...user,
-        _csrf: csrfToken,
-      };
-      User.updateProfile(updatedUserData)
-        .then((response) => {
-          if (response.message) {
-            notify(response.message, "success");
-          } else {
-            notify(response.error, "error");
-          }
-        })
-        .catch((error) => {
-          notify(error, "error");
-        });
-
-      return updatedUserData;
-    });
+    User.updateProfile(modifiedData)
+      .then((response: any) => {
+        if (response.message) {
+          notify(response.message, "success");
+        } else {
+          notify(response.error, "error");
+        }
+      })
+      .catch((error: any) => {
+        notify(error, "error");
+      });
   };
 
   const handleCancelClick = () => {
     setEditMode(false);
-    // Add logic to revert changes if necessary
+    // Reset modified data if necessary
+    setModifiedData({});
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setModifiedData({ ...modifiedData, [field]: value });
+    setUser({ ...user!, [field]: value });
   };
 
   const showModal = (label: string, value: string) => {
@@ -96,7 +94,7 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
     );
   }
 
-  const isVerificationEnabled =
+  const isVerified =
     user.isEmailVerified === "true" && user.isTelVerified === "true";
 
   return (
@@ -174,18 +172,19 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                     type="text"
                     name="first-name"
                     id="first-name"
-                    className={`mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                      editMode ? "cursor-auto" : "cursor-not-allowed"
+                    className={`shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                      !editMode
+                        ? "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
+                        : ""
                     }`}
                     value={user.firstname}
                     readOnly={!editMode}
                     onChange={(e) =>
-                      setUser({ ...user, firstname: e.target.value })
+                      handleInputChange("firstname", e.target.value)
                     }
                     required
                   />
                 </div>
-
                 <div className="col-span-6 sm:col-span-3">
                   <label
                     htmlFor="last-name"
@@ -197,40 +196,20 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                     type="text"
                     name="last-name"
                     id="last-name"
-                    className={`mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                      editMode ? "cursor-auto" : "cursor-not-allowed"
+                    className={`shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                      !editMode
+                        ? "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
+                        : ""
                     }`}
                     value={user.lastname}
                     readOnly={!editMode}
                     onChange={(e) =>
-                      setUser({ ...user, lastname: e.target.value })
+                      handleInputChange("lastname", e.target.value)
                     }
                     required
                   />
                 </div>
 
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    htmlFor="username"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    className={`mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                      editMode ? "cursor-auto" : "cursor-not-allowed"
-                    }`}
-                    value={user.username}
-                    readOnly={!editMode}
-                    onChange={(e) =>
-                      setUser({ ...user, username: e.target.value })
-                    }
-                    required
-                  />
-                </div>
                 <div className="col-span-6 sm:col-span-3">
                   <label
                     htmlFor="email"
@@ -243,13 +222,15 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       type="email"
                       name="email"
                       id="email"
-                      className={`mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                        editMode ? "cursor-auto" : "cursor-not-allowed"
+                      className={`shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                        !editMode
+                          ? "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
+                          : ""
                       }`}
                       value={user.email}
                       readOnly={!editMode}
                       onChange={(e) =>
-                        setUser({ ...user, email: e.target.value })
+                        handleInputChange("email", e.target.value)
                       }
                       required
                     />
@@ -279,22 +260,22 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       type="tel"
                       name="phone-number"
                       id="phone-number"
-                      className={`mb-5 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 ${
-                        editMode ? "cursor-auto" : "cursor-not-allowed"
+                      className={`shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                        !editMode
+                          ? "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
+                          : ""
                       }`}
                       value={user.tel}
                       readOnly={!editMode}
-                      onChange={(e) =>
-                        setUser({ ...user, tel: e.target.value })
-                      }
+                      onChange={(e) => handleInputChange("tel", e.target.value)}
                       required
                     />
                     <span
                       onClick={() => showModal("Phone Number", user.tel)}
-                      className={`absolute right-2 top-3 text-sm font-medium ${
+                      className={`absolute right-2 top-3 text-sm font-medium cursor-pointer ${
                         user.isTelVerified === "true"
                           ? "text-green-600"
-                          : "text-red-600 cursor-pointer"
+                          : "text-red-600"
                       }`}
                     >
                       {user.isTelVerified === "true"
@@ -341,7 +322,8 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                 Security Settings
               </h3>
               <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                Manage your security settings.
+                Manage your security settings. Two-factor authentication can
+                only be enabled if both email and phone number are verified.
               </p>
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
                 <div className="flex items-center justify-between py-4">
@@ -356,9 +338,7 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                   <label
                     htmlFor="2fa-verification"
                     className={`relative flex items-center cursor-pointer ${
-                      !isVerificationEnabled
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
+                      !isVerified ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
                     <input
@@ -366,15 +346,7 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       id="2fa-verification"
                       className="sr-only"
                       checked={user.is2FAEnabled === "true"}
-                      readOnly
-                      disabled={!isVerificationEnabled}
-                      onChange={() =>
-                        setUser((prevUser) => ({
-                          ...prevUser,
-                          is2FAEnabled:
-                            prevUser.is2FAEnabled === "true" ? "false" : "true",
-                        }))
-                      }
+                      readOnly={!isVerified}
                     />
                     <span
                       className={`h-6 w-11 rounded-full toggle-bg ${
@@ -392,6 +364,11 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       ></span>
                     </span>
                   </label>
+                </div>
+                <div className="mt-6">
+                  <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Save all
+                  </button>
                 </div>
               </div>
             </div>

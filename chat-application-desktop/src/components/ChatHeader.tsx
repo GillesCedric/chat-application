@@ -1,6 +1,6 @@
 /**
  *Ce composant représente l'en-tête. Il affiche le nom du chat ("ChatBOT") avec une icône de messagerie. Il contient également des liens de navigation vers différentes sections telles que la page d'accueil, les demandes d'amis, les contacts et les paramètres. De plus, il inclut une icône de notification qui ouvre un tiroir de notifications lorsqu'on clique dessus. Ce tiroir affiche une liste de notifications, telles que des succès, des erreurs ou des avertissements, avec leur état de lecture.
- * 
+ *
  * @module components/ChatHeaders
  */
 
@@ -14,15 +14,10 @@ import NotificationRepository, {
 import { notify } from "./toastify";
 import { NotificationDrawer } from "./NotificationDrawer";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  faGear,
-  faHome,
-  faPowerOff,
-  faUsers,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGear, faHome, faUsers } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { useSocketContext } from "../context/SocketContext";
-import { NotificationStatus, SocketKeywords } from "../utils/keywords";
+import { SocketKeywords } from "../utils/keywords";
 import { ToastContainer } from "react-toastify";
 import { LogOutModal } from "./LogoutModal";
 
@@ -81,7 +76,6 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
       };
     }
   }, [isConnected, subscribe, unsubscribe]);
-
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -118,6 +112,7 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
               </div>
             )}
           </Link>
+          <NotificationIcon count={notificationsCount} onClick={toggleDrawer} />
           <Link
             className="relative inline-flex items-center p-3 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             to="/settings"
@@ -125,7 +120,6 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
           >
             <FontAwesomeIcon icon={faGear} />
           </Link>
-          <NotificationIcon count={notificationsCount} onClick={toggleDrawer} />
           <LogOutModal csrfToken={csrfToken} />
           <NotificationDrawer
             isOpen={isDrawerOpen}

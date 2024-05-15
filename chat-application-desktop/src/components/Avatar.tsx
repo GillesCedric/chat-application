@@ -5,8 +5,8 @@
  * @module components/Avatar
  */
 
-import { AVATAR_DEFAULT } from "../utils/keywords";
-import { BEGINING_URL } from "../utils/keywords";
+import { AVATAR_IDENTIFIERS, BEGINING_URL_AVATAR } from "../utils/keywords";
+
 export const getInitials = (name: string) => {
   return name
     .split(" ")

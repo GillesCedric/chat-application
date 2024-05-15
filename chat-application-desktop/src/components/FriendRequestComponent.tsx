@@ -1,8 +1,8 @@
 /**
- * Le composant FriendRequestComponent représente une demande d'ami dans l'interface utilisateur.
- * Il affiche les détails de la demande d'ami, y compris le nom de l'expéditeur, le commentaire, et la date de création.
- * Les utilisateurs peuvent accepter ou rejeter la demande, ainsi que supprimer la demande.
- * 
+ * The FriendRequestComponent represents a friend request in the user interface.
+ * It displays the details of the friend request, including the sender's name, comment, and creation date.
+ * Users can accept, reject, or delete the request.
+ *
  * @module components/FriendRequestComponent
  */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,11 +10,10 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
 import { FriendsRequestStatus } from "../utils/keywords";
 import { notify } from "./toastify";
-import { useEffect, useState } from "react";
-
-import { Avatar } from "./Avatar";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { Avatar } from "./Avatar";
+
 export const FriendRequestComponent = ({
   friendRequest,
   csrfToken,
@@ -24,16 +23,16 @@ export const FriendRequestComponent = ({
 }) => {
   const navigate = useNavigate();
   const friendRequestId: string = friendRequest._id;
+
   const handleAccept = () => {
     const data = {
       status: FriendsRequestStatus.accepted,
       _csrf: csrfToken,
     };
-    User.updateFriendRequest(friendRequestId, data)
+
     User.updateFriendRequest(friendRequestId, data)
       .then((response: any) => {
         if (response.message) {
-          /* console.log(response.message); */
           notify("Friend request successfully accepted", "success", () => {
             navigate("/");
           });
@@ -43,7 +42,7 @@ export const FriendRequestComponent = ({
       })
       .catch((error: any) => {
         console.log(error);
-        notify("An error occur !", "error");
+        notify("An error occurred!", "error");
       });
   };
 
@@ -54,9 +53,9 @@ export const FriendRequestComponent = ({
     })
       .then((response: any) => {
         if (response.message) {
-          console.log(response.message);
+          notify("Friend request deleted", "success");
         } else {
-          console.log(response.error);
+          notify(response.error, "error");
         }
       })
       .catch((error: any) => {
@@ -71,9 +70,8 @@ export const FriendRequestComponent = ({
     })
       .then((response: any) => {
         if (response.message) {
-          notify("Friend request rejected ", "success");
+          notify("Friend request rejected", "success");
         } else {
-          console.log(response.error);
           notify(response.error, "error");
         }
       })
@@ -83,14 +81,9 @@ export const FriendRequestComponent = ({
   };
 
   const formatDate = (isoString: string): string => {
-  const formatDate = (isoString: string): string => {
     const date = new Date(isoString);
     return (
       date.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
         weekday: "long",
         year: "numeric",
         month: "long",
@@ -125,17 +118,17 @@ export const FriendRequestComponent = ({
           <button
             className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
             type="button"
+            onClick={handleDelete}
           >
             <FontAwesomeIcon
               icon={faTrash}
               className="w-5 h-5 hover:text-red-600"
-              onClick={handleDelete}
             />
           </button>
         </div>
         <div className="flex flex-col items-center pb-4">
           <Avatar
-            fullname={friendRequest.fullname}
+            fullname={friendRequest.sender.fullname}
             avatar={friendRequest.sender.picture}
           />
           <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">

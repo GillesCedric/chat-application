@@ -3,11 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import User from "../modules/manager/User";
 import { notify } from "./toastify";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
   const [modalVisible, setModalVisible] = useState(false);
-
+  const navigate = useNavigate(); 
   const handleLogOut = () => {
+    console.log(csrfToken)
     User.signOut({ _csrf: csrfToken })
       .then((response: any) => {
         if (response.error) {
@@ -16,6 +18,7 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
         } else {
           window.electron.store.set("chat-application-access_token", "");
           window.electron.store.set("chat-application-refresh_token", "");
+          notify("You'll be redirect to the home page" , "success" ,() => {navigate("/")})
         }
       })
       .catch((error: any) => {

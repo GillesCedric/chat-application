@@ -1,10 +1,10 @@
 /**
-* Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
-* @module pages/ChatPage
+ * Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
+ * @module pages/ChatPage
  */
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
-import { Conversation } from "../components/Conversation";
+import { Conversation } from "../components/conversation";
 import ChatInput from "../components/ChatInput";
 import ConversationHeader from "../components/ConversationHeader";
 import ChatHeader from "../components/ChatHeader";
@@ -35,6 +35,11 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   const [csrfToken, setCsrfToken] = useState("");
+   useEffect(() => {
+     API.getCSRFToken().then((data: any) => {
+       setCsrfToken(data.token);
+     });
+   }, []);
   useEffect(() => {
     fetchConversations();
 
@@ -100,7 +105,7 @@ const ChatPage = () => {
     updateChat(conversation._id);
   };
 
-  const updateChat = (conversationId : string) => {
+  const updateChat = (conversationId: string) => {
     ConversationRepository.updateChat(conversationId, csrfToken)
       .then((response) => {
         /* console.log(response); */
@@ -140,7 +145,6 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
-
   };
 
   useEffect(() => {
