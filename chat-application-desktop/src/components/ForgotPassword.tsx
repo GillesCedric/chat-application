@@ -1,3 +1,10 @@
+/**
+ * Le composant ForgotPassword représente la page permettant aux utilisateurs de réinitialiser leur mot de passe.
+ * Il comprend un formulaire où les utilisateurs peuvent saisir leur adresse e-mail pour recevoir un lien de réinitialisation.
+ * Le composant effectue également une validation de base sur l'e-mail saisi avant de soumettre le formulaire.
+ * 
+ * @module components/ForgotPassword
+ */
 import React, { useRef, useState } from "react";
 import FormValidator from "../modules/validator/form/FormValidator";
 import { Link } from "react-router-dom";
@@ -39,8 +46,8 @@ const ForgotPassword = () => {
   };
 
   return (
-		<body className="bg-grey-lighter">
-			<ToastContainer/>
+    <body className="bg-grey-lighter">
+      <ToastContainer />
       <main
         id="content"
         role="main"
@@ -80,8 +87,8 @@ const ForgotPassword = () => {
                         name="email"
                         className="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 shadow-sm"
                         required
-												value={email}
-												placeholder="xyz@example.com"
+                        value={email}
+                        placeholder="xyz@example.com"
                         onChange={(e) => setEmail(e.target.value)}
                         ref={emailRef}
                       />
@@ -109,7 +116,7 @@ const ForgotPassword = () => {
             to="/register"
             className="pr-3.5 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-blue-600 dark:text-gray-500 dark:hover:text-gray-200"
           >
-            Register instead ? 
+            Register instead ?
           </Link>
           <Link
             className="pl-3 inline-flex items-center gap-x-2 text-sm text-gray-600 decoration-2 hover:underline hover:text-blue-600 dark:text-gray-500 dark:hover:text-gray-200"

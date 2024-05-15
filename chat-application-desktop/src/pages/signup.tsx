@@ -1,3 +1,7 @@
+/**
+*Ce composant React permet aux utilisateurs de s'inscrire. Il affiche un formulaire avec des champs pour le nom, le prénom, l'email et le numéro de téléphone. Lorsque l'utilisateur soumet le formulaire, la fonction handleSubmit est appelée pour gérer la soumission (elle doit être implémentée pour gérer la logique d'inscription). Un lien est également fourni pour rediriger vers la page de connexion.
+* @module pages/signup
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 

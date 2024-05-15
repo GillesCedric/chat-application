@@ -1,3 +1,10 @@
+/**
+ * Le composant FriendRequestComponent représente une demande d'ami dans l'interface utilisateur.
+ * Il affiche les détails de la demande d'ami, y compris le nom de l'expéditeur, le commentaire, et la date de création.
+ * Les utilisateurs peuvent accepter ou rejeter la demande, ainsi que supprimer la demande.
+ * 
+ * @module components/FriendRequestComponent
+ */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
@@ -22,6 +29,7 @@ export const FriendRequestComponent = ({
       status: FriendsRequestStatus.accepted,
       _csrf: csrfToken,
     };
+    User.updateFriendRequest(friendRequestId, data)
     User.updateFriendRequest(friendRequestId, data)
       .then((response: any) => {
         if (response.message) {
@@ -58,7 +66,7 @@ export const FriendRequestComponent = ({
 
   const handleReject = () => {
     User.updateFriendRequest(friendRequestId, {
-      status: FriendsRequestStatus.deleted,
+      status: FriendsRequestStatus.rejected,
       _csrf: csrfToken,
     })
       .then((response: any) => {
@@ -75,9 +83,14 @@ export const FriendRequestComponent = ({
   };
 
   const formatDate = (isoString: string): string => {
+  const formatDate = (isoString: string): string => {
     const date = new Date(isoString);
     return (
       date.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
         weekday: "long",
         year: "numeric",
         month: "long",

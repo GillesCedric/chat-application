@@ -1,3 +1,16 @@
+/**
+ * Le module SocketContext fournit un contexte pour la gestion de la connexion WebSocket de l'application.
+ * Il permet de vérifier l'état de la connexion, de s'abonner et de se désabonner aux événements WebSocket.
+ * Le contexte de socket contient les valeurs suivantes :
+ * - isConnected: Un booléen indiquant si la connexion WebSocket est établie.
+ * - subscribe: Une fonction pour s'abonner à un événement WebSocket et définir un gestionnaire pour ce dernier.
+ * - unsubscribe: Une fonction pour se désabonner d'un événement WebSocket et supprimer un gestionnaire pour ce dernier.
+ * 
+ * Le module expose également un hook personnalisé `useSocketContext` pour utiliser le contexte de socket dans les composants de l'application.
+ *Le module expose également un hook personnalisé `useAuthContext` pour utiliser le contexte d'authentification dans les composants de l'application.
+ * 
+ * @module context/SocketContext
+ */
 import {
   createContext,
   useContext,
@@ -63,7 +76,7 @@ export const SocketContextProvider: React.FC<SocketContextProviderProps> = ({
   };
 
   return (
-    <SocketContext.Provider value={{isConnected, subscribe, unsubscribe}}>
+    <SocketContext.Provider value={{ isConnected, subscribe, unsubscribe }}>
       {children}
     </SocketContext.Provider>
   );

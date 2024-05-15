@@ -1,3 +1,9 @@
+/**
+ * Le composant EmptySection représente une section vide affichée lorsqu'il n'y a aucun ami dans la liste.
+ * Il permet à l'utilisateur de démarrer une nouvelle conversation en envoyant une demande d'ami.
+ * 
+ * @module components/EmptySection
+ */
 import React, { useState } from "react";
 import { AddFriend } from "./AddFriend";
 export const EmptySection = () => {
@@ -127,12 +133,12 @@ export const EmptySection = () => {
         </svg>
         <div>
           <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">
-            There are no friend in your list 
+            There are no friend in your list
           </h2>
           <p className="text-center text-black text-base font-normal leading-relaxed pb-4">
             Try sending some to friend request to start messaging
           </p>
-          <AddFriend/>
+          <AddFriend />
         </div>
       </div>
     </div>

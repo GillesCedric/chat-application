@@ -1,3 +1,8 @@
+/**
+* 
+Ce module constitue le cœur de l'application React, gérant les routes et la navigation entre les différentes pages telles que l'inscription, la connexion, la messagerie, les demandes d'amis, etc. Il intègre également des fonctionnalités d'authentification pour rediriger les utilisateurs vers les pages appropriées en fonction de leur statut de connexion.
+*@module App
+*/
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import NotFound from './pages/404'

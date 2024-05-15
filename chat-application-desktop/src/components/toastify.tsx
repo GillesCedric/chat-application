@@ -1,3 +1,13 @@
+/**
+ * La fonction notify est une fonction utilitaire qui facilite la création et l'affichage de notifications à l'aide de la bibliothèque react-toastify.
+ * Elle prend trois arguments :
+ * - message: Le message de la notification à afficher.
+ * - type: Le type de la notification, pouvant être "info", "success", "warning", "error" ou "default" (par défaut).
+ * - callback (optionnel) : Une fonction de rappel à exécuter lorsque la notification est fermée.
+ * La fonction toast de react-toastify est utilisée pour afficher la notification avec les paramètres spécifiés, tels que le type, la position, la durée de fermeture automatique, etc.
+ * En résumé, la fonction notify offre une manière simple et pratique d'afficher des notifications à l'utilisateur dans l'application, avec la possibilité de personnaliser le contenu et le comportement des notifications.
+ *@module components/toastify
+*/
 import { Zoom, toast } from "react-toastify";
 export type NotificationType =
   | "info"

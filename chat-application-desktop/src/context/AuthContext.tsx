@@ -1,3 +1,15 @@
+/**
+ * Le module AuthContext fournit un contexte d'authentification pour l'application.
+ * Il définit les types nécessaires pour représenter l'état de l'authentification de l'utilisateur ainsi que le contexte d'authentification lui-même.
+ * Le contexte d'authentification contient deux valeurs :
+ * - authUser: Représente l'utilisateur authentifié. Il peut être un objet contenant un jeton d'accès (`access_token`), `null` si aucun utilisateur n'est actuellement authentifié ou `false` s'il y a eu une erreur d'authentification.
+ * - setAuthUser: Une fonction pour mettre à jour l'état de l'utilisateur authentifié.
+ * 
+ * Le module expose également un hook personnalisé `useAuthContext` pour utiliser le contexte d'authentification dans les composants de l'application.
+ * 
+ * @module context/AuthContext
+ */
+
 import {
   createContext,
   useContext,
@@ -11,8 +23,8 @@ import API from "../modules/api/API";
 // Définir le type pour le contexte d'authentification
 type AuthUser =
   | {
-      access_token: string;
-    }
+    access_token: string;
+  }
   | null
   | boolean;
 
@@ -24,7 +36,7 @@ type AuthContextType = {
 // Créer le contexte avec un objet par défaut
 export const AuthContext = createContext<AuthContextType>({
   authUser: null,
-  setAuthUser: () => {},
+  setAuthUser: () => { },
 });
 
 // Hook personnalisé pour utiliser le contexte d'authentification
@@ -84,7 +96,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     .then((response: any) => {
       setAuthUser(response);
     })
-    .catch((error: any) => {});
+    .catch((error: any) => { });
 
   if (authUser == null) {
     return <div>Chargement...</div>;

@@ -1,3 +1,7 @@
+/**
+* Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
+* @module pages/ChatPage
+ */
 import React, { useState, useEffect, useRef } from "react";
 import Conversations from "../components/Conversations";
 import { Conversation } from "../components/Conversation";
@@ -31,12 +35,6 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   const [csrfToken, setCsrfToken] = useState("");
-  useEffect(() => {
-    API.getCSRFToken().then((data: any) => {
-      setCsrfToken(data.token);
-    });
-  }, []);
-
   useEffect(() => {
     fetchConversations();
 
@@ -142,6 +140,7 @@ const ChatPage = () => {
   };
   const addMessage = () => {
     notify("New message received", "info");
+
   };
 
   useEffect(() => {

@@ -1,3 +1,9 @@
+/**
+ *Ce composant représente l'en-tête. Il affiche le nom du chat ("ChatBOT") avec une icône de messagerie. Il contient également des liens de navigation vers différentes sections telles que la page d'accueil, les demandes d'amis, les contacts et les paramètres. De plus, il inclut une icône de notification qui ouvre un tiroir de notifications lorsqu'on clique dessus. Ce tiroir affiche une liste de notifications, telles que des succès, des erreurs ou des avertissements, avec leur état de lecture.
+ * 
+ * @module components/ChatHeaders
+ */
+
 import { faComments } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";

@@ -1,3 +1,7 @@
+/**
+* Cette page est celle visible par les utilisateurs pour gérer leurs demandes d'amis
+* @module pages/FriendRequests
+ */
 import React, { useEffect, useState } from "react";
 import { FriendRequestComponent } from "../components/FriendRequestComponent";
 import ChatHeader from "../components/ChatHeader";

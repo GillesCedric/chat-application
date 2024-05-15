@@ -1,3 +1,8 @@
+/**
+*
+*Ce code définit une classe ConversationRepository qui agit comme une couche d'abstraction pour interagir avec les conversations et les messages. Les méthodes statiques fournies permettent de récupérer les conversations d'un utilisateur, d'ajouter un message à une conversation spécifique et de charger toutes les conversations. Ces méthodes utilisent les méthodes correspondantes de la classe API pour effectuer des requêtes HTTP vers l'API distante. Des gestionnaires d'erreurs sont inclus pour traiter les réponses de l'API et fournir des messages d'erreur appropriés en cas d'échec.
+ * @module modules/manager/ConversationRepository
+ */
 import API from "../api/API";
 
 export type ConversationModel = {

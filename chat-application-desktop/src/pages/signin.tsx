@@ -12,6 +12,7 @@ export const Settings = () => {
 
   useEffect(() => {
     API.getCSRFToken().then((data: any) => {
+    API.getCSRFToken().then((data: any) => {
       setCsrfToken(data.token);
     });
   }, []);
