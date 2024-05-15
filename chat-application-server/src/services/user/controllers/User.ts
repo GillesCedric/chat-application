@@ -88,13 +88,15 @@ export default class UserController {
 
   public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
     const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
-    const { firstname, lastname, username, password, is2FAEnabled } = req.body
+    const { firstname, lastname, username, password, tel, is2FAEnabled } = req.body
     try {
       const updates: {
         firstname?: string
         lastname?: string
         username?: string
         password?: string
+        tel?: string
+        isTelVerified?: string
         is2FAEnabled?: string
       } = {}
       if (firstname) updates.firstname = Crypto.encrypt(firstname, "database");
@@ -104,7 +106,21 @@ export default class UserController {
         password,
         Number.parseInt(process.env.SALT_ROUNDS)
       )
-      if (is2FAEnabled) updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
+      if (tel) {
+        updates.tel = Crypto.encrypt(tel, "tel");
+        updates.isTelVerified = Crypto.encrypt("false", "boolean");
+      } 
+      if (is2FAEnabled) {
+        const user = await UserModel.findById(userId)
+
+        if (!user.isTelVerified) {
+          return res.status(401).json({
+            error: "Votre numéro de téléphone n'est pas vérifié"
+          })
+        }
+
+        updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
+      } 
       // Mise à jour de l'utilisateur dans la base de données
       const updatedUser = await UserModel.findByIdAndUpdate(userId, updates, { new: true }).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status");
 
