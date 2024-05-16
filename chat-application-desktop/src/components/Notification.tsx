@@ -3,7 +3,7 @@
  *
  * @module components/Notification
  */
-import React, { useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -18,12 +18,27 @@ import { notify } from "./toastify";
 export const Notification = ({
   notifications,
   setNotifications,
-  csrfToken, 
+  csrfToken,
 }: {
   notifications: NotificationModel[];
   setNotifications: any;
   csrfToken: string;
 }) => {
+  const fetchNotifications = async () => {
+    try {
+      const response = await NotificationRepository.getNotifications();
+      if (response.data) {
+        setNotifications(response.data);
+      } else {
+        console.log(response.error);
+        notify(response.error, "error");
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      notify(error, "error");
+    }
+  };
+
   const handleDismiss = (id: string) => {
     const newNotifications = notifications.map((notification: any) =>
       notification._id === id
@@ -33,17 +48,23 @@ export const Notification = ({
     setNotifications(newNotifications);
     NotificationRepository.updateNotifications(id, { _csrf: csrfToken })
       .then((response: any) => {
+        if (response.message) {
+          fetchNotifications();
+        }
         if (response.error) {
           notify(response.error, "error");
         }
       })
-      .then((error: any) => {
-        notify(error);
+      .catch((error: any) => {
+        notify(error, "error");
       });
   };
 
+  
+
   return (
     <>
+     
       {notifications.map((notification: NotificationModel) => (
         <div
           key={notification._id}

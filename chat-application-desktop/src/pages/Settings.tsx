@@ -30,13 +30,14 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [fieldToVerify, setFieldToVerify] = useState("");
   const [fieldToVerifyValue, setValueFieldToVerify] = useState("");
-  const [storeTel, setStoreTel] = useState("");
+  const [initialUser, setInitialUser] = useState<UserModel | null>(null); // Store initial user data
+
   useEffect(() => {
     User.me()
       .then((response: any) => {
         if (response.data) {
           setUser(response.data);
-          setStoreTel(user.tel);
+          setInitialUser(response.data); // Store initial user data
         } else {
           notify(response.error, "error");
         }
@@ -45,23 +46,31 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
         console.error(error);
         notify("Error loading user information", "error");
       });
-    console.log(user);
   }, [editMode]);
 
   const handleUpdateClick = () => {
     setEditMode(true);
   };
 
-  const handleSaveClick = () => {
-    setEditMode(false);
-    console.log(user);
-    const dataToSave = { ...user, _csrf: csrfToken };
+  const handleSaveClick = (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const dataToSave: { [key: string]: any } = { _csrf: csrfToken };
+
+    if (user && initialUser) {
+      for (const key in user) {
+        if ((user as any)[key] !== (initialUser as any)[key]) {
+          dataToSave[key] = (user as any)[key];
+        }
+      }
+    }
+
     console.log(dataToSave);
     User.updateProfile(dataToSave)
       .then((response: any) => {
         if (response.message) {
           notify(response.message, "success");
-          console.log("User update profile response " +response.data)
+          console.log("User update profile response", response.data);
         } else {
           notify(response.error, "error");
         }
@@ -69,10 +78,13 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
       .catch((error: any) => {
         notify(error, "error");
       });
+
+    setEditMode(false);
   };
 
   const handleCancelClick = () => {
     setEditMode(false);
+    setUser(initialUser); // Reset user to initial state if necessary
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -281,8 +293,11 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                     />
                     <span
                       onClick={() => {
-                        user.isTelVerified === "true" ?  () => {return} :
-                          showModal("Phone Number", user.tel) ;
+                        user.isTelVerified === "true"
+                          ? () => {
+                              return;
+                            }
+                          : showModal("Phone Number", user.tel);
                       }}
                       className={`absolute right-2 top-3 text-sm font-medium cursor-pointer ${
                         user.isTelVerified === "true"

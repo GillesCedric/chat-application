@@ -560,8 +560,9 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const response = await fetch(this.apiUrl + "/notifications/" +id, {
-        method: "POST",
+      const url = this.apiUrl + "/notifications/" + id;
+      const response = await fetch(url, {
+        method: "PUT",
         headers: {
           ...this.headers,
           ...headers,
@@ -573,7 +574,7 @@ export default class API {
       console.log("error " + error);
     }
     handleRequest = await this.handleRequest(responseData);
-    if (handleRequest) return this.updateNotifcation(data);
+    if (handleRequest) return this.updateNotifcation(id , data);
     return responseData;
   };
 }
