@@ -22,7 +22,7 @@ export default class NotificationController {
           error: "Cet utilisateur n'existe pas",
         });
       }
-
+      console.log(notifications);
       const decryptedNotifications = notifications.map(notification => {
         return {
           _id: notification._id,
