@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 
 export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const handleLogOut = () => {
-    console.log(csrfToken)
+    console.log(csrfToken);
     User.signOut({ _csrf: csrfToken })
       .then((response: any) => {
         if (response.error) {
@@ -18,7 +18,9 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
         } else {
           window.electron.store.set("chat-application-access_token", "");
           window.electron.store.set("chat-application-refresh_token", "");
-          notify("You'll be redirect to the home page" , "success" ,() => {navigate("/signin")})
+          notify("You'll be redirect to the signIn page", "success", () => {
+            navigate("/signin");
+          });
         }
       })
       .catch((error: any) => {
