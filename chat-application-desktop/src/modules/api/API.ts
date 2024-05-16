@@ -405,7 +405,9 @@ export default class API {
       console.log("error " + error);
     }
     handleRequest = await this.handleRequest(responseData);
-    if (handleRequest) return this.getNotifications();
+    if (handleRequest) return this.getNotifications().catch((error : any) => {
+      return { error : "Internal server error occur : " + error}
+    });
     return responseData;
   };
 

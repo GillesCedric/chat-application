@@ -6,6 +6,7 @@ import { notify } from "../components/toastify";
 import { Avatar } from "../components/Avatar";
 import { NotFound } from "../components/NotFound";
 import Modal from "../components/VerifyModal";
+import { ToastContainer } from "react-toastify";
 
 export const Settings = () => {
   const [csrfToken, setCsrfToken] = useState("");

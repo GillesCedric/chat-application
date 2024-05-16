@@ -58,7 +58,6 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
     }
   };
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
-  const navigate = useNavigate();
   useEffect(() => {
     fetchFriendRequests();
     fetchNotifications();
@@ -82,7 +81,6 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
 
   return (
     <>
-      <ToastContainer />
       <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
         <Link className="flex items-center hover:cursor-pointer" to="/">
           <img width={40} height={40} alt="Chat Application Icon" src="chat-application.png" />
@@ -122,7 +120,7 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
             isOpen={isDrawerOpen}
             onClose={() => setIsDrawerOpen(false)}
             initialNotifications={notifications}
-            csrfToken= {csrfToken}
+            csrfToken={csrfToken}
           />
         </nav>
       </header>

@@ -19,7 +19,7 @@ export const FriendRequestComponent = ({
   csrfToken,
 }: {
   friendRequest: any;
-    csrfToken: string;
+  csrfToken: string;
 }) => {
   const navigate = useNavigate();
   const friendRequestId: string = friendRequest._id;
@@ -71,7 +71,6 @@ export const FriendRequestComponent = ({
       .then((response: any) => {
         if (response.message) {
           notify("Friend request rejected", "success");
-          
         } else {
           notify(response.error, "error");
         }
@@ -101,7 +100,6 @@ export const FriendRequestComponent = ({
 
   return (
     <>
-      <ToastContainer />
       <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <div className="flex justify-between p-4">
           <span className="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
@@ -116,7 +114,7 @@ export const FriendRequestComponent = ({
             </svg>
             Since {formatDate(friendRequest.createdAt)}
           </span>
-          <button
+{/*           <button
             className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5"
             type="button"
             onClick={handleDelete}
@@ -125,7 +123,7 @@ export const FriendRequestComponent = ({
               icon={faTrash}
               className="w-5 h-5 hover:text-red-600"
             />
-          </button>
+          </button> */}
         </div>
         <div className="flex flex-col items-center pb-4">
           <Avatar
