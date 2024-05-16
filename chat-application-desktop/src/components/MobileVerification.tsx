@@ -4,12 +4,13 @@ import API from "../modules/api/API";
 import { notify } from "./toastify";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
 
 const MobileVerification: React.FC = () => {
   const [csrfToken, setCsrfToken] = useState("");
   const location = useLocation();
-  const is2FA : boolean = location.state?.is2FA || false;
-  const userId : string = location.state?.userId || "";
+  const is2FA: boolean = location.state?.is2FA || false;
+  const userId: string = location.state?.userId || "";
   useEffect(() => {
     API.getCSRFToken().then((data: any) => {
       setCsrfToken(data.token);
@@ -35,18 +36,24 @@ const MobileVerification: React.FC = () => {
 
   const navigate = useNavigate();
   let notificationShown = false;
+  const { authUser, setAuthUser } = useAuthContext();
 
   const submitCode = () => {
     if (notificationShown) return; // Prevent multiple notifications
 
     console.log("Verifying:", inputs.join(""));
     if (is2FA) {
-      User.checkCode2FA({ _csrf: csrfToken, userId : userId ,  code: inputs.join("") })
+      User.checkCode2FA({
+        _csrf: csrfToken,
+        userId: userId,
+        code: inputs.join(""),
+      })
         .then((response: any) => {
           if (response.message) {
             notificationShown = true;
             notify("Code correct.\n Redirecting ...", "success", () => {
-              navigate("/settings");
+              setAuthUser(response.access_token);
+              navigate("/");
             });
           } else {
             notificationShown = true;

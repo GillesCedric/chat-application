@@ -50,7 +50,7 @@ export default class NotificationRepository {
   ): Promise<any> {
     try {
       const response = await API.updateNotifcation(id, data, {
-        "csrf-token": data._csrf,
+        "csrf-token": data._csrf, 
       });
       if (response.message) {
         return { message: response.message };
