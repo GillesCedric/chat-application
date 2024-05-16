@@ -112,7 +112,7 @@ export default class UserController {
       if (tel && tel != Crypto.decrypt(user.tel, 'tel')) {
         updates.tel = Crypto.encrypt(tel, "tel");
         updates.isTelVerified = Crypto.encrypt("false", "boolean");
-      } 
+      }
       if (is2FAEnabled) {
 
         if (!user.isTelVerified) {
@@ -122,7 +122,7 @@ export default class UserController {
         }
 
         updates.is2FAEnabled = Crypto.encrypt(is2FAEnabled, "boolean");
-      } 
+      }
       // Mise à jour de l'utilisateur dans la base de données
       const updatedUser = await UserModel.findByIdAndUpdate(userId, updates, { new: true }).select("lastname firstname username tel email isEmailVerified isTelVerified is2FAEnabled picture status");
 
@@ -615,10 +615,10 @@ export default class UserController {
         return res.status(401).json({
           error: "Vous ne pouvez pas vous envoyer une demande d'amitié à vous même",
         })
-        
+
       }
-        if (user.friends.includes(friend.id)) {
-          return res.status(403).json({
+      if (user.friends.includes(friend.id)) {
+        return res.status(403).json({
           error: "Vous êtes déjà amis avec cet Utilisateur",
         })
       }

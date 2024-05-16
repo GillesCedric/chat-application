@@ -85,11 +85,8 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
       <ToastContainer />
       <header className="border-2 border-transparent bg-gray-50 text-black px-4 py-1 flex justify-between items-center">
         <Link className="flex items-center hover:cursor-pointer" to="/">
-          <FontAwesomeIcon
-            icon={faComments}
-            className=" bg-blue-500 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 p-2 mr-2"
-          />
-          <span className="font-semibold">ChatBOT</span>
+          <img width={40} height={40} alt="Chat Application Icon" src="chat-application.png" />
+          <span className="font-semibold">Chat-Application</span>
         </Link>
         <nav className="flex space-x-4 items-center justify-center">
           <Link
