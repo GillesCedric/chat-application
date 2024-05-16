@@ -122,6 +122,7 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
             isOpen={isDrawerOpen}
             onClose={() => setIsDrawerOpen(false)}
             initialNotifications={notifications}
+            csrfToken= {csrfToken}
           />
         </nav>
       </header>

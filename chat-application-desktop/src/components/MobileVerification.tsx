@@ -2,16 +2,20 @@ import React, { useState, useRef, useEffect } from "react";
 import User from "../modules/manager/User";
 import API from "../modules/api/API";
 import { notify } from "./toastify";
-import { Link,  useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
 
 const MobileVerification: React.FC = () => {
   const [csrfToken, setCsrfToken] = useState("");
-
+  const location = useLocation();
+  const is2FA: boolean = location.state?.is2FA || false;
+  const userId: string = location.state?.userId || "";
   useEffect(() => {
     API.getCSRFToken().then((data: any) => {
       setCsrfToken(data.token);
     });
+    console.log(is2FA);
   }, []);
 
   const [inputs, setInputs] = useState<string[]>(new Array(6).fill(""));
@@ -32,27 +36,52 @@ const MobileVerification: React.FC = () => {
 
   const navigate = useNavigate();
   let notificationShown = false;
+  const { authUser, setAuthUser } = useAuthContext();
 
   const submitCode = () => {
     if (notificationShown) return; // Prevent multiple notifications
 
     console.log("Verifying:", inputs.join(""));
-    User.checkCodeTel({ _csrf: csrfToken, code: inputs.join("") })
-      .then((response: any) => {
-        if (response.message) {
-          notificationShown = true;
-          notify(response.message, "success", () => {
-            navigate("/settings");
-          });
-        } else {
-          notificationShown = true;
-          notify(response.error, "error");
-        }
+    if (is2FA) {
+      User.checkCode2FA({
+        _csrf: csrfToken,
+        userId: userId,
+        code: inputs.join(""),
       })
-      .catch((error: any) => {
-        notificationShown = true;
-        notify(error, "error");
-      });
+        .then((response: any) => {
+          if (response.message) {
+            notificationShown = true;
+            notify("Code correct.\n Redirecting ...", "success", () => {
+              setAuthUser(response.access_token);
+              navigate("/");
+            });
+          } else {
+            notificationShown = true;
+            notify(response.error, "error");
+          }
+        })
+        .catch((error: any) => {
+          notificationShown = true;
+          notify(error, "error");
+        });
+    } else {
+      User.checkCodeTel({ _csrf: csrfToken, code: inputs.join("") })
+        .then((response: any) => {
+          if (response.message) {
+            notificationShown = true;
+            notify("Code correct.\n Redirecting ...", "success", () => {
+              navigate("/settings");
+            });
+          } else {
+            notificationShown = true;
+            notify(response.error, "error");
+          }
+        })
+        .catch((error: any) => {
+          notificationShown = true;
+          notify(error, "error");
+        });
+    }
   };
 
   const handleKeyDown = (
@@ -100,6 +129,7 @@ const MobileVerification: React.FC = () => {
       }
     });
   };
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     submitCode();
@@ -144,7 +174,7 @@ const MobileVerification: React.FC = () => {
                   : "bg-indigo-500 hover:bg-indigo-600"
               }`}
               disabled={isButtonDisabled}
-              onClick={() =>handleSubmit}
+              onClick={() => handleSubmit}
             >
               Verify Account
             </button>

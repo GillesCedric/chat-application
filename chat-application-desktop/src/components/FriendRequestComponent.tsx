@@ -19,7 +19,7 @@ export const FriendRequestComponent = ({
   csrfToken,
 }: {
   friendRequest: any;
-  csrfToken: string;
+    csrfToken: string;
 }) => {
   const navigate = useNavigate();
   const friendRequestId: string = friendRequest._id;
@@ -71,6 +71,7 @@ export const FriendRequestComponent = ({
       .then((response: any) => {
         if (response.message) {
           notify("Friend request rejected", "success");
+          
         } else {
           notify(response.error, "error");
         }

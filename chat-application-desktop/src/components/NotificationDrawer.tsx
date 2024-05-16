@@ -2,21 +2,37 @@ import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faBroom } from "@fortawesome/free-solid-svg-icons";
 import { Notification } from "./Notification";
-import { NotificationModel } from "../modules/manager/NotificationRepository";
+import NotificationRepository, { NotificationModel } from "../modules/manager/NotificationRepository";
+import { notify } from "./toastify";
 
 export const NotificationDrawer = ({
   isOpen,
   onClose,
   initialNotifications,
+  csrfToken,
 }: {
   isOpen: boolean;
   onClose: any;
   initialNotifications: NotificationModel[];
+  csrfToken: string;
 }) => {
   const drawerRef = useRef(null);
   const [notifications, setNotifications] =
     useState<NotificationModel[]>(initialNotifications);
-
+  const fetchNotifications = async () => {
+    try {
+      const response = await NotificationRepository.getNotifications();
+      if (response.data) {
+        setNotifications(response.data);
+      } else {
+        console.log(response.error);
+        notify(response.error, "error");
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      notify(error, "error");
+    }
+  };
   useEffect(() => {
     setNotifications(initialNotifications);
   }, [initialNotifications]);
@@ -27,7 +43,20 @@ export const NotificationDrawer = ({
     }
   };
 
-  const clearAllNotifications = () => {
+  const clearAllNotifications =  async () => {
+      try {
+        await Promise.all(
+          notifications.map((notification) =>
+            NotificationRepository.updateNotifications(notification._id, {
+              _csrf: csrfToken,
+            })
+          )
+        );
+        notify("All notifications marked as read", "success");
+        fetchNotifications();
+      } catch (error) {
+        notify("Error marking notifications as read", "error");
+      }
     setNotifications([]);
   };
 
@@ -59,6 +88,7 @@ export const NotificationDrawer = ({
             <Notification
               notifications={notifications}
               setNotifications={setNotifications}
+              csrfToken={csrfToken}
             />
           </div>
         )}
