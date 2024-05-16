@@ -18,7 +18,7 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
         } else {
           window.electron.store.set("chat-application-access_token", "");
           window.electron.store.set("chat-application-refresh_token", "");
-          notify("You'll be redirect to the signIn page", "success", () => {
+          notify("Redirecting ...", "success", () => {
             navigate("/signin");
           });
         }

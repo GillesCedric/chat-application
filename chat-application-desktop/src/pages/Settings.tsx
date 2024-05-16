@@ -30,14 +30,14 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [fieldToVerify, setFieldToVerify] = useState("");
   const [fieldToVerifyValue, setValueFieldToVerify] = useState("");
-
-  const [modifiedData, setModifiedData] = useState<{ [key: string]: any }>({});
+  const [initialUser, setInitialUser] = useState<UserModel | null>(null); // Store initial user data
 
   useEffect(() => {
     User.me()
       .then((response: any) => {
         if (response.data) {
           setUser(response.data);
+          setInitialUser(response.data); // Store initial user data
         } else {
           notify(response.error, "error");
         }
@@ -46,18 +46,31 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
         console.error(error);
         notify("Error loading user information", "error");
       });
-  }, []);
+  }, [editMode]);
 
   const handleUpdateClick = () => {
     setEditMode(true);
   };
 
-  const handleSaveClick = () => {
-    setEditMode(false);
-    User.updateProfile(modifiedData)
+  const handleSaveClick = (event: React.FormEvent) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    const dataToSave: { [key: string]: any } = { _csrf: csrfToken };
+
+    if (user && initialUser) {
+      for (const key in user) {
+        if ((user as any)[key] !== (initialUser as any)[key]) {
+          dataToSave[key] = (user as any)[key];
+        }
+      }
+    }
+
+    console.log(dataToSave);
+    User.updateProfile(dataToSave)
       .then((response: any) => {
         if (response.message) {
           notify(response.message, "success");
+          console.log("User update profile response", response.data);
         } else {
           notify(response.error, "error");
         }
@@ -65,16 +78,16 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
       .catch((error: any) => {
         notify(error, "error");
       });
+
+    setEditMode(false);
   };
 
   const handleCancelClick = () => {
     setEditMode(false);
-    // Reset modified data if necessary
-    setModifiedData({});
+    setUser(initialUser); // Reset user to initial state if necessary
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setModifiedData({ ...modifiedData, [field]: value });
     setUser({ ...user!, [field]: value });
   };
 
@@ -88,14 +101,21 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
     setIsOpen(false);
   };
 
+  const isVerified =
+    user?.isEmailVerified === "true" && user?.isTelVerified === "true";
+
+  const handle2FAToggle = () => {
+    if (isVerified) {
+      const new2FAStatus = user?.is2FAEnabled === "true" ? "false" : "true";
+      setUser({ ...user, is2FAEnabled: new2FAStatus });
+    }
+  };
+
   if (!user) {
     return (
       <NotFound errorMessage="Seem like we encounter an error loading your information 😞" />
     );
   }
-
-  const isVerified =
-    user.isEmailVerified === "true" && user.isTelVerified === "true";
 
   return (
     <>
@@ -225,22 +245,23 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       className={`shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
                         !editMode
                           ? "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
-                          : ""
+                          : "cursor-not-allowed mb-5 bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
                       }`}
                       value={user.email}
-                      readOnly={!editMode}
-                      onChange={(e) =>
-                        handleInputChange("email", e.target.value)
-                      }
+                      readOnly
                       required
                     />
                     <span
                       className={`absolute right-2 top-3 text-sm font-medium ${
                         user.isEmailVerified === "true"
                           ? "text-green-600"
-                          : "text-red-600"
+                          : "text-red-600 cursor-pointer"
                       }`}
-                      onClick={() => showModal("Email", user.email)}
+                      onClick={
+                        user.isEmailVerified === "true"
+                          ? undefined
+                          : () => showModal("Email", user.email)
+                      }
                     >
                       {user.isEmailVerified === "true"
                         ? "Verified ✅"
@@ -271,7 +292,13 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       required
                     />
                     <span
-                      onClick={() => showModal("Phone Number", user.tel)}
+                      onClick={() => {
+                        user.isTelVerified === "true"
+                          ? () => {
+                              return;
+                            }
+                          : showModal("Phone Number", user.tel);
+                      }}
                       className={`absolute right-2 top-3 text-sm font-medium cursor-pointer ${
                         user.isTelVerified === "true"
                           ? "text-green-600"
@@ -337,8 +364,10 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                   </div>
                   <label
                     htmlFor="2fa-verification"
-                    className={`relative flex items-center cursor-pointer ${
-                      !isVerified ? "opacity-50 cursor-not-allowed" : ""
+                    className={`relative flex items-center ${
+                      !isVerified
+                        ? "opacity-50 cursor-not-allowed"
+                        : "cursor-pointer"
                     }`}
                   >
                     <input
@@ -346,10 +375,12 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       id="2fa-verification"
                       className="sr-only"
                       checked={user.is2FAEnabled === "true"}
-                      readOnly={!isVerified}
+                      readOnly
+                      onClick={handle2FAToggle}
+                      disabled={!isVerified}
                     />
                     <span
-                      className={`h-6 w-11 rounded-full toggle-bg ${
+                      className={`h-6 w-11 rounded-full ${
                         user.is2FAEnabled === "true"
                           ? "bg-blue-600 border-blue-600"
                           : "bg-gray-200 border-gray-200"
@@ -364,11 +395,6 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
                       ></span>
                     </span>
                   </label>
-                </div>
-                <div className="mt-6">
-                  <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    Save all
-                  </button>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 /**
-*
-*Ce code définit une classe User qui encapsule les fonctionnalités liées à un utilisateur, telles que l'enregistrement, l'envoi de demandes d'amis, la mise à jour des demandes d'amis et la récupération des demandes d'amis. Les méthodes statiques fournies effectuent des opérations asynchrones en utilisant les méthodes correspondantes de la classe API pour interagir avec l'API distante. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API et fournir des messages d'erreur appropriés en cas d'échec.
+ *
+ *Ce code définit une classe User qui encapsule les fonctionnalités liées à un utilisateur, telles que l'enregistrement, l'envoi de demandes d'amis, la mise à jour des demandes d'amis et la récupération des demandes d'amis. Les méthodes statiques fournies effectuent des opérations asynchrones en utilisant les méthodes correspondantes de la classe API pour interagir avec l'API distante. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API et fournir des messages d'erreur appropriés en cas d'échec.
  * @module modules/manager/User
  */
 import API from "../api/API";
@@ -153,6 +153,7 @@ export default class User {
   public static async me(): Promise<any> {
     try {
       const response = await API.me();
+      console.log(response.user);
       if (response.error) {
         console.error("Failed to load user's data :", response.error);
         return { error: response.error };
@@ -170,8 +171,8 @@ export default class User {
         );
         return { error: "Failed to load user's data" };
       } else {
-/*         console.log(response);
- */        return { data: response.user };
+        /*         console.log(response);
+         */ return { data: response.user };
       }
     } catch (error) {
       console.error("Failed to load user's data :", error);
@@ -273,8 +274,36 @@ export default class User {
         "csrf-token": data._csrf,
       });
       if (response.message) {
-/*         console.log(response.message);
- */        return {
+        /*         console.log(response.message);
+         */ return {
+          message: response.message,
+        };
+      } else if (response.error) {
+        console.error(response.error);
+        return { error: response.error };
+      } else if (response.errors) {
+        console.log(response);
+        return {
+          error: +response.errors[0].msg,
+        };
+      }
+    } catch (error) {
+      console.error("Error while verifying code ", error);
+      return { error: error };
+    }
+  }
+  public static async checkCode2FA(data: {
+    _csrf: string;
+    code: string;
+    userId: string;
+  }): Promise<any> {
+    try {
+      const response = await API.checkCode2FA(data, {
+        "csrf-token": data._csrf,
+      });
+      if (response.message) {
+        /*         console.log(response.message);
+         */ return {
           message: response.message,
         };
       } else if (response.error) {
@@ -293,6 +322,7 @@ export default class User {
   }
   public static async updateProfile(data: any): Promise<any> {
     try {
+      console.log(data);
       const response = await API.updateProfile(data, {
         "csrf-token": data._csrf,
       });
@@ -302,10 +332,7 @@ export default class User {
           message: response.message,
         };
       } else if (response.error) {
-        console.error(
-          "Failed to update user info:",
-          response.error
-        );
+        console.error("Failed to update user info:", response.error);
         return { error: response.error };
       } else if (response.errors) {
         console.log(response);
