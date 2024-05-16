@@ -528,4 +528,52 @@ export default class API {
     if (handleRequest) return this.checkCodeTel(data);
     return responseData;
   };
+  public static readonly checkCode2FA = async (
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/users/connect", {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.checkCode2FA(data);
+    return responseData;
+  };
+
+  public static readonly updateNotifcation = async (
+    id : string, 
+    data: any,
+    headers: HeadersInit = {}
+  ): Promise<any> => {
+    let responseData = null;
+    let handleRequest = false;
+    try {
+      const response = await fetch(this.apiUrl + "/notifications/" +id, {
+        method: "POST",
+        headers: {
+          ...this.headers,
+          ...headers,
+        },
+        body: this.generateBody(data),
+      });
+      responseData = await response.json();
+    } catch (error) {
+      console.log("error " + error);
+    }
+    handleRequest = await this.handleRequest(responseData);
+    if (handleRequest) return this.updateNotifcation(data);
+    return responseData;
+  };
 }

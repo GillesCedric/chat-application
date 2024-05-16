@@ -8,10 +8,12 @@ export const NotificationDrawer = ({
   isOpen,
   onClose,
   initialNotifications,
+  csrfToken,
 }: {
   isOpen: boolean;
   onClose: any;
   initialNotifications: NotificationModel[];
+  csrfToken : string,
 }) => {
   const drawerRef = useRef(null);
   const [notifications, setNotifications] =

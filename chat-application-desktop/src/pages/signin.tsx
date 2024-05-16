@@ -20,7 +20,7 @@ export default function SignIn() {
       setCsrfToken(data.token);
     });
   }, []);
-
+  const navigate = useNavigate();
   const signIn = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     API.login(
@@ -32,8 +32,12 @@ export default function SignIn() {
       { "csrf-token": csrfToken }
     ).then((data: any) => {
       if (data.reason && data.reason == "2FAEnabled") {
-        // TODO redirect to code verification page
         console.log("Redirection");
+        notify("Redirecting to OTP verification...", "info", () => {
+          navigate("/verifyPage", {
+            state: { is2FA: true, userId: data.userId },
+          });
+        });
       } else if (data.message) {
         //window.electron.store.set('chat-application-access_token', data.access_token)
         //window.electron.store.set('chat-application-refresh_token', data.refresh_token)
@@ -54,9 +58,8 @@ export default function SignIn() {
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
+    <section className="bg-gray-50 dark:bg-gray-900 h-screen r">
       <ToastContainer />
-
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
