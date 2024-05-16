@@ -14,7 +14,11 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
       .then((response: any) => {
         if (response.error) {
           notify(response.error);
-          return;
+          if (
+            response.error ===
+            "Invalid CSRF token , please reload this page and try again !"
+          ){navigate("/")}
+            
         } else {
           window.electron.store.set("chat-application-access_token", "");
           window.electron.store.set("chat-application-refresh_token", "");
@@ -42,7 +46,6 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
       >
         <FontAwesomeIcon icon={faPowerOff} />
       </button>
-
       {modalVisible && (
         <div
           id="hs-custom-backdrop-modal"
