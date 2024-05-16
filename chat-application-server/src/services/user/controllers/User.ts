@@ -98,17 +98,12 @@ export default class UserController {
     }
   };
 
-  public readonly updateProfile = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    const userId = await JWTUtils.getUserFromToken(
-      req.body.access_token,
-      req.headers["user-agent"],
-      "access_token"
-    );
-    const { firstname, lastname, username, password, tel, is2FAEnabled } =
-      req.body;
+  public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
+    const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
+    const { firstname, lastname, username, password, tel, is2FAEnabled } = req.body
+
+    const user = await UserModel.findById(userId)
+
     try {
       const updates: {
         firstname?: string;
@@ -122,17 +117,16 @@ export default class UserController {
       if (firstname) updates.firstname = Crypto.encrypt(firstname, "database");
       if (lastname) updates.lastname = Crypto.encrypt(lastname, "database");
       if (username) updates.username = Crypto.encrypt(username, "username");
-      if (password)
-        updates.password = bcrypt.hashSync(
-          password,
-          Number.parseInt(process.env.SALT_ROUNDS)
-        );
-      const user = await UserModel.findById(userId);
-      if (tel) {
+      if (password) updates.password = bcrypt.hashSync(
+        password,
+        Number.parseInt(process.env.SALT_ROUNDS)
+      )
+      if (tel && tel != Crypto.decrypt(user.tel, 'tel')) {
         updates.tel = Crypto.encrypt(tel, "tel");
         updates.isTelVerified = Crypto.encrypt("false", "boolean");
       }
       if (is2FAEnabled) {
+
         if (!user.isTelVerified) {
           return res.status(401).json({
             error: "Votre numéro de téléphone n'est pas vérifié",
