@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
 export const getTime = (dateString?: string): string => {
   const now = dateString ? new Date(dateString) : new Date();
   const hours = now.getHours();
@@ -69,5 +68,20 @@ export const needsDateDivider = (currentMessage : any, previousMessage : any) =>
   const previousDate = new Date(previousMessage.createdAt).setHours(0, 0, 0, 0);
 /*   console.log(currentMessage , previousMessage)
  */  return currentDate !== previousDate;
+};
+
+// utils/useAuthNavigation.ts
+import { useAuthContext } from "../context/AuthContext";
+
+export const useAuthNavigation = () => {
+  const navigate = useNavigate();
+  const { setAuthUser } = useAuthContext();
+
+  const redirectToSignIn = () => {
+    setAuthUser(JSON.parse("null"));
+    navigate("/signin");console.log("I execute your shit")
+  };
+
+  return { redirectToSignIn };
 };
 

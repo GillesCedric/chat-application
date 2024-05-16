@@ -1,6 +1,6 @@
 /**
-*
-*Ce code définit une classe API qui facilite les requêtes HTTP vers une API distante. Il inclut des méthodes pour l'authentification, la vérification de l'authenticité des jetons, l'envoi de messages, la gestion des amis, etc. Les requêtes sont configurées avec des en-têtes comprenant des jetons d'authentification et sont envoyées avec les données nécessaires au format JSON. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API, notamment pour actualiser les jetons d'authentification et rediriger vers la page de connexion en cas d'erreur d'authentification.
+ *
+ *Ce code définit une classe API qui facilite les requêtes HTTP vers une API distante. Il inclut des méthodes pour l'authentification, la vérification de l'authenticité des jetons, l'envoi de messages, la gestion des amis, etc. Les requêtes sont configurées avec des en-têtes comprenant des jetons d'authentification et sont envoyées avec les données nécessaires au format JSON. Des gestionnaires d'erreurs sont inclus pour gérer les réponses de l'API, notamment pour actualiser les jetons d'authentification et rediriger vers la page de connexion en cas d'erreur d'authentification.
  * @module modules/API
  */
 import { Crypto } from "../crypto/Crypto";
@@ -10,8 +10,62 @@ import { redirect } from "react-router-dom";
 import Socket from "../socket/Socket";
 
 export type Method = "GET" | "HEAD" | "POST" | "OPTIONS";
-
+interface NavigationContext {
+  redirectToSignIn: () => void;
+}
 export default class API {
+  private static navigationContext: NavigationContext | null = null;
+
+  public static setNavigationContext(context: NavigationContext) {
+    API.navigationContext = context;
+  }
+
+  private static handleRequest = async (responseData: any) => {
+    if (
+      responseData.message &&
+      responseData.access_token &&
+      responseData.refresh_token
+    ) {
+      window.electron.store.set(
+        "chat-application-access_token",
+        responseData.access_token
+      );
+      window.electron.store.set(
+        "chat-application-refresh_token",
+        responseData.refresh_token
+      );
+      return false;
+    } else if (responseData.error && responseData.error === "unauthenticated") {
+      const access_token = window.electron.store.get(
+        "chat-application-access_token"
+      );
+      const refresh_token = window.electron.store.get(
+        "chat-application-refresh_token"
+      );
+      const response = await this.refreshTokens({
+        access_token,
+        refresh_token,
+      });
+      console.log("API ...");
+      if (response.message) {
+        console.log("API resposne message ...");
+        window.electron.store.set(
+          "chat-application-access_token",
+          response.access_token
+        );
+        window.electron.store.set(
+          "chat-application-refresh_token",
+          response.refresh_token
+        );
+        return true;
+      }
+      console.log("redirecting ...");
+      API.navigationContext?.redirectToSignIn();
+      return false;
+    }
+    return false;
+  };
+
   private static readonly tokenPrefix: string = "Bearer ";
 
   private static readonly apiUrl: string = `${CONFIG.api_url}/${CONFIG.api_basepath}/v${CONFIG.api_version}`;
@@ -56,50 +110,6 @@ export default class API {
     urlObject.searchParams.set("refresh_token", refresh_token);
 
     return urlObject.toString();
-  };
-
-  private static handleRequest = async (responseData: any) => {
-    if (
-      responseData.message &&
-      responseData.access_token &&
-      responseData.refresh_token
-    ) {
-      window.electron.store.set(
-        "chat-application-access_token",
-        responseData.access_token
-      );
-      window.electron.store.set(
-        "chat-application-refresh_token",
-        responseData.refresh_token
-      );
-      return false;
-    } else if (responseData.error && responseData.error == "unauthenticated") {
-      const access_token = window.electron.store.get(
-        "chat-application-access_token"
-      );
-      const refresh_token = window.electron.store.get(
-        "chat-application-refresh_token"
-      );
-      const response = await this.refreshTokens({
-        access_token,
-        refresh_token,
-      });
-      if (response.message) {
-        window.electron.store.set(
-          "chat-application-access_token",
-          response.access_token
-        );
-        window.electron.store.set(
-          "chat-application-refresh_token",
-          response.refresh_token
-        );
-        return true;
-      }
-      //TODO redirect to the login page
-      redirect("/signin");
-      return false;
-    }
-    return false;
   };
 
   public static readonly refreshTokens = async (

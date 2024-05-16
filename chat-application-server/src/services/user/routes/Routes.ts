@@ -14,7 +14,7 @@ export default class Routes {
       .get(...UserValidators.me, UserValidators.errors, this.userController.me)
       .patch(...UserValidators.updateProfile, UserValidators.errors, this.userController.updateProfile)
     app.route("/signin").post(rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
+      windowMs: 1500 * 600 * 3000, // 15 minutes
       max: 5, // Limite chaque IP à 5 tentatives de connexion par fenêtre de 15 minutes
       message: 'Trop de tentatives de connexion, veuillez réessayer après 15 minutes',
       standardHeaders: 'draft-7',
