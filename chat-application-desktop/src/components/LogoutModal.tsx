@@ -17,7 +17,7 @@ export const LogOutModal = ({ csrfToken }: { csrfToken: string }) => {
           if (
             response.error ===
             "Invalid CSRF token , please reload this page and try again !"
-          ){navigate("/")}
+          ){window.location.reload()}
             
         } else {
           window.electron.store.set("chat-application-access_token", "");
