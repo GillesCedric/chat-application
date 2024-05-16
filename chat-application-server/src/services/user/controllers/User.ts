@@ -89,6 +89,9 @@ export default class UserController {
   public readonly updateProfile = async (req: Request, res: Response): Promise<Response> => {
     const userId = await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], "access_token")
     const { firstname, lastname, username, password, tel, is2FAEnabled } = req.body
+
+    const user = await UserModel.findById(userId)
+
     try {
       const updates: {
         firstname?: string
@@ -106,12 +109,11 @@ export default class UserController {
         password,
         Number.parseInt(process.env.SALT_ROUNDS)
       )
-      if (tel) {
+      if (tel && tel != Crypto.decrypt(user.tel, 'tel')) {
         updates.tel = Crypto.encrypt(tel, "tel");
         updates.isTelVerified = Crypto.encrypt("false", "boolean");
       } 
       if (is2FAEnabled) {
-        const user = await UserModel.findById(userId)
 
         if (!user.isTelVerified) {
           return res.status(401).json({
