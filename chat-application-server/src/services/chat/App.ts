@@ -9,7 +9,7 @@ import { createServer as createHTTPServer, Server as HTTPServer } from "http"
 import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import mongoose from 'mongoose'
 import Routes from './routes/Routes'
-import { chatLogger as Logger } from '../../modules/logger/Logger'
+import { ChatLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'

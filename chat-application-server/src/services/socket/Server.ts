@@ -1,6 +1,6 @@
 import App from './App'
 import { Services, SocketKeywords } from '../../utils/Keywords'
-import { socketLogger as Logger } from '../../modules/logger/Logger'
+import { SocketLogger as Logger } from '../../modules/logger/Logger'
 import SERVICES from '../../config/services.json'
 import { Server as SocketServer } from "socket.io"
 import Socket from './Socket'

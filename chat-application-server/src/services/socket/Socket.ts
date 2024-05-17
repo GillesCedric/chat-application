@@ -4,6 +4,7 @@ import { SocketKeywords, Tokens } from "../../utils/Keywords";
 import { Server as SocketServer } from "socket.io"
 import JWTUtils from "../../modules/jwt/JWT";
 import { UserSocketModel } from "../../models/UserSocket";
+import { SocketLogger as Logger } from '../../modules/logger/Logger'
 
 
 
@@ -18,11 +19,10 @@ export default class Socket {
 		try {
 			const userSockets = await UserSocketModel.find({ user: userId })
 			userSockets.forEach((userSocket) => {
-				console.log("Emit socket event")
 				this.socket.to(userSocket.socket).emit(event, data)
 			});
 		} catch (err) {
-			console.log('Error sending message to user:', err);
+			Logger.error(err);
 		}
 
 	}
@@ -33,7 +33,7 @@ export default class Socket {
 		this.socket = socketServer
 
 		this.socket.on(SocketKeywords.connection, async (socket) => {
-			console.log("connection client")
+
 			try {
 
 				const userId = await JWTUtils.getUserFromToken(socket.handshake.headers['token'] as string, socket.handshake.headers["user-agent"] as string, Tokens.accessToken)
@@ -52,7 +52,7 @@ export default class Socket {
 				}
 
 			} catch (err) {
-				console.error('Error saving user socket:', err)
+				Logger.error(err)
 			}
 
 			// Pour gérer la déconnexion
@@ -63,13 +63,13 @@ export default class Socket {
 					await UserSocketModel.deleteOne({ socket: socket.id })
 
 				} catch (err) {
-					console.error('Error deleting user socket:', err)
+					Logger.error(err)
 				}
 
 			})
 
 			socket.on('message', (data) => {
-				console.log('received: %s', data)
+				Logger.log('received: %s', data)
 
 			});
 

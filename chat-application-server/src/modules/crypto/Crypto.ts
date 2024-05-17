@@ -167,7 +167,6 @@ export class Crypto {
 	}
 
 	public static readonly encryptSymmetricKey = (symmetricKey: Buffer, publicKey: string) => {
-		console.log(publicKey)
 
 		return crypto.publicEncrypt(
 			{

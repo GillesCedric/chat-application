@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { BlacklistedTokenModel } from "../../models/BlacklistedToken";
+//import { Apigwconsole as console } from '../../modules/logger/console'
 
 export type TokenType = "access_token" | "refresh_token"
 

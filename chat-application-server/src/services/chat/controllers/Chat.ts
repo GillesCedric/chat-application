@@ -8,6 +8,7 @@ import SERVICES from '../../../config/services.json'
 import mongoose from "mongoose";
 import { Crypto } from "../../../modules/crypto/Crypto";
 import { UserModel } from "../../../models/User";
+import { ChatLogger as Logger } from '../../../modules/logger/Logger'
 
 
 
@@ -24,7 +25,7 @@ export default class ChatController {
 
       return false
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return null
     }
 
@@ -43,7 +44,6 @@ export default class ChatController {
       }
 
       const symmetricKey = Crypto.generateSymmetricKey()
-      console.log(symmetricKey.toString('hex'))
 
       // Récupérer les clés publiques des membres et chiffrer la clé symétrique
       const encryptedKeys = await Promise.all(req.body.members.map(async (memberId: mongoose.Types.ObjectId) => {
@@ -102,7 +102,7 @@ export default class ChatController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible d'enregistrer la conversation",
       });
@@ -139,7 +139,7 @@ export default class ChatController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible de récupérer les chats de cette conversation",
       });
@@ -248,7 +248,6 @@ export default class ChatController {
       conversations = conversations.map(conversation => {
         // Déchiffrer les détails de chaque membre
         // Retourner la conversation mise à jour avec les membres déchiffrés
-        console.log(conversation);
         return {
           _id: conversation._id,
           lastMessage: {
@@ -271,7 +270,7 @@ export default class ChatController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible de récupérer la liste des conversations",
       });
@@ -306,7 +305,7 @@ export default class ChatController {
           error: "Le destinataire de cette conversation n'existe pas",
         });
       }
-      console.log(recipient)
+
       // Créer un nouvel objet chat
       const chat = new ChatModel({
         conversation: new mongoose.Types.ObjectId(req.params.id),
@@ -352,7 +351,7 @@ export default class ChatController {
       });
 
     } catch (error) {
-      console.error('Failed to add chat or update conversation:', error);
+      Logger.error('Failed to add chat or update conversation:', error);
       return res.status(401).json({
         error: "Failed to add chat or update conversation",
       });
@@ -375,7 +374,7 @@ export default class ChatController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible de mettre à jour les messages",
       });

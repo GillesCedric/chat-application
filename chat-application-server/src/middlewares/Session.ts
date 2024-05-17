@@ -1,19 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
 import JWTUtils from '../modules/jwt/JWT'
 import { Services, Tokens } from '../utils/Keywords'
-import { Method, protocol } from '../utils/HTTP'
+import { Code, Method, protocol } from '../utils/HTTP'
 import SERVICES from '../config/services.json'
+import { ApigwLogger as Logger } from '../modules/logger/Logger'
 
 
 export default class Session {
 
   public static readonly authenticate = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-    console.log(req.headers['user-agent'])
     if ((req.body.access_token && await JWTUtils.getUserFromToken(req.body.access_token, req.headers['user-agent'], Tokens.accessToken) != undefined) || (req.query.access_token && await JWTUtils.getUserFromToken(req.query.access_token as string, req.headers['user-agent'], Tokens.accessToken) != undefined)) {
       if (req.path.substring(req.path.indexOf('/') + 1, req.path.length) == 'images') {
         return next()
       } else if (req.path.substring(req.path.lastIndexOf('/') + 1, req.path.length) == 'signin') {
-        return res.status(401).json({ error: 'already authenticated' })
+        return res.status(Code.badRequest).json({ error: 'already authenticated' })
       } else {
         return next()
       }

@@ -113,7 +113,7 @@ class APIGWLogger extends Logger {
   }
 }
 
-export const apiGWLogger = new APIGWLogger()
+export const ApigwLogger = new APIGWLogger()
 
 class USERLogger extends Logger {
   constructor() {
@@ -122,7 +122,7 @@ class USERLogger extends Logger {
   }
 }
 
-export const userLogger = new USERLogger()
+export const UserLogger = new USERLogger()
 
 class CHATLogger extends Logger {
   constructor() {
@@ -131,7 +131,7 @@ class CHATLogger extends Logger {
   }
 }
 
-export const chatLogger = new CHATLogger()
+export const ChatLogger = new CHATLogger()
 
 
 class NOTIFICATIONLogger extends Logger {
@@ -143,11 +143,11 @@ class NOTIFICATIONLogger extends Logger {
 
 export const NotificationLogger = new NOTIFICATIONLogger()
 
-class SocketLogger extends Logger {
+class SOCKETLogger extends Logger {
   constructor() {
     super()
     this.serviceName = SERVICES[this.env][Services.socket].name
   }
 }
 
-export const socketLogger = new SocketLogger()
+export const SocketLogger = new SOCKETLogger()

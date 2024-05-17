@@ -8,7 +8,7 @@ import Socket from "../Socket"
 
 export default class SocketController {
   public readonly sendEventToUser = async (req: Request, res: Response): Promise<Response> => {
-    console.log("received")
+
     Socket.sendEventToUser(req.body.receiver, req.body.data, req.body.event)
 
     return res.status(Code.okay).json({

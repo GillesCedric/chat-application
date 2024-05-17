@@ -15,6 +15,7 @@ import Mailer from "../../../modules/mailer/Mailer";
 import fs from "fs";
 import path from "path";
 import { BlacklistedTokenModel } from "../../../models/BlacklistedToken";
+import { UserLogger as Logger } from '../../../modules/logger/Logger'
 
 export default class UserController {
   public readonly getAll = (req: Request, res: Response): Response => {
@@ -44,14 +45,13 @@ export default class UserController {
         }
         var friendsId = user.friends;
         UserModel.find({ id: { $in: friendsId } }).then((friends) => {
-          // console.log(friends);
           return res.status(200).json({
-            frineds: friends,
+            friends: friends,
           });
         });
       })
       .catch((error) => {
-        console.error(error);
+        Logger.error(error);
         return res.status(500).json({ error: "Internal Server Error" });
       });
   };
@@ -91,7 +91,7 @@ export default class UserController {
         user,
       });
     } catch (error) {
-      console.log(error);
+      Logger.log(error);
       return res.status(500).json({
         error: "Erreur lors de la vérification des informations",
       });
@@ -166,7 +166,7 @@ export default class UserController {
         },
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Erreur lors de la modifications des informations",
       });
@@ -270,7 +270,7 @@ export default class UserController {
         ),
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Cet utilisateur n'existe pas",
       });
@@ -337,7 +337,7 @@ export default class UserController {
       );
       return;
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Internal server Error",
       });
@@ -392,7 +392,7 @@ export default class UserController {
         message: "vérification effectuée avec succèss",
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Internal server Error",
       });
@@ -449,7 +449,7 @@ export default class UserController {
         message: "Message envoyé avec succèss",
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Internal server Error",
       });
@@ -502,7 +502,7 @@ export default class UserController {
         ),
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Internal server Error",
       });
@@ -611,7 +611,7 @@ export default class UserController {
       });
     } catch (error) {
       //TODO log the error
-      console.log(error);
+      Logger.error(error);
       return res.status(401).json({
         error: "Impossible d'enregistrer l'utilisateur",
       });
@@ -745,7 +745,7 @@ export default class UserController {
         message: "Demande d'amis envoyée avec succèss",
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(401).json({
         error: "Impossible d'envoyer la demande d'amis",
       });
@@ -793,7 +793,7 @@ export default class UserController {
         }),
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(401).json({
         error: "Internal server error",
       });
@@ -813,8 +813,6 @@ export default class UserController {
         req.headers["user-agent"],
         "access_token"
       );
-
-      console.log(userId);
 
       const user = await UserModel.findById(userId);
 
@@ -905,7 +903,7 @@ export default class UserController {
         });
       }
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(401).json({
         error: "Impossible de mettre à jour la demande d'amis",
       });
@@ -944,7 +942,7 @@ export default class UserController {
         });
       }
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Impossible d'effectuer la vérification",
       });
@@ -977,7 +975,7 @@ export default class UserController {
         message: "disconnection success",
       });
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       return res.status(500).json({
         error: "Cet utilisateur n'existe pas",
       });

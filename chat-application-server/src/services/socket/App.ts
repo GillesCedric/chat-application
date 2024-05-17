@@ -10,7 +10,7 @@ import { createServer as createHTTPSServer, Server as HTTPSServer } from "https"
 import { Server as SocketServer } from "socket.io"
 import Socket from './Socket'
 import BasicAuthentication from '../../middlewares/BasicAuthentication'
-import { socketLogger as Logger } from '../../modules/logger/Logger'
+import { SocketLogger as Logger } from '../../modules/logger/Logger'
 import { Method, protocol } from '../../utils/HTTP'
 import Session from '../../middlewares/Session'
 import { Services } from '../../utils/Keywords'

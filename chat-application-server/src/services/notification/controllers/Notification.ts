@@ -5,6 +5,7 @@ import { Code, headers, protocol } from "../../../utils/HTTP";
 import { Services, SocketKeywords, Tokens } from "../../../utils/Keywords";
 import { NotificationModel, NotificationStatus } from "../../../models/Notification";
 import SERVICES from '../../../config/services.json'
+import { NotificationLogger as Logger } from '../../../modules/logger/Logger'
 
 
 export default class NotificationController {
@@ -22,7 +23,7 @@ export default class NotificationController {
           error: "Cet utilisateur n'existe pas",
         });
       }
-      console.log(notifications);
+
       const decryptedNotifications = notifications.map(notification => {
         return {
           _id: notification._id,
@@ -41,7 +42,7 @@ export default class NotificationController {
       });
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(422).json({
         error: "Impossible de récupérer les notifications",
       });
@@ -79,7 +80,7 @@ export default class NotificationController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible d'envoyer la notification",
       });
@@ -102,7 +103,7 @@ export default class NotificationController {
       })
 
     } catch (error) {
-      console.log(error)
+      Logger.error(error)
       return res.status(401).json({
         error: "Impossible d'envoyer la notification",
       });

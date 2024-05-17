@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { Crypto } from '../modules/crypto/Crypto'
+import { Code } from '../utils/HTTP'
 
 
 export default class ImageAuthentication {
@@ -15,9 +16,9 @@ export default class ImageAuthentication {
                 if (authorization[0] == process.env.BASIC_APP_USERNAME && authorization[1] == process.env.BASIC_APP_PASSWORD)
                     next()
                 else
-                    return response.status(401).json({ error: 'Incorrect Authorization Header' });
+                    return response.status(Code.forbidden).json({ error: 'Incorrect Authorization Header' });
             } else {
-                return response.status(401).json({ error: 'Missing Authorization Header' });
+                return response.status(Code.forbidden).json({ error: 'Missing Authorization Header' });
             }
         }
 

@@ -1,6 +1,6 @@
 import App from './App'
 import SERVICES from '../../config/services.json'
-import { chatLogger as Logger } from '../../modules/logger/Logger'
+import { ChatLogger as Logger } from '../../modules/logger/Logger'
 import { Services } from '../../utils/Keywords'
 
 class Server {
