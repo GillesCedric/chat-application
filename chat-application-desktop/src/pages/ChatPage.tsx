@@ -144,8 +144,8 @@ const ChatPage = () => {
       });
   };
   const addMessage = () => {
-    notify("New message received", "info");
-  };
+/*     notify("New message received", "info");
+ */  };
 
   useEffect(() => {
     if (wasOnlineRef.current !== isOnline) {

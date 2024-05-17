@@ -50,11 +50,11 @@ const ChatHeader = ({ csrfToken }: { csrfToken: string }) => {
         setNotificationsCount(response.data.length);
       } else {
         console.log(response.error);
-        notify(response.error, "error");
+       /*  notify(response.error, "error"); */
       }
     } catch (error) {
       console.error("Error fetching friend requests:", error);
-      notify(error, "error");
+     /*  notify(error, "error"); */
     }
   };
   const { isConnected, subscribe, unsubscribe } = useSocketContext();

@@ -7,6 +7,7 @@ import { Avatar } from "../components/Avatar";
 import { NotFound } from "../components/NotFound";
 import Modal from "../components/VerifyModal";
 import { ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export const Settings = () => {
   const [csrfToken, setCsrfToken] = useState("");
@@ -34,6 +35,10 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
   const [initialUser, setInitialUser] = useState<UserModel | null>(null); // Store initial user data
 
   useEffect(() => {
+    me();
+  }, [editMode]);
+
+  const me = () => {
     User.me()
       .then((response: any) => {
         if (response.data) {
@@ -47,14 +52,13 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
         console.error(error);
         notify("Error loading user information", "error");
       });
-  }, [editMode]);
-
+  };
   const handleUpdateClick = () => {
     setEditMode(true);
   };
 
-  const handleSaveClick = (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission
+  const handleSaveClick = (event?: React.FormEvent) => {
+    if (event) event.preventDefault();
 
     const dataToSave: { [key: string]: any } = { _csrf: csrfToken };
 
@@ -70,7 +74,10 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
     User.updateProfile(dataToSave)
       .then((response: any) => {
         if (response.message) {
-          notify(response.message, "success");
+          notify("Reloading ...", "success", () => {
+            window.location.reload();
+          });
+
           console.log("User update profile response", response.data);
         } else {
           notify(response.error, "error");
@@ -108,8 +115,46 @@ const SettingPage = ({ csrfToken }: { csrfToken: string }) => {
   const handle2FAToggle = () => {
     if (isVerified) {
       const new2FAStatus = user?.is2FAEnabled === "true" ? "false" : "true";
-      setUser({ ...user, is2FAEnabled: new2FAStatus });
+      setUser((prevUser) => {
+        if (prevUser) {
+          const updatedUser = { ...prevUser, is2FAEnabled: new2FAStatus };
+          handleSaveClickWithUser(updatedUser);
+          return updatedUser;
+        }
+        return prevUser;
+      });
     }
+  };
+
+  const navigate = useNavigate();
+  const handleSaveClickWithUser = (updatedUser: UserModel) => {
+    const dataToSave: { [key: string]: any } = { _csrf: csrfToken };
+
+    if (updatedUser && initialUser) {
+      for (const key in updatedUser) {
+        if ((updatedUser as any)[key] !== (initialUser as any)[key]) {
+          dataToSave[key] = (updatedUser as any)[key];
+        }
+      }
+    }
+
+    console.log(dataToSave);
+    User.updateProfile(dataToSave)
+      .then((response: any) => {
+        if (response.message) {
+          notify("Reloading ...", "success", () => {
+            window.location.reload();
+          });
+          console.log("User update profile response", response.data);
+        } else {
+          notify(response.error, "error");
+        }
+      })
+      .catch((error: any) => {
+        notify(error, "error");
+      });
+
+    setEditMode(false);
   };
 
   if (!user) {
