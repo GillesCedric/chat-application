@@ -1,11 +1,22 @@
-import mongoose from "mongoose";
+/**
+ * Modèle pour les conversations.
+@module models/Conversation
+ */
 
+import mongoose, { Schema, Document } from "mongoose";
+
+/**
+ * Interface représentant une clé chiffrée dans la base de données.
+ */
 interface IEncryptedKey {
   user: mongoose.Types.ObjectId;
-  encryptedKey: String;
+  encryptedKey: string;
 }
 
-interface IConversation extends mongoose.Document {
+/**
+ * Interface représentant une conversation dans la base de données.
+ */
+interface IConversation extends Document {
   members: mongoose.Types.ObjectId[];
   encryptedKeys: IEncryptedKey[];
   chats: mongoose.Types.ObjectId[];
@@ -13,7 +24,10 @@ interface IConversation extends mongoose.Document {
   updatedAt: Date;
 }
 
-const encryptedKeySchema = new mongoose.Schema({
+/**
+ * Schéma mongoose pour les clés chiffrées.
+ */
+const encryptedKeySchema: Schema<IEncryptedKey> = new Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Users',
@@ -25,7 +39,10 @@ const encryptedKeySchema = new mongoose.Schema({
   },
 });
 
-const conversationSchema = new mongoose.Schema({
+/**
+ * Schéma mongoose pour les conversations.
+ */
+const conversationSchema: Schema<IConversation> = new Schema({
   members: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -51,6 +68,9 @@ const conversationSchema = new mongoose.Schema({
   timestamps: true // Gère automatiquement les champs createdAt et updatedAt
 });
 
+/**
+ * Middleware pour s'assurer de l'unicité des membres de la conversation et les trier par ID avant la sauvegarde.
+ */
 conversationSchema.pre('save', function (next) {
   // Assurer l'unicité des membres pour éviter les doublons
   this.members = Array.from(new Set(this.members));
@@ -60,4 +80,7 @@ conversationSchema.pre('save', function (next) {
   next();
 });
 
+/**
+ * Modèle mongoose pour les conversations.
+ */
 export const ConversationModel = mongoose.model<IConversation>('Conversations', conversationSchema);

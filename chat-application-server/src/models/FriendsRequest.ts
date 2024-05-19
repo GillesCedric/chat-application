@@ -1,3 +1,7 @@
+/**
+ * Modèle pour les demandes d'amis.
+@module models/FriendsRequest
+ */
 import mongoose from "mongoose";
 
 export enum FriendsRequestStatus {

@@ -1,3 +1,9 @@
+/**
+ * Ce code définit une série de classes et de méthodes pour valider des données dans une application Express.js. Il utilise le module express-validator pour effectuer des vérifications sur les requêtes HTTP. Les classes et méthodes spécifiées sont conçues pour valider différents types de requêtes liées aux utilisateurs, aux chats, et aux notifications.
+ * 
+ * @module middlewares/Validators
+ * 
+ */
 import { Request, Response, NextFunction } from 'express'
 import { body, param, query, validationResult } from 'express-validator'
 import { Code } from '../utils/HTTP'
