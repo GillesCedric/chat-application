@@ -1,9 +1,22 @@
+/**
+ * Middleware pour l'authentification de base.
+ * @module middlewares/BasicAuthentication
+ */
 import { Request, Response, NextFunction } from 'express'
 import { Crypto } from '../modules/crypto/Crypto'
 
-
+/**
+ * Middleware pour l'authentification de base.
+ */
 export default class BasicAuthentication {
 
+    /**
+     * Middleware pour authentifier les requêtes.
+     * @param request - L'objet requête Express.
+     * @param response - L'objet réponse Express.
+     * @param next - La fonction next à appeler pour passer au middleware suivant.
+     * @returns Rien.
+     */
     public static readonly authenticate = (request: Request, response: Response, next: NextFunction): any => {
 
         if (request.path.substring(request.path.lastIndexOf('/') + 1, request.path.length) == 'email') {

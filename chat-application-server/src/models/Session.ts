@@ -1,14 +1,25 @@
-import mongoose from "mongoose";
+/**
+ * Modèle pour les sessions.
+ * @module models/Session
+ */
 
-interface ISession extends mongoose.Document {
-  userAgent: string
-  token: string
-  validity: Date
+import mongoose, { Schema, Document } from "mongoose";
+
+/**
+ * Interface représentant une session dans la base de données.
+ */
+interface ISession extends Document {
+  userAgent: string;
+  token: string;
+  validity: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const sessionSchema = new mongoose.Schema({
+/**
+ * Schéma mongoose pour les sessions.
+ */
+const sessionSchema: Schema<ISession> = new Schema({
   userAgent: {
     type: String,
     required: true,
@@ -24,7 +35,7 @@ const sessionSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    index: { expires: '48h' }
+    index: { expires: '48h' } // Supprime automatiquement les sessions après 48 heures
   },
   updatedAt: {
     type: Date,
@@ -34,4 +45,7 @@ const sessionSchema = new mongoose.Schema({
   timestamps: true // Gère automatiquement les champs createdAt et updatedAt
 });
 
+/**
+ * Modèle mongoose pour les sessions.
+ */
 export const SessionModel = mongoose.model<ISession>("Sessions", sessionSchema);

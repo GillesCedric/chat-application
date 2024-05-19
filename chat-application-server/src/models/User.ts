@@ -1,3 +1,7 @@
+/**
+ * Modèle pour les utilisateurs.
+ * @module models/User
+ */
 import mongoose from "mongoose";
 
 export enum UserStatus {

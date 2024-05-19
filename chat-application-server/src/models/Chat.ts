@@ -1,15 +1,26 @@
-import mongoose from "mongoose";
+/**
+ * Modèle pour les chats.
+ * @module models/Chat
+ */
 
-interface IChat extends mongoose.Document {
+import mongoose, { Schema, Document } from "mongoose";
+
+/**
+ * Interface représentant un chat dans la base de données.
+ */
+interface IChat extends Document {
   conversation: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
   message: string;
-  readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }]
+  readBy: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
 
-const chatSchema = new mongoose.Schema({
+/**
+ * Schéma mongoose pour les chats.
+ */
+const chatSchema: Schema<IChat> = new Schema({
   conversation: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Conversations',
@@ -40,4 +51,7 @@ const chatSchema = new mongoose.Schema({
   timestamps: true // Gère automatiquement les champs createdAt et updatedAt
 });
 
+/**
+ * Modèle mongoose pour les chats.
+ */
 export const ChatModel = mongoose.model<IChat>('Chats', chatSchema);

@@ -22,7 +22,7 @@ export abstract class UserValidators extends Validators {
     public static readonly signUp = [
         body('firstname').escape().trim().stripLow().isAlphanumeric().notEmpty(),
         body('lastname').escape().trim().stripLow().isAlphanumeric().notEmpty(),
-        body('username', 'username must contains at least 6 characters, without specials characters').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }),
+        body('username', 'username must contains at least 6 characters, without spaces and specials characters').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }),
         body('tel').escape().trim().stripLow().isMobilePhone('fr-FR'),
         body('email').escape().trim().stripLow().isEmail(),
         body('password', 'Password must contains al least 8 characters, 1 lowercase, 1 uppercase and 1 symbol').escape().trim().stripLow().isStrongPassword(),
@@ -32,6 +32,10 @@ export abstract class UserValidators extends Validators {
     public static readonly signIn = [
         body('email').escape().trim().stripLow().isEmail(),
         body('password').escape().trim().stripLow().isStrongPassword(),
+    ]
+
+    public static readonly signOut = [
+        body('access_token').escape().trim().stripLow().isJWT(),
     ]
 
     public static readonly sendFriendRequest = [
@@ -67,8 +71,9 @@ export abstract class UserValidators extends Validators {
         body('access_token').escape().trim().stripLow().isJWT(),
         body('firstname').escape().trim().stripLow().isAlphanumeric().notEmpty().optional(),
         body('lastname').escape().trim().stripLow().isAlphanumeric().notEmpty().optional(),
-        body('username', 'username must contains at least 6 characters, without specials characters').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }).optional(),
+        body('username', 'username must contains at least 6 characters, without spaces and specials characters').escape().trim().stripLow().isAlphanumeric().isLength({ min: 6 }).optional(),
         body('password', 'Password must contains al least 8 characters, 1 lowercase, 1 uppercase and 1 symbol').escape().trim().stripLow().isStrongPassword().optional(),
+        body('tel').escape().trim().stripLow().isMobilePhone('fr-FR').optional(),
         body('is2FAEnabled').escape().trim().stripLow().isBoolean().optional(),
     ]
 
