@@ -79,11 +79,15 @@ export default function Register() {
     if (nextButtonRef.current) {
       if (visibility) {
         let wLength = "w-full";
-        if ( backButtonRef.current &&   backButtonRef.current.className !== "hidden") {
+        if (
+          backButtonRef.current &&
+          backButtonRef.current.className !== "hidden"
+        ) {
           wLength = "w-32";
         }
-          nextButtonRef.current.className = wLength + 
-            " text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
+        nextButtonRef.current.className =
+          wLength +
+          " text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800";
       } else {
         nextButtonRef.current.className = "hidden";
       }
@@ -396,7 +400,7 @@ export default function Register() {
     }
     return true;
   };
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const signUp = async () => {
     if (checkPassword()) {
       const userdata = {
@@ -408,7 +412,7 @@ export default function Register() {
         tel: telRef.current?.value.replace(/-/g, ""),
         picture: useInitials ? AVATAR_IDENTIFIERS.none : picture,
         _csrf: csrfTokenRef.current?.value,
-        publicKey: window.electron.security.getPublicKey()
+        publicKey: window.electron.security.getPublicKey(),
       };
       console.log(userdata);
       console.log(csrfToken);
@@ -418,8 +422,9 @@ export default function Register() {
           if (!response.message) {
             notify(response.error, "error");
           } else {
-            notify(response.message, "success");
-            navigate("/signin")
+            notify(response.message, "success", () => {
+              navigate("/signin");
+            });
           }
         })
         .catch((error: any) => {

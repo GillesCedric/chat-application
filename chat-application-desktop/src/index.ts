@@ -51,7 +51,7 @@ ipcMain.on("electron-security-getPublicKey", (event) => {
   event.returnValue = publicKey
 });
 
-const suffix = 1
+const suffix = 3
 //TODO remove the suffix in production
 //const suffix = crypto.randomInt(100)
 
@@ -158,8 +158,8 @@ app.on("ready", () => {
   security = new Security(suffix)
 
   /* Acces token persitency here */
-  //secureStore.set("chat-application-access_token", "null");
-  //secureStore.set("chat-application-refresh_token", "null");
+  secureStore.set("chat-application-access_token", "null");
+  secureStore.set("chat-application-refresh_token", "null");
 
   createWindow();
 

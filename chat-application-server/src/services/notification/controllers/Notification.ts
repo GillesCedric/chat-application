@@ -24,6 +24,7 @@ export default class NotificationController {
       }
       console.log(notifications);
       const decryptedNotifications = notifications.map(notification => {
+       
         return {
           _id: notification._id,
           sender: notification.sender,
