@@ -1,44 +1,70 @@
-import { Notification } from "./Notification";
-export class NotificationCenter {
-  private notifications: Notification[];
-  private static instance: NotificationCenter;
-  public constructor() {}
+/**
+ * Représente une notification.
+ * @module models/Notification
+ */
+import { NotificationTypes } from "../utils/keywords";
 
-  public static getInstance(): NotificationCenter {
-    if (!NotificationCenter.instance) {
-      NotificationCenter.instance = new NotificationCenter();
-    }
-    return NotificationCenter.instance;
+export class Notification {
+  private _id: number;
+  private _content: string;
+  private _isSeen: boolean;
+  public _type: NotificationTypes;
+
+  /**
+   * Crée une nouvelle instance de Notification.
+   * @param id L'identifiant de la notification.
+   * @param content Le contenu de la notification.
+   * @param type Le type de la notification.
+   */
+  public constructor(id: number, content: string, type: NotificationTypes) {
+    this._id = id;
+    this._content = content;
+    this._type = type;
+    this._isSeen = false;
   }
 
-  public  getNotifications(): Notification[] {
-    return this.notifications;
+  /**
+   * Récupère l'identifiant de la notification.
+   * @returns L'identifiant de la notification.
+   */
+  public get id(): number {
+    return this._id;
   }
-  public addNotification = (notification: Notification): void => {
-    this.notifications.push(notification);
-  };
-  public removeNotification = (notificationId: number): void => {
-    this.notifications = this.notifications.filter(
-      (notification) => notification.id != notificationId
-    );
-  };
-
-  public markAsRead(notificationId: number): void {
-    const notification = this.notifications.find(
-      (nofitication) => nofitication.id === notificationId
-    );
-    if (notification) {
-      notification.read = true;
-    }
+  /**
+   * Définit l'identifiant de la notification.
+   * @param value Le nouvel identifiant de la notification.
+   */
+  public set id(value: number) {
+    this._id = value;
   }
 
-  public markAllAsRead(): void {
-    this.notifications.forEach((notification: Notification) => {
-      notification.read = true;
-    });
+  /**
+   * Récupère le contenu de la notification.
+   * @returns Le contenu de la notification.
+   */
+  public get content(): string {
+    return this._content;
+  }
+  /**
+   * Définit le contenu de la notification.
+   * @param value Le nouveau contenu de la notification.
+   */
+  public set content(value: string) {
+    this._content = value;
   }
 
-  public deleteAll(): void {
-    this.notifications = [];
+  /**
+   * Indique si la notification a été lue.
+   * @returns true si la notification a été lue, sinon false.
+   */
+  public get read(): boolean {
+    return this._isSeen;
+  }
+  /**
+   * Définit si la notification a été lue.
+   * @param value true si la notification a été lue, sinon false.
+   */
+  public set read(value: boolean) {
+    this._isSeen = value;
   }
 }

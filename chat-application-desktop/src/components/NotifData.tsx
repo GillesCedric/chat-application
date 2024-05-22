@@ -5,7 +5,26 @@
  * 
  * @module components/NotifData
  */
-const notificationsData = [
+
+/**
+ * Interface décrivant une notification.
+ */
+interface Notification {
+  /** Identifiant unique de la notification. */
+  id: number;
+  /** Type de la notification (success, error, warning). */
+  type: "success" | "error" | "warning";
+  /** Message de la notification. */
+  message: string;
+  /** Indicateur de lecture de la notification. */
+  unread: boolean;
+}
+
+/** 
+ * Tableau contenant les données de notifications.
+ * @remarks Les notifications peuvent être de trois types : success, error, warning.
+ */
+const notificationsData: Notification[] = [
   {
     id: 1,
     type: "success",

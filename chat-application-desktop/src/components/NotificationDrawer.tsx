@@ -1,10 +1,34 @@
-import React, { useEffect, useRef, useState } from "react";
+/**
+ * Le composant NotificationDrawer est une fonction React qui affiche un tiroir latéral dans une application.
+ * Ce tiroir contient une liste de notifications, permettant à l'utilisateur de voir les dernières notifications reçues.
+ * Il offre également des fonctionnalités pour marquer toutes les notifications comme lues ou pour effacer toutes les notifications d'un seul coup.
+ * Le composant EmptySectionNotification est inclus pour afficher un message lorsque la liste de notifications est vide, indiquant à l'utilisateur qu'aucune nouvelle notification n'est disponible pour le moment.
+ * En résumé, le NotificationDrawer offre une interface conviviale pour gérer les notifications de l'application de manière efficace.
+ * 
+ * @module components/NotificationDrawer
+ */
+
+import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faBroom } from "@fortawesome/free-solid-svg-icons";
 import { Notification } from "./Notification";
 import NotificationRepository, { NotificationModel } from "../modules/manager/NotificationRepository";
 import { notify } from "./toastify";
 
+/**
+ * Propriétés pour le composant NotificationDrawer.
+ * @typedef {Object} NotificationDrawerProps
+ * @property {boolean} isOpen - Indique si le tiroir est ouvert.
+ * @property {Function} onClose - Fonction à appeler pour fermer le tiroir.
+ * @property {Array<Object>} initialNotifications - Liste initiale des notifications.
+ * @property {number} notificationCount - Nombre de notifications non lues.
+ */
+
+/**
+ * Composant NotificationDrawer.
+ * @param {NotificationDrawerProps} props - Les propriétés du composant.
+ * @returns {JSX.Element} Élément JSX représentant le tiroir de notifications.
+ */
 export const NotificationDrawer = ({
   isOpen,
   onClose,
@@ -37,26 +61,31 @@ export const NotificationDrawer = ({
     setNotifications(initialNotifications);
   }, [initialNotifications]);
 
-  const handleClose = (e: any) => {
+  /**
+   * Gère la fermeture du tiroir lorsque l'utilisateur clique en dehors de celui-ci.
+   * @param {React.MouseEvent} e - L'événement de clic.
+   */
+  const handleClose = (e: React.MouseEvent) => {
     if (drawerRef.current === e.target) {
       onClose();
     }
   };
 
-  const clearAllNotifications =  async () => {
-      try {
-        await Promise.all(
-          notifications.map((notification) =>
-            NotificationRepository.updateNotifications(notification._id, {
-              _csrf: csrfToken,
-            })
-          )
-        );
-        notify("All notifications marked as read", "success");
-        fetchNotifications();
-      } catch (error) {
-        notify("Error marking notifications as read", "error");
-      }
+  /**
+   * Marque toutes les notifications comme lues.
+   */
+  const markAllAsRead = () => {
+    const updatedNotifications = notifications.map((notification: any) => ({
+      ...notification,
+      unread: false,
+    }));
+    setNotifications(updatedNotifications);
+  };
+
+  /**
+   * Efface toutes les notifications.
+   */
+  const clearAllNotifications = () => {
     setNotifications([]);
   };
 
@@ -64,9 +93,8 @@ export const NotificationDrawer = ({
     <div
       ref={drawerRef}
       onClick={handleClose}
-      className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
+      className={`fixed inset-0 bg-black bg-opacity-15 backdrop-blur-lg transition-opacity z-50 ${isOpen ? " opacity-100" : "opacity-0 pointer-events-none"
+        }`}
     >
       <div
         className={`flex flex-col justify-between fixed inset-y-0 right-0 p-4 overflow-y-auto bg-white dark:bg-gray-700 w-80 duration-700 transition-transform transform ${
@@ -106,7 +134,12 @@ export const NotificationDrawer = ({
   );
 };
 
-export const EmptySectionNotification = () => {
+/**
+ * Composant EmptySectionNotification.
+ * Affiche un message lorsque la liste de notifications est vide.
+ * @returns {JSX.Element} Élément JSX représentant l'état vide des notifications.
+ */
+export const EmptySectionNotification: React.FC = () => {
   return (
     <div className="w-full flex items-center flex-wrap justify-center gap-10 h-screen">
       <div className="grid gap-4 w-60">
@@ -114,7 +147,7 @@ export const EmptySectionNotification = () => {
           className="w-42 h-12 mx-auto"
           style={{ filter: "drop-shadow(2px 4px 6px gray)" }}
           src="https://static.vecteezy.com/system/resources/previews/021/975/474/original/no-notification-3d-render-icon-illustration-with-transparent-background-empty-state-png.png"
-          alt="belt"
+          alt="No notifications"
         />
         <div>
           <h2 className="text-center text-black text-xl font-semibold leading-loose pb-2">

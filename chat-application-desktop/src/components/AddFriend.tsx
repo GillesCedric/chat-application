@@ -1,7 +1,5 @@
 /**
- * 
- * Ce code constitue un composant React pour l'ajout d'amis.Lorsque l'utilisateur clique sur le bouton "Send invitation", un modal s'ouvre pour saisir le nom d'utilisateur et un commentaire optionnel pour l'invitation.Le composant utilise la bibliothèque FontAwesome pour les icônes et React Toastify pour afficher les notifications.L'état du modal est géré via useState pour contrôler son ouverture et sa fermeture. Lorsque l'utilisateur soumet le formulaire, une requête est envoyée au serveur via l'API pour envoyer une demande d'ami.Les erreurs sont gérées et affichées à l'utilisateur via les notifications.
- * 
+ * Ce composant représente un bouton pour envoyer une invitation d'ami et un modal pour saisir le nom d'utilisateur et un commentaire optionnel.
  * @module components/AddFriend
  */
 
@@ -15,7 +13,10 @@ import { ToastContainer } from "react-toastify";
 import { DEFAULT_COMMENT } from "../utils/keywords";
 import API from "../modules/api/API";
 
-
+/**
+ * Ce composant représente un bouton pour envoyer une invitation d'ami et gère l'état du modal pour saisir le nom d'utilisateur et un commentaire optionnel.
+ * @returns {JSX.Element} Le bouton pour envoyer une invitation d'ami et le modal pour saisir le nom d'utilisateur et un commentaire optionnel.
+ */
 export const AddFriend = () => {
   // Close modal if clicked outside of it
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,6 +38,12 @@ export const AddFriend = () => {
   );
 };
 
+/**
+ * Ce composant représente le modal pour saisir le nom d'utilisateur et un commentaire optionnel pour une invitation d'ami.
+ * @param {Object} props Les props du composant.
+ * @param {Function} props.closeModal La fonction pour fermer le modal.
+ * @returns {JSX.Element} Le modal pour saisir le nom d'utilisateur et un commentaire optionnel pour une invitation d'ami.
+ */
 const FriendRequestModal = ({ closeModal }: { closeModal: any }) => {
   const modalRef = useRef();
   const [comment, setComment] = useState("");
@@ -124,7 +131,6 @@ const FriendRequestModal = ({ closeModal }: { closeModal: any }) => {
                   onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
-
               <div className="col-span-2">
                 <label
                   htmlFor="description"
@@ -158,3 +164,4 @@ const FriendRequestModal = ({ closeModal }: { closeModal: any }) => {
     </>
   );
 };
+

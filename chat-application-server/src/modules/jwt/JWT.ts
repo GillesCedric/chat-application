@@ -1,3 +1,9 @@
+/**
+ * Cette classe est utilisée pour gérer toutes les opérations JsonWebToken.
+ * 
+ * @module modules/jwt/JWT
+ * 
+ */
 import * as jwt from "jsonwebtoken";
 import { BlacklistedTokenModel } from "../../models/BlacklistedToken";
 //import { Apigwconsole as console } from '../../modules/logger/console'
@@ -6,31 +12,49 @@ export type TokenType = "access_token" | "refresh_token"
 
 /**
  * @class JWTUtils
- * @author Gilles Cédric
- * @description this class is used to handle oll the JsonWebToken operations
- * @abstract
- * @exports
- * @default
- * @since 22/05/2022
+ * @description Cette classe est utilisée pour gérer toutes les opérations JsonWebToken.
+
  */
 export default abstract class JWTUtils {
 
-  public static readonly generateTokenForUser: (id: string | number, userAgent: string, tokenType: TokenType) => string = (id: string, userAgent: string, tokenType: TokenType): string => {
-    return jwt.sign({ userId: id, userAgent: userAgent }, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY, { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY })
+  /**
+   * Génère un token pour un utilisateur spécifique.
+   * @param {string | number} id - L'identifiant de l'utilisateur.
+   * @param {string} userAgent - L'agent utilisateur.
+   * @param {TokenType} tokenType - Le type de token (access_token ou refresh_token).
+   * @returns {string} Le token généré.
+   */
+  public static readonly generateTokenForUser: (id: string | number, userAgent: string, tokenType: TokenType) => string = (
+    id: string,
+    userAgent: string,
+    tokenType: TokenType
+  ): string => {
+    return jwt.sign(
+      { userId: id, userAgent: userAgent },
+      tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY,
+      { expiresIn: tokenType == "access_token" ? process.env.ACCESS_TOKEN_DELAY : process.env.REFRESH_TOKEN_DELAY }
+    );
   }
-
-  public static readonly generateTokenWithData: (data: any) => string = (data: any): string => {
-    return jwt.sign(data, process.env.VERIFY_EMAIL_TOKEN_ENCRYPTION_KEY, { expiresIn: process.env.VERIFY_EMAIL_TOKEN_DELAY })
-  }
-
 
   /**
-   * @method parseToken
-   * @description this method is used to parse a given token
-   * @readonly
-   * @static
-   * @private
-   * @returns {string}
+   * Génère un token avec des données spécifiques.
+   * @param {any} data - Les données à inclure dans le token.
+   * @returns {string} Le token généré.
+   */
+  public static readonly generateTokenWithData: (data: any) => string = (
+    data: any
+  ): string => {
+    return jwt.sign(
+      data,
+      process.env.VERIFY_EMAIL_TOKEN_ENCRYPTION_KEY,
+      { expiresIn: process.env.VERIFY_EMAIL_TOKEN_DELAY }
+    );
+  }
+
+  /**
+   * Analyse un token donné.
+   * @param {string} token - Le token à analyser.
+   * @returns {string} Le token sans le préfixe "Bearer ".
    */
   public static readonly parseToken: (token: string) => string = (
     token: string
@@ -39,12 +63,11 @@ export default abstract class JWTUtils {
   };
 
   /**
-   * @method getUserFromToken
-   * @description this method is used to get a specific userId from a given token
-   * @readonly
-   * @static
-   * @private
-   * @returns {number}
+   * Récupère un utilisateur spécifique à partir d'un token donné.
+   * @param {string} token - Le token à analyser.
+   * @param {string} userAgent - L'agent utilisateur.
+   * @param {TokenType} tokenType - Le type de token (access_token ou refresh_token).
+   * @returns {Promise<string | undefined>} L'ID de l'utilisateur si trouvé, sinon undefined.
    */
   public static readonly getUserFromToken: (token: string, userAgent: string, tokenType: TokenType) => Promise<string | undefined> = async (
     token: string,
@@ -54,11 +77,12 @@ export default abstract class JWTUtils {
     token = this.parseToken(token)
     let userId = undefined;
     try {
-      const jwtToken = jwt.verify(token, tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY);
+      const jwtToken = jwt.verify(
+        token,
+        tokenType == "access_token" ? process.env.ACCESS_TOKEN_ENCRYPTION_KEY : process.env.REFRESH_TOKEN_ENCRYPTION_KEY
+      );
 
-      const blacklistedToken = await BlacklistedTokenModel.findOne({
-        token: token
-      })
+      const blacklistedToken = await BlacklistedTokenModel.findOne({ token: token });
 
       //@ts-ignore
       if (jwtToken && jwtToken.userAgent as unknown as string == userAgent && !blacklistedToken) {
@@ -72,9 +96,14 @@ export default abstract class JWTUtils {
     return userId;
   };
 
+  /**
+   * Récupère les données à partir d'un token donné.
+   * @param {string} token - Le token à analyser.
+   * @returns {any | undefined} Les données si trouvées, sinon undefined.
+   */
   public static readonly getDataFromToken: (token: string) => any | undefined = (
-    token: string): string | undefined => {
-
+    token: string
+  ): string | undefined => {
     let data = undefined;
 
     try {
@@ -82,7 +111,7 @@ export default abstract class JWTUtils {
 
       if (jwtToken) {
         //@ts-ignore
-        data = jwtToken
+        data = jwtToken;
       }
 
     } catch (error) {

@@ -1,4 +1,3 @@
-
 /**
  * La fonction NotifyAsync est une fonction utilitaire qui facilite la notification asynchrone des résultats d'une fonction asynchrone à l'aide de la bibliothèque react-toastify.
  * Cette fonction prend quatre arguments :
@@ -13,19 +12,23 @@
  * @module components/NotificationAsync
  */
 
-
-
-
-
 import { Zoom, toast } from "react-toastify";
+
+/**
+ * Affiche une notification asynchrone en fonction du résultat d'une fonction asynchrone.
+ * @param pendingMessage Le message à afficher pendant que l'opération asynchrone est en cours d'exécution.
+ * @param successMessage Le message à afficher si l'opération asynchrone réussit.
+ * @param errorMessage Le message à afficher si l'opération asynchrone échoue.
+ * @param asyncFunction La fonction asynchrone à exécuter.
+ */
 export const NotifyAsync = (
   pendingMessage: string,
   successMessage: string,
   errorMessage: string,
-  asyncFuction: () => Promise<any>
-) => {
+  asyncFunction: () => Promise<any>
+): void => {
   toast.promise(
-    asyncFuction(),
+    asyncFunction(),
     {
       pending: pendingMessage,
       success: successMessage,

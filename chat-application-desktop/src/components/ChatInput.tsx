@@ -1,5 +1,5 @@
 /**
- *Ce composant représente la zone de saisie du chat. Il permet à l'utilisateur d'entrer un message à envoyer. Il inclut des fonctionnalités telles que l'envoi de messages, l'affichage d'une sélection d'emoji, et l'ajustement automatique de la taille de la zone de texte en fonction du contenu. Le composant affiche également des boutons pour envoyer le message et ouvrir la sélection d'emoji. Lorsqu'un message est envoyé, il est transmis à la fonction onSendMessage fournie en tant que prop.
+ * Ce composant représente la zone de saisie du chat. Il permet à l'utilisateur d'entrer un message à envoyer. Il inclut des fonctionnalités telles que l'envoi de messages, l'affichage d'une sélection d'emoji, et l'ajustement automatique de la taille de la zone de texte en fonction du contenu. Le composant affiche également des boutons pour envoyer le message et ouvrir la sélection d'emoji. Lorsqu'un message est envoyé, il est transmis à la fonction onSendMessage fournie en tant que prop.
  * 
  * @module components/ChatInput
  */
@@ -14,6 +14,11 @@ import {
 import API from "../modules/api/API";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
+/**
+ * Réinitialise la taille de la zone de texte à sa valeur par défaut.
+ * 
+ * @param event L'événement de formulaire.
+ */
 function resetTextAreaToDefault(event: React.FormEvent): void {
   const textarea = event.currentTarget.querySelector("textarea");
   if (textarea) {
@@ -22,6 +27,11 @@ function resetTextAreaToDefault(event: React.FormEvent): void {
   }
 }
 
+/**
+ * Ajuste la taille de la zone de texte en fonction de son contenu.
+ * 
+ * @param element L'élément textarea.
+ */
 const textAreaAdjust = (element: HTMLTextAreaElement) => {
   element.style.height = "auto";
   element.style.height = `${element.scrollHeight}px`;
@@ -35,12 +45,36 @@ const textAreaAdjust = (element: HTMLTextAreaElement) => {
   }
 };
 
+/**
+ * Composant ChatInput.
+ */
 const ChatInput = ({
   onSendMessage,
 }: {
-  onSendMessage: (message: string) => void;
+  /**
+   * Fonction pour envoyer un message.
+   * 
+   * @param message Le message à envoyer.
+   * @param csrfToken Le jeton CSRF.
+   */
+  onSendMessage: (message: string, csrfToken: string) => void;
 }) => {
-  const [message, setMessage] = useState("");  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [message, setMessage] = useState("");
+  const [csrfToken, setCsrfToken] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const csrfTokenRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    API.getCSRFToken().then((data) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
+
+  /**
+   * Manipulateur de l'envoi de message.
+   * 
+   * @param event L'événement de formulaire.
+   */
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
     if (message.trim()) {
@@ -50,16 +84,25 @@ const ChatInput = ({
     resetTextAreaToDefault(event);
   };
 
+  /**
+   * Manipulateur de touche enfoncée.
+   * 
+   * @param event L'événement de clavier.
+   */
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       handleSend(event);
     }
   };
 
+  /**
+   * Manipulateur de clic sur emoji.
+   * 
+   * @param emojiObject Les données de l'emoji cliqué.
+   */
   const onEmojiClick = (emojiObject: any) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
     setShowEmojiPicker(false);
-    console.log(emojiObject);
   };
 
   return (

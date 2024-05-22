@@ -1,3 +1,13 @@
+/**
+ * Module contenant des utilitaires et des définitions liés aux communications réseau dans l'application.
+ * @module utils/networkUtils
+ */
+
+/**
+ * Enumération des mots-clés de socket.
+ * @readonly
+ * @enum {string}
+ */
 export enum SocketKeywords {
 	join = "join",
 	connection = "connection",
@@ -8,6 +18,11 @@ export enum SocketKeywords {
 	emit = "emit",
 }
 
+/**
+ * Enumération des services disponibles dans l'application.
+ * @readonly
+ * @enum {string}
+ */
 export enum Services {
 	user = "user",
 	chat = "chat",
@@ -16,6 +31,11 @@ export enum Services {
 	socket = "socket",
 }
 
+/**
+ * Enumération des types de jetons (tokens).
+ * @readonly
+ * @enum {string}
+ */
 export enum Tokens {
 	accessToken = "access_token",
 	refreshToken = "refresh_token",

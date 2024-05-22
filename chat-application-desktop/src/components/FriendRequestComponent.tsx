@@ -5,6 +5,7 @@
  *
  * @module components/FriendRequestComponent
  */
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import User from "../modules/manager/User";
@@ -14,10 +15,24 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { Avatar } from "./Avatar";
 
+/**
+ * Composant FriendRequestComponent.
+ * 
+ * Représente une demande d'ami dans l'interface utilisateur. Affiche les détails de la demande d'ami,
+ * y compris le nom de l'expéditeur, le commentaire, et la date de création.
+ * Les utilisateurs peuvent accepter ou rejeter la demande, ainsi que supprimer la demande.
+ * 
+ * @param friendRequest Un objet représentant la demande d'ami, incluant les informations sur l'expéditeur, le commentaire, et la date de création.
+ * @returns {JSX.Element} Le composant FriendRequestComponent.
+ */
 export const FriendRequestComponent = ({
   friendRequest,
   csrfToken,
 }: {
+  /**
+   * Un objet représentant la demande d'ami. 
+   * Contient les informations telles que l'identifiant de la demande, le nom de l'expéditeur, le commentaire, et la date de création.
+   */
   friendRequest: any;
   csrfToken: string;
 }) => {
@@ -91,9 +106,9 @@ export const FriendRequestComponent = ({
       }) +
       " " +
       date.toLocaleTimeString("en-US", {
-        hour: "2-digit", // "02"
-        minute: "2-digit", // "00"
-        second: "2-digit", // "00"
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       })
     );
   };

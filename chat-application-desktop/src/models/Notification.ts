@@ -1,3 +1,8 @@
+/**
+
+ *
+ * @module models/Notification
+ */
 import { NotificationTypes } from "../utils/keywords";
 
 export class Notification {
@@ -8,8 +13,8 @@ export class Notification {
 
   public constructor(id: number, content: string, type: NotificationTypes) {
     this._content = content;
-		this._type = type;
-		this._isSeen = false; 
+    this._type = type;
+    this._isSeen = false;
   }
 
   public get id(): number {

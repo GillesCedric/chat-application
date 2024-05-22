@@ -1,7 +1,12 @@
 /**
- *Le module Notification est un composant React utilisé pour afficher une liste de notifications dans une application. Chaque notification est représentée par un élément de la liste, affichant un message et une icône correspondant à son type (succès, erreur, avertissement). Le composant permet à l'utilisateur d'interagir avec les notifications en les marquant comme lues ou en les supprimant. Lorsque l'utilisateur clique sur l'icône "Marquer comme lu", la notification correspondante est mise à jour pour indiquer qu'elle a été lue. De même, lorsque l'utilisateur clique sur l'icône "Supprimer", la notification est retirée de la liste. En résumé, ce composant offre une interface conviviale pour gérer les notifications de l'application de manière interactive.
- *
  * @module components/Notification
+ * @description
+ * Le module Notification est un composant React utilisé pour afficher une liste de notifications dans une application.
+ * Chaque notification est représentée par un élément de la liste, affichant un message et une icône correspondant à son type (succès, erreur, avertissement).
+ * Le composant permet à l'utilisateur d'interagir avec les notifications en les marquant comme lues ou en les supprimant.
+ * Lorsque l'utilisateur clique sur l'icône "Marquer comme lu", la notification correspondante est mise à jour pour indiquer qu'elle a été lue.
+ * De même, lorsque l'utilisateur clique sur l'icône "Supprimer", la notification est retirée de la liste.
+ * En résumé, ce composant offre une interface conviviale pour gérer les notifications de l'application de manière interactive.
  */
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,6 +20,18 @@ import { NotificationStatus } from "../utils/keywords";
 import { formatDate } from "../utils/utilsFunctions";
 import { notify } from "./toastify";
 
+/**
+ * Propriétés du composant Notification.
+ * @typedef {Object} NotificationProps
+ * @property {Array<Object>} notifications - Les notifications à afficher.
+ * @property {Function} setNotifications - Fonction pour mettre à jour les notifications.
+ */
+
+/**
+ * Composant de notification.
+ * @param {NotificationProps} props - Les propriétés du composant.
+ * @returns {JSX.Element} Élément JSX représentant la liste des notifications.
+ */
 export const Notification = ({
   notifications,
   setNotifications,
@@ -39,6 +56,10 @@ export const Notification = ({
     }
   };
 
+  /**
+ * Gère le clic sur l'icône "Marquer comme lu" pour une notification donnée.
+ * @param {number} id - L'identifiant de la notification à marquer comme lue.
+ */
   const handleDismiss = (id: string) => {
     const newNotifications = notifications.map((notification: any) =>
       notification._id === id
@@ -64,7 +85,6 @@ export const Notification = ({
 
   return (
     <>
-     
       {notifications.map((notification: NotificationModel) => (
         <div
           key={notification._id}
