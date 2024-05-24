@@ -158,8 +158,8 @@ app.on("ready", () => {
   security = new Security(suffix)
 
   /* Acces token persitency here */
-  //secureStore.set("chat-application-access_token", "null");
-  //secureStore.set("chat-application-refresh_token", "null");
+  secureStore.set("chat-application-access_token", "null");
+  secureStore.set("chat-application-refresh_token", "null");
 
   createWindow();
 

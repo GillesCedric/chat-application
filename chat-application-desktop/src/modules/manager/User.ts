@@ -33,7 +33,7 @@ export default class User {
       });
       if (response.message) {
         console.log("Registration successful");
-        return { message: userData.username + " registration successful" };
+        return { message: userData.lastname +" " +userData.firstname + " registration successful.\n Redirecting..." };
       }
       if (response.error) {
         console.error(

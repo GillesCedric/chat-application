@@ -392,7 +392,7 @@ export default class API {
     let responseData = null;
     let handleRequest = false;
     try {
-      const url = await this.generateURL(this.apiUrl + "/notifications/");
+      const url =  this.generateURL(this.apiUrl + "/notifications");
       const response = await fetch(url, {
         method: "GET",
         headers: {
