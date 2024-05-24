@@ -69,6 +69,41 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
    */
   const checkAuthentication = async () => {
     // Logique de vérification de l'authentification...
+    const access_token = await window.electron.store.get(
+      "chat-application-access_token"
+    );
+    const refresh_token = await window.electron.store.get(
+      "chat-application-refresh_token"
+    );
+
+    const response = await API.checkAuthentication({
+      access_token,
+      refresh_token,
+    });
+    console.log(response);
+    if (response && response.message) {
+      return access_token;
+    } else if (response.error && response.error == "Invalid access token") {
+      const response2 = await API.refreshTokens({
+        access_token,
+        refresh_token,
+      });
+      if (response2 && response2.message) {
+        window.electron.store.set(
+          "chat-application-access_token",
+          response2.access_token
+        );
+        window.electron.store.set(
+          "chat-application-refresh_token",
+          response2.refresh_token
+        );
+        return response2.access_token;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   };
 
   // Appel de la fonction de vérification d'authentification au chargement du composant

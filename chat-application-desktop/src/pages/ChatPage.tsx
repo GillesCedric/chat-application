@@ -2,7 +2,7 @@
  * Cette page est celle visible par les utilisateurs pour converser avec les autres utilisateurs avec qui ils sont en contacts
  * @module pages/ChatPage
  */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react"; 
 import Conversations from "../components/Conversations";
 import { Conversation } from "../components/conversation";
 import ChatInput from "../components/ChatInput";
@@ -35,11 +35,11 @@ const ChatPage = () => {
   const { isConnected, subscribe, unsubscribe } = useSocketContext();
 
   const [csrfToken, setCsrfToken] = useState("");
-   useEffect(() => {
-     API.getCSRFToken().then((data: any) => {
-       setCsrfToken(data.token);
-     });
-   }, []);
+  useEffect(() => {
+    API.getCSRFToken().then((data: any) => {
+      setCsrfToken(data.token);
+    });
+  }, []);
   useEffect(() => {
     fetchConversations();
 
@@ -122,7 +122,7 @@ const ChatPage = () => {
     ConversationRepository.getConversations()
       .then(async (response: any) => {
         console.log(response);
-        if (!response.error) {
+        if (response.data) {
           const conversations = await Promise.all<ConversationModel[]>(
             response.data.map((conversation: ConversationModel) => {
               conversation.decryptedKey =
@@ -164,7 +164,8 @@ const ChatPage = () => {
       wasOnlineRef.current = isOnline;
     }
   }, [isOnline]);
-
+  console.log('test 2')
+  console.log(conversations)
   return (
     <div className="flex flex-col h-screen">
       {showBanner && <OfflineBanner isOnline={isOnline} />}
@@ -180,9 +181,8 @@ const ChatPage = () => {
         ) : (
           <>
             <aside
-              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${
-                conversations.length === 0 ? "" : "flex-none"
-              }`}
+              className={`overflow-y-auto w-1/4 scrollbar justify-center items-center p-2 border-grey-lighter shadow-sm  bg-white ${conversations.length === 0 ? "" : "flex-none"
+                }`}
             >
               <div className="sticky top-0 z-50">
                 <SearchBar />

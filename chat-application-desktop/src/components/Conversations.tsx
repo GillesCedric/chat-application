@@ -23,6 +23,8 @@ const ConversationItem = ({
     conversation: ConversationModel ) => void;
   isSelected: boolean;
   }) => {
+  console.log('test')
+  console.log(conversation)
   const decryptedKey = window.electron.security.decryptWithPrivateKey(conversation.encryptedKey)
   return (
     <div
